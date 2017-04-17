@@ -16,12 +16,14 @@
 #include "WatchFolder.h"
 #include "MTWorker.h"
 #include "stdio.h"
+#ifndef WIN_PLATFORM
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/sendfile.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#endif
 #include <iostream>
 #include <fstream>
 #include <ctime>
@@ -29,11 +31,11 @@
 #include <iterator>
 using namespace std;
 #ifdef WIN_PLATFORM
-    #include <direct.h>
-    #define GetCurrentDir _getcwd
+	#include <direct.h>
+	#define GetCurrentDir _getcwd
 #else
-    #include <unistd.h>
-    #define GetCurrentDir getcwd
+	#include <unistd.h>
+	#define GetCurrentDir getcwd
  #endif
 #ifdef MAC_PLATFORM
 #include "macUtils.h"
@@ -76,103 +78,100 @@ int MainProc(int argc, char *argv[] )
 	printf("output folder defined as %s\n", outdir);
 	printf("Will process %d PDF files\n",numFiles);
 	printf("Will create %d threads\n",numThreads);
-    ASInt32 loop = numFiles;
-    if (numFiles < numThreads)
-        loop = numThreads;
-    char firstFile[256], otherFile[256];    
+	ASInt32 loop = numFiles;
+	if (numFiles < numThreads)
+		loop = numThreads;
+	char firstFile[256], otherFile[256];    
 
-    
+	
 #ifdef WIN_PLATFORM
 	strcpy_safe(firstFile, "input.pdf");
-    printf("YL -- firstFile is %s\n", firstFile);	
-    for(ASInt32 index = 1; index < loop; index++)
-    {
-        //Copy Input.pdf to Input-[index].pdf
-        strcpy_safe(otherFile, folderName);
-        strcat_safe(otherFile, "\\input");
-        char str[50];
-        sprintf_safe(str, "-%d.pdf", index);
-        strcat_safe(otherFile, str);
-        BOOL b = CopyFile(firstFile, otherFile, 0);
-    }
+	for(ASInt32 index = 0; index < loop; index++)
+	{
+		//Copy Input.pdf to Input-[index].pdf
+		strcpy_safe(otherFile, folderName);
+		strcat_safe(otherFile, "\\input");
+		char str[50];
+		sprintf_safe(str, "-%d.pdf", index);
+		strcat_safe(otherFile, str);
+		BOOL b = CopyFile(firstFile, otherFile, 0);
+	}
 
 #else //Linux/Mac/Unix
 	strcpy(firstFile, "input.pdf");
-    printf("YL -- firstFile is %s\n", firstFile);
-    for(int index = 0; index < loop; index++)
-    {
-        //Copy Input.pdf to Input-[index].pdf
-        strcpy(otherFile, folderName);
-        strcat(otherFile, "/input");
-        char str[50];
-        sprintf(str, "-%d.pdf", index);
-        strcat(otherFile, str);
-        printf("YL -- otherFile is %s\n", otherFile);
-        
-        std::ofstream file(otherFile);
+	for(int index = 0; index < loop; index++)
+	{
+		//Copy Input.pdf to Input-[index].pdf
+		strcpy(otherFile, folderName);
+		strcat(otherFile, "/input");
+		char str[50];
+		sprintf(str, "-%d.pdf", index);
+		strcat(otherFile, str);
+		
+		std::ofstream file(otherFile);
 		if(file){
 			//Clean up previous exist file
 			if( remove( otherFile ) != 0 )
 			{
-				printf("YL -- not able to clean up %s\n", otherFile);
+				printf("error in clean up %s\n", otherFile);
 				return -1;
 			}
 		}
 		
 		int fd_to, fd_from;
-    	char buf[4096];
-    	ssize_t nread;
-    	int saved_errno;
-    	fd_from = open(firstFile, O_RDONLY);
-    	if (fd_from < 0)
-    	{
-    		printf("error in open original file\n");
-        	return -1;
-        }
+		char buf[4096];
+		ssize_t nread;
+		int saved_errno;
+		fd_from = open(firstFile, O_RDONLY);
+		if (fd_from < 0)
+		{
+			printf("error in open original file\n");
+			return -1;
+		}
 		fd_to = open(otherFile, O_WRONLY | O_CREAT | O_EXCL, 0666);
 		if (fd_to < 0)
 		{
 			printf("error in copy input file\n");
-        	goto out_error;
-        }
-    	while (nread = read(fd_from, buf, sizeof buf), nread > 0)
-    	{
-        	char *out_ptr = buf;
-        	ssize_t nwritten;
+			goto out_error;
+		}
+		while (nread = read(fd_from, buf, sizeof buf), nread > 0)
+		{
+			char *out_ptr = buf;
+			ssize_t nwritten;
 
-        	do {
-            	nwritten = write(fd_to, out_ptr, nread);
+			do {
+				nwritten = write(fd_to, out_ptr, nread);
 
-            	if (nwritten >= 0)
-            	{
-                	nread -= nwritten;
-                	out_ptr += nwritten;
-            	}
-            	else if (errno != EINTR)
-            	{
-                	goto out_error;
-            	}
-        	} while (nread > 0);
-    	}
+				if (nwritten >= 0)
+				{
+					nread -= nwritten;
+					out_ptr += nwritten;
+				}
+				else if (errno != EINTR)
+				{
+					goto out_error;
+				}
+			} while (nread > 0);
+		}
 	
-    	if (nread == 0)
-    	{
-        	if (close(fd_to) < 0)
-        	{
-            	fd_to = -1;
-            	goto out_error;
-        	}
-        	close(fd_from);
-        	/* Success! */
-    	}
+		if (nread == 0)
+		{
+			if (close(fd_to) < 0)
+			{
+				fd_to = -1;
+				goto out_error;
+			}
+			close(fd_from);
+			/* Success! */
+		}
 
 out_error:
-    	saved_errno = errno;
+		saved_errno = errno;
 
-    	close(fd_from);
-    	if (fd_to >= 0)
-        	close(fd_to);
-    }
+		close(fd_from);
+		if (fd_to >= 0)
+			close(fd_to);
+	}
 #endif //WIN_PLATFORM
 
 	//create the ASPathName
