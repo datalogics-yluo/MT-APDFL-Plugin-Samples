@@ -20,7 +20,6 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/sendfile.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #endif
@@ -64,8 +63,8 @@ int MainProc(int argc, char *argv[] )
 #else
 	pthread_attr_t *pattr = NULL;
 #endif
-	ASInt32 numFiles = 10;
-	ASInt32 numThreads = 10;
+	ASInt32 numFiles = 20;
+	ASInt32 numThreads = 20;
 	if (argc > 5) {
 		printf( "Usage: %s folderPath outdir [numfiles [numthreads]]\n", argv[0] );
 		printf("The folder path must be absolute\n");

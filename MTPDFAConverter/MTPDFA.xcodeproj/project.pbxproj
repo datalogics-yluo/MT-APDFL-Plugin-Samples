@@ -1,0 +1,872 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2E33C4021E81732B000FA07B /* MTmain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2E33C4001E81732B000FA07B /* MTmain.cpp */; };
+		2E33C4031E81732B000FA07B /* MTWorker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2E33C4011E81732B000FA07B /* MTWorker.cpp */; };
+		2E33C4051E817505000FA07B /* DL150PDFSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E33C4041E817505000FA07B /* DL150PDFSettings.framework */; };
+		2E33C4061E81752C000FA07B /* DL150PDFSettings.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2E33C4041E817505000FA07B /* DL150PDFSettings.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2E33C40A1E81757B000FA07B /* DL150PDFPort.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E33C4091E81757B000FA07B /* DL150PDFPort.framework */; };
+		2E33C40B1E817596000FA07B /* DL150PDFPort.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2E33C4091E81757B000FA07B /* DL150PDFPort.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		335728010C9B424E0095FC3D /* DL150ACE.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335727F70C9B424E0095FC3D /* DL150ACE.framework */; };
+		335728020C9B424E0095FC3D /* DL150AGM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335727F80C9B424E0095FC3D /* DL150AGM.framework */; };
+		335728030C9B424E0095FC3D /* DL150ARE.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335727F90C9B424E0095FC3D /* DL150ARE.framework */; };
+		335728040C9B424E0095FC3D /* DL150AXE8SharedExpat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335727FA0C9B424E0095FC3D /* DL150AXE8SharedExpat.framework */; };
+		335728050C9B424E0095FC3D /* DL150BIB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335727FB0C9B424E0095FC3D /* DL150BIB.framework */; };
+		335728060C9B424E0095FC3D /* DL150BIBUtils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335727FC0C9B424E0095FC3D /* DL150BIBUtils.framework */; };
+		335728070C9B424E0095FC3D /* DL150CoolType.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335727FD0C9B424E0095FC3D /* DL150CoolType.framework */; };
+		335728090C9B424E0095FC3D /* DL150PDFL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335727FF0C9B424E0095FC3D /* DL150PDFL.framework */; };
+		335728170C9B42530095FC3D /* DL150ACE.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335727F70C9B424E0095FC3D /* DL150ACE.framework */; };
+		335728180C9B42530095FC3D /* DL150AGM.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335727F80C9B424E0095FC3D /* DL150AGM.framework */; };
+		335728190C9B42530095FC3D /* DL150ARE.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335727F90C9B424E0095FC3D /* DL150ARE.framework */; };
+		3357281A0C9B42530095FC3D /* DL150AXE8SharedExpat.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335727FA0C9B424E0095FC3D /* DL150AXE8SharedExpat.framework */; };
+		3357281B0C9B42530095FC3D /* DL150BIB.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335727FB0C9B424E0095FC3D /* DL150BIB.framework */; };
+		3357281C0C9B42530095FC3D /* DL150BIBUtils.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335727FC0C9B424E0095FC3D /* DL150BIBUtils.framework */; };
+		3357281D0C9B42530095FC3D /* DL150CoolType.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335727FD0C9B424E0095FC3D /* DL150CoolType.framework */; };
+		3357281F0C9B42530095FC3D /* DL150PDFL.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335727FF0C9B424E0095FC3D /* DL150PDFL.framework */; };
+		3EC92F870F98F6CE00505316 /* DL150JP2KLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EC92F860F98F6CE00505316 /* DL150JP2KLib.framework */; };
+		3EC92F8A0F98F6D400505316 /* DL150AdobeXMP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EC92F890F98F6D400505316 /* DL150AdobeXMP.framework */; };
+		3EC92F8E0F98F6E600505316 /* ICUData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EC92F8C0F98F6E600505316 /* ICUData.framework */; };
+		3EC92F8F0F98F6E600505316 /* ICUConverter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EC92F8D0F98F6E600505316 /* ICUConverter.framework */; };
+		3EC92F940F98F6F600505316 /* DL150AdobeXMP.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3EC92F890F98F6D400505316 /* DL150AdobeXMP.framework */; };
+		3EC92F950F98F6FA00505316 /* DL150JP2KLib.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3EC92F860F98F6CE00505316 /* DL150JP2KLib.framework */; };
+		3EC92F960F98F70000505316 /* ICUData.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3EC92F8C0F98F6E600505316 /* ICUData.framework */; };
+		3EC92F970F98F70000505316 /* ICUConverter.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3EC92F8D0F98F6E600505316 /* ICUConverter.framework */; };
+		8D0C4E920486CD37000505A6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20286C33FDCF999611CA2CEA /* Foundation.framework */; };
+		BA0654DB0AC34D340029CB3D /* PDFLInitCommon.c in Sources */ = {isa = PBXBuildFile; fileRef = BA0654DA0AC34D340029CB3D /* PDFLInitCommon.c */; };
+		BA18F3700885D7D300B9CC28 /* MyPDFLibApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BA18F36F0885D7D300B9CC28 /* MyPDFLibApp.cpp */; };
+		BA18F3720885D7DA00B9CC28 /* MyPDFLibUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BA18F3710885D7DA00B9CC28 /* MyPDFLibUtils.cpp */; };
+		BA18F3740885D7E400B9CC28 /* macutils.c in Sources */ = {isa = PBXBuildFile; fileRef = BA18F3730885D7E400B9CC28 /* macutils.c */; };
+		BA2E45960888421A0081FD28 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA2E45950888421A0081FD28 /* ApplicationServices.framework */; };
+		BA568C160A47467400825A50 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA568C150A47467400825A50 /* CoreServices.framework */; };
+		BA6D7D520ACDCEFD00629526 /* WatchFolder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BA6D7D4E0ACDCEFD00629526 /* WatchFolder.cpp */; };
+		BA93648A0B653CD200FE4E0A /* PDFLPrecompile.pch in Headers */ = {isa = PBXBuildFile; fileRef = BA44EDBA0ADABD7B00A1208A /* PDFLPrecompile.pch */; };
+		BA9365020B653CE200FE4E0A /* ToolkitInitEASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364920B653CE200FE4E0A /* ToolkitInitEASF.h */; };
+		BA9365030B653CE200FE4E0A /* XtnMgrEASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364930B653CE200FE4E0A /* XtnMgrEASF.h */; };
+		BA9365040B653CE200FE4E0A /* XtnMgrE.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364940B653CE200FE4E0A /* XtnMgrE.h */; };
+		BA9365050B653CE200FE4E0A /* EReturnValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364950B653CE200FE4E0A /* EReturnValidator.h */; };
+		BA9365060B653CE200FE4E0A /* PDMetadataErrorASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364960B653CE200FE4E0A /* PDMetadataErrorASF.h */; };
+		BA9365070B653CE200FE4E0A /* PDMetadataError.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364970B653CE200FE4E0A /* PDMetadataError.h */; };
+		BA9365080B653CE200FE4E0A /* PIExcept.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364980B653CE200FE4E0A /* PIExcept.h */; };
+		BA9365090B653CE200FE4E0A /* PDSysFont.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364990B653CE200FE4E0A /* PDSysFont.h */; };
+		BA93650A0B653CE200FE4E0A /* PDSWriteProcs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA93649A0B653CE200FE4E0A /* PDSWriteProcs.h */; };
+		BA93650B0B653CE200FE4E0A /* ASProcs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA93649B0B653CE200FE4E0A /* ASProcs.h */; };
+		BA93650C0B653CE200FE4E0A /* ASKey.h in Headers */ = {isa = PBXBuildFile; fileRef = BA93649C0B653CE200FE4E0A /* ASKey.h */; };
+		BA93650D0B653CE200FE4E0A /* FontSvrE.h in Headers */ = {isa = PBXBuildFile; fileRef = BA93649D0B653CE200FE4E0A /* FontSvrE.h */; };
+		BA93650E0B653CE200FE4E0A /* CosSynE.h in Headers */ = {isa = PBXBuildFile; fileRef = BA93649E0B653CE200FE4E0A /* CosSynE.h */; };
+		BA93650F0B653CE200FE4E0A /* CosProcs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA93649F0B653CE200FE4E0A /* CosProcs.h */; };
+		BA9365100B653CE200FE4E0A /* PDFLPrint.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364A00B653CE200FE4E0A /* PDFLPrint.h */; };
+		BA9365110B653CE200FE4E0A /* PDFLInitHFT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364A10B653CE200FE4E0A /* PDFLInitHFT.h */; };
+		BA9365120B653CE200FE4E0A /* PDFLInitCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364A20B653CE200FE4E0A /* PDFLInitCommon.h */; };
+		BA9365130B653CE200FE4E0A /* PDFLHFTVers.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364A30B653CE200FE4E0A /* PDFLHFTVers.h */; };
+		BA9365140B653CE200FE4E0A /* PDFLHFT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364A40B653CE200FE4E0A /* PDFLHFT.h */; };
+		BA9365150B653CE200FE4E0A /* PDFLExpT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364A50B653CE200FE4E0A /* PDFLExpT.h */; };
+		BA9365160B653CE200FE4E0A /* PDFLErrorsFromASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364A60B653CE200FE4E0A /* PDFLErrorsFromASF.h */; };
+		BA9365170B653CE200FE4E0A /* ASGenE.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364A70B653CE200FE4E0A /* ASGenE.h */; };
+		BA9365180B653CE200FE4E0A /* ASFileEASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364A80B653CE200FE4E0A /* ASFileEASF.h */; };
+		BA9365190B653CE200FE4E0A /* ASFileE.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364A90B653CE200FE4E0A /* ASFileE.h */; };
+		BA93651A0B653CE200FE4E0A /* FontSvrEASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364AA0B653CE200FE4E0A /* FontSvrEASF.h */; };
+		BA93651B0B653CE200FE4E0A /* Environ.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364AB0B653CE200FE4E0A /* Environ.h */; };
+		BA93651C0B653CE200FE4E0A /* PIRequir.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364AC0B653CE200FE4E0A /* PIRequir.h */; };
+		BA93651D0B653CE200FE4E0A /* EncConvE.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364AD0B653CE200FE4E0A /* EncConvE.h */; };
+		BA93651E0B653CE200FE4E0A /* CosSynEASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364AE0B653CE200FE4E0A /* CosSynEASF.h */; };
+		BA93651F0B653CE200FE4E0A /* PagePDECntCalls.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364AF0B653CE200FE4E0A /* PagePDECntCalls.h */; };
+		BA9365200B653CE200FE4E0A /* PageE.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364B00B653CE200FE4E0A /* PageE.h */; };
+		BA9365210B653CE200FE4E0A /* RasterE.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364B10B653CE200FE4E0A /* RasterE.h */; };
+		BA9365220B653CE200FE4E0A /* ToolkitInitE.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364B20B653CE200FE4E0A /* ToolkitInitE.h */; };
+		BA9365230B653CE200FE4E0A /* SmartPDPage.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364B30B653CE200FE4E0A /* SmartPDPage.h */; };
+		BA9365240B653CE200FE4E0A /* RasterEASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364B40B653CE200FE4E0A /* RasterEASF.h */; };
+		BA9365250B653CE200FE4E0A /* Plugin.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364B50B653CE200FE4E0A /* Plugin.h */; };
+		BA9365260B653CE200FE4E0A /* PIPokes.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364B60B653CE200FE4E0A /* PIPokes.h */; };
+		BA9365270B653CE200FE4E0A /* PIMain.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364B70B653CE200FE4E0A /* PIMain.h */; };
+		BA9365280B653CE200FE4E0A /* PICommon.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364B80B653CE200FE4E0A /* PICommon.h */; };
+		BA9365290B653CE200FE4E0A /* PgCntProcs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364B90B653CE200FE4E0A /* PgCntProcs.h */; };
+		BA93652A0B653CE200FE4E0A /* PEWProcs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364BA0B653CE200FE4E0A /* PEWProcs.h */; };
+		BA93652B0B653CE200FE4E0A /* PEWCalls.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364BB0B653CE200FE4E0A /* PEWCalls.h */; };
+		BA93652C0B653CE200FE4E0A /* PETypes.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364BC0B653CE200FE4E0A /* PETypes.h */; };
+		BA93652D0B653CE200FE4E0A /* PERProcs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364BD0B653CE200FE4E0A /* PERProcs.h */; };
+		BA93652E0B653CE200FE4E0A /* PERCalls.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364BE0B653CE200FE4E0A /* PERCalls.h */; };
+		BA93652F0B653CE200FE4E0A /* PEExpT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364BF0B653CE200FE4E0A /* PEExpT.h */; };
+		BA9365300B653CE200FE4E0A /* PEErrorASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364C00B653CE200FE4E0A /* PEErrorASF.h */; };
+		BA9365310B653CE200FE4E0A /* PEVers.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364C10B653CE200FE4E0A /* PEVers.h */; };
+		BA9365320B653CE200FE4E0A /* PDSysFT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364C20B653CE200FE4E0A /* PDSysFT.h */; };
+		BA9365330B653CE200FE4E0A /* PDSysFontExpT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364C30B653CE200FE4E0A /* PDSysFontExpT.h */; };
+		BA9365340B653CE200FE4E0A /* PDSReadCalls.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364C40B653CE200FE4E0A /* PDSReadCalls.h */; };
+		BA9365350B653CE200FE4E0A /* PDSExpT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364C50B653CE200FE4E0A /* PDSExpT.h */; };
+		BA9365360B653CE200FE4E0A /* PDSErrorASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364C60B653CE200FE4E0A /* PDSErrorASF.h */; };
+		BA9365370B653CE200FE4E0A /* PDSError.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364C70B653CE200FE4E0A /* PDSError.h */; };
+		BA9365380B653CE200FE4E0A /* PDProcs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364C80B653CE200FE4E0A /* PDProcs.h */; };
+		BA9365390B653CE200FE4E0A /* PDPageEASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364C90B653CE200FE4E0A /* PDPageEASF.h */; };
+		BA93653A0B653CE200FE4E0A /* PSFCalls.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364CA0B653CE200FE4E0A /* PSFCalls.h */; };
+		BA93653B0B653CE200FE4E0A /* PDDocEASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364CB0B653CE200FE4E0A /* PDDocEASF.h */; };
+		BA93653C0B653CE200FE4E0A /* PDDocE.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364CC0B653CE200FE4E0A /* PDDocE.h */; };
+		BA93653D0B653CE200FE4E0A /* PDClasses.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364CD0B653CE200FE4E0A /* PDClasses.h */; };
+		BA93653E0B653CE200FE4E0A /* PIVersn.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364CE0B653CE200FE4E0A /* PIVersn.h */; };
+		BA93653F0B653CE200FE4E0A /* ASGenEASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364CF0B653CE200FE4E0A /* ASGenEASF.h */; };
+		BA9365400B653CE200FE4E0A /* CosCalls.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364D00B653CE200FE4E0A /* CosCalls.h */; };
+		BA9365410B653CE200FE4E0A /* CorProcs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364D10B653CE200FE4E0A /* CorProcs.h */; };
+		BA9365420B653CE200FE4E0A /* CoreExpT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364D20B653CE200FE4E0A /* CoreExpT.h */; };
+		BA9365430B653CE200FE4E0A /* PageEASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364D30B653CE200FE4E0A /* PageEASF.h */; };
+		BA9365440B653CE200FE4E0A /* CosGenEASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364D40B653CE200FE4E0A /* CosGenEASF.h */; };
+		BA9365450B653CE200FE4E0A /* ASExtraVers.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364D50B653CE200FE4E0A /* ASExtraVers.h */; };
+		BA9365460B653CE200FE4E0A /* CosGenE.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364D60B653CE200FE4E0A /* CosGenE.h */; };
+		BA9365470B653CE200FE4E0A /* CosExpT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364D70B653CE200FE4E0A /* CosExpT.h */; };
+		BA9365480B653CE200FE4E0A /* PDClassDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364D80B653CE200FE4E0A /* PDClassDefs.h */; };
+		BA9365490B653CE200FE4E0A /* PDCalls.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364D90B653CE200FE4E0A /* PDCalls.h */; };
+		BA93654A0B653CE200FE4E0A /* PDBasicExpT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364DA0B653CE200FE4E0A /* PDBasicExpT.h */; };
+		BA93654B0B653CE200FE4E0A /* ASExtraCalls.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364DB0B653CE200FE4E0A /* ASExtraCalls.h */; };
+		BA93654C0B653CE200FE4E0A /* ASExpT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364DC0B653CE200FE4E0A /* ASExpT.h */; };
+		BA93654D0B653CE200FE4E0A /* acroassert.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364DD0B653CE200FE4E0A /* acroassert.h */; };
+		BA93654E0B653CE200FE4E0A /* PDPageE.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364DE0B653CE200FE4E0A /* PDPageE.h */; };
+		BA93654F0B653CE200FE4E0A /* PDModEASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364DF0B653CE200FE4E0A /* PDModEASF.h */; };
+		BA9365500B653CE200FE4E0A /* PDModE.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364E00B653CE200FE4E0A /* PDModE.h */; };
+		BA9365510B653CE200FE4E0A /* PDMetadataProcs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364E10B653CE200FE4E0A /* PDMetadataProcs.h */; };
+		BA9365520B653CE200FE4E0A /* PDMetadataHFTVers.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364E20B653CE200FE4E0A /* PDMetadataHFTVers.h */; };
+		BA9365530B653CE200FE4E0A /* PDMetadataExpT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364E30B653CE200FE4E0A /* PDMetadataExpT.h */; };
+		BA9365540B653CE200FE4E0A /* CorCalls.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364E40B653CE200FE4E0A /* CorCalls.h */; };
+		BA9365550B653CE200FE4E0A /* ASRaiseAware.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364E50B653CE200FE4E0A /* ASRaiseAware.h */; };
+		BA9365560B653CE200FE4E0A /* ASCalls.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364E60B653CE200FE4E0A /* ASCalls.h */; };
+		BA9365570B653CE200FE4E0A /* AcroColorExpT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364E70B653CE200FE4E0A /* AcroColorExpT.h */; };
+		BA9365580B653CE200FE4E0A /* PDSWriteHFTVers.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364E80B653CE200FE4E0A /* PDSWriteHFTVers.h */; };
+		BA9365590B653CE200FE4E0A /* PDSReadProcs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364E90B653CE200FE4E0A /* PDSReadProcs.h */; };
+		BA93655A0B653CE200FE4E0A /* PDSReadHFTVers.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364EA0B653CE200FE4E0A /* PDSReadHFTVers.h */; };
+		BA93655B0B653CE200FE4E0A /* PDSWriteCalls.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364EB0B653CE200FE4E0A /* PDSWriteCalls.h */; };
+		BA93655C0B653CE200FE4E0A /* NSelExpT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364EC0B653CE200FE4E0A /* NSelExpT.h */; };
+		BA93655D0B653CE200FE4E0A /* MacPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364ED0B653CE200FE4E0A /* MacPlatform.h */; };
+		BA93655E0B653CE200FE4E0A /* PEError.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364EE0B653CE200FE4E0A /* PEError.h */; };
+		BA93655F0B653CE200FE4E0A /* ASExtraProcs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364EF0B653CE200FE4E0A /* ASExtraProcs.h */; };
+		BA9365600B653CE200FE4E0A /* ASExtraExpT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364F00B653CE200FE4E0A /* ASExtraExpT.h */; };
+		BA9365610B653CE200FE4E0A /* PDMetadataCalls.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364F10B653CE200FE4E0A /* PDMetadataCalls.h */; };
+		BA9365620B653CE200FE4E0A /* PDFXEASF.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364F20B653CE200FE4E0A /* PDFXEASF.h */; };
+		BA9365630B653CE200FE4E0A /* PDFXE.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364F30B653CE200FE4E0A /* PDFXE.h */; };
+		BA9365640B653CE200FE4E0A /* PDFLProcs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364F40B653CE200FE4E0A /* PDFLProcs.h */; };
+		BA9365650B653CE200FE4E0A /* PDFLCalls.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364F50B653CE200FE4E0A /* PDFLCalls.h */; };
+		BA9365660B653CE200FE4E0A /* PDFInit.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364F60B653CE200FE4E0A /* PDFInit.h */; };
+		BA9365670B653CE200FE4E0A /* PDFErrorCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364F70B653CE200FE4E0A /* PDFErrorCodes.h */; };
+		BA9365680B653CE200FE4E0A /* PDExpT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364F80B653CE200FE4E0A /* PDExpT.h */; };
+		BA9365690B653CE200FE4E0A /* AcroColorCalls.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364F90B653CE200FE4E0A /* AcroColorCalls.h */; };
+		BA93656A0B653CE200FE4E0A /* AcroErr.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364FA0B653CE200FE4E0A /* AcroErr.h */; };
+		BA93656B0B653CE200FE4E0A /* AcroColorVers.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364FB0B653CE200FE4E0A /* AcroColorVers.h */; };
+		BA93656C0B653CE200FE4E0A /* Library.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364FC0B653CE200FE4E0A /* Library.h */; };
+		BA93656D0B653CE200FE4E0A /* HFTLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364FD0B653CE200FE4E0A /* HFTLibrary.h */; };
+		BA93656E0B653CE200FE4E0A /* PSFProcs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364FE0B653CE200FE4E0A /* PSFProcs.h */; };
+		BA93656F0B653CE200FE4E0A /* PDFLRequir.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9364FF0B653CE200FE4E0A /* PDFLRequir.h */; };
+		BA9365700B653CE200FE4E0A /* AcroColorHFT.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9365000B653CE200FE4E0A /* AcroColorHFT.h */; };
+		BA9365710B653CE200FE4E0A /* AcroColorProcs.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9365010B653CE200FE4E0A /* AcroColorProcs.h */; };
+		BA9365EA0B653D1400FE4E0A /* extrURI.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9365E50B653D1400FE4E0A /* extrURI.h */; };
+		BA9365EB0B653D1400FE4E0A /* macUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9365E60B653D1400FE4E0A /* macUtils.h */; };
+		BA9365EC0B653D1400FE4E0A /* MyPDFLibUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9365E70B653D1400FE4E0A /* MyPDFLibUtils.h */; };
+		BA9365EE0B653D1400FE4E0A /* SDKThreads.h in Headers */ = {isa = PBXBuildFile; fileRef = BA9365E90B653D1400FE4E0A /* SDKThreads.h */; };
+		BA93C6F50B61809E002C5ED0 /* PDFLInitHFT.c in Sources */ = {isa = PBXBuildFile; fileRef = BA93C6F40B61809E002C5ED0 /* PDFLInitHFT.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BAD19408088F1C5600DCC249 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				2E33C40B1E817596000FA07B /* DL150PDFPort.framework in CopyFiles */,
+				2E33C4061E81752C000FA07B /* DL150PDFSettings.framework in CopyFiles */,
+				335728170C9B42530095FC3D /* DL150ACE.framework in CopyFiles */,
+				335728180C9B42530095FC3D /* DL150AGM.framework in CopyFiles */,
+				335728190C9B42530095FC3D /* DL150ARE.framework in CopyFiles */,
+				3357281A0C9B42530095FC3D /* DL150AXE8SharedExpat.framework in CopyFiles */,
+				3357281B0C9B42530095FC3D /* DL150BIB.framework in CopyFiles */,
+				3357281C0C9B42530095FC3D /* DL150BIBUtils.framework in CopyFiles */,
+				3357281D0C9B42530095FC3D /* DL150CoolType.framework in CopyFiles */,
+				3EC92F950F98F6FA00505316 /* DL150JP2KLib.framework in CopyFiles */,
+				3EC92F940F98F6F600505316 /* DL150AdobeXMP.framework in CopyFiles */,
+				3357281F0C9B42530095FC3D /* DL150PDFL.framework in CopyFiles */,
+				3EC92F960F98F70000505316 /* ICUData.framework in CopyFiles */,
+				3EC92F970F98F70000505316 /* ICUConverter.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		20286C33FDCF999611CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		2E33C4001E81732B000FA07B /* MTmain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MTmain.cpp; sourceTree = "<group>"; };
+		2E33C4011E81732B000FA07B /* MTWorker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MTWorker.cpp; sourceTree = "<group>"; };
+		2E33C4041E817505000FA07B /* DL150PDFSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150PDFSettings.framework; path = ../../Binaries/DL150PDFSettings.framework; sourceTree = "<group>"; };
+		2E33C4091E81757B000FA07B /* DL150PDFPort.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150PDFPort.framework; path = ../../Binaries/DL150PDFPort.framework; sourceTree = "<group>"; };
+		335727F70C9B424E0095FC3D /* DL150ACE.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150ACE.framework; path = ../../Binaries/DL150ACE.framework; sourceTree = SOURCE_ROOT; };
+		335727F80C9B424E0095FC3D /* DL150AGM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150AGM.framework; path = ../../Binaries/DL150AGM.framework; sourceTree = SOURCE_ROOT; };
+		335727F90C9B424E0095FC3D /* DL150ARE.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150ARE.framework; path = ../../Binaries/DL150ARE.framework; sourceTree = SOURCE_ROOT; };
+		335727FA0C9B424E0095FC3D /* DL150AXE8SharedExpat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150AXE8SharedExpat.framework; path = ../../Binaries/DL150AXE8SharedExpat.framework; sourceTree = SOURCE_ROOT; };
+		335727FB0C9B424E0095FC3D /* DL150BIB.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150BIB.framework; path = ../../Binaries/DL150BIB.framework; sourceTree = SOURCE_ROOT; };
+		335727FC0C9B424E0095FC3D /* DL150BIBUtils.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150BIBUtils.framework; path = ../../Binaries/DL150BIBUtils.framework; sourceTree = SOURCE_ROOT; };
+		335727FD0C9B424E0095FC3D /* DL150CoolType.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150CoolType.framework; path = ../../Binaries/DL150CoolType.framework; sourceTree = SOURCE_ROOT; };
+		335727FF0C9B424E0095FC3D /* DL150PDFL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150PDFL.framework; path = ../../Binaries/DL150PDFL.framework; sourceTree = SOURCE_ROOT; };
+		3EC92F860F98F6CE00505316 /* DL150JP2KLib.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150JP2KLib.framework; path = ../../Binaries/DL150JP2KLib.framework; sourceTree = SOURCE_ROOT; };
+		3EC92F890F98F6D400505316 /* DL150AdobeXMP.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150AdobeXMP.framework; path = ../../Binaries/DL150AdobeXMP.framework; sourceTree = SOURCE_ROOT; };
+		3EC92F8C0F98F6E600505316 /* ICUData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ICUData.framework; path = ../../Binaries/ICUData.framework; sourceTree = SOURCE_ROOT; };
+		3EC92F8D0F98F6E600505316 /* ICUConverter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ICUConverter.framework; path = ../../Binaries/ICUConverter.framework; sourceTree = SOURCE_ROOT; };
+		9C32A3CF0BDE9442002858C3 /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = ../utils/MacSDKConfigurations/Debug.xcconfig; sourceTree = SOURCE_ROOT; };
+		9C32A3D00BDE9442002858C3 /* Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = ../utils/MacSDKConfigurations/Release.xcconfig; sourceTree = SOURCE_ROOT; };
+		9C32A3D10BDE9442002858C3 /* Resources.xcconfig */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xcconfig; name = Resources.xcconfig; path = ../utils/MacSDKConfigurations/Resources.xcconfig; sourceTree = SOURCE_ROOT; };
+		BA0654DA0AC34D340029CB3D /* PDFLInitCommon.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = PDFLInitCommon.c; path = ../../Include/Source/PDFLInitCommon.c; sourceTree = SOURCE_ROOT; };
+		BA18F36F0885D7D300B9CC28 /* MyPDFLibApp.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = MyPDFLibApp.cpp; path = ../utils/MyPDFLibApp.cpp; sourceTree = SOURCE_ROOT; };
+		BA18F3710885D7DA00B9CC28 /* MyPDFLibUtils.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = MyPDFLibUtils.cpp; path = ../utils/MyPDFLibUtils.cpp; sourceTree = SOURCE_ROOT; };
+		BA18F3730885D7E400B9CC28 /* macutils.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = macutils.c; path = ../utils/macutils.c; sourceTree = SOURCE_ROOT; };
+		BA22726E0ACDCECE00DAC569 /* InfoPlist.strings */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = InfoPlist.strings; path = ../utils/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		BA2E45950888421A0081FD28 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
+		BA44EDBA0ADABD7B00A1208A /* PDFLPrecompile.pch */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFLPrecompile.pch; path = ../utils/PDFLPrecompile.pch; sourceTree = SOURCE_ROOT; };
+		BA568C150A47467400825A50 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
+		BA6D7D4E0ACDCEFD00629526 /* WatchFolder.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; path = WatchFolder.cpp; sourceTree = "<group>"; };
+		BA8BFB9A0AC2FB5500AF4E32 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = Info.plist; path = ../utils/Info.plist; sourceTree = SOURCE_ROOT; };
+		BA8BFCA50AC30A0700AF4E32 /* Default.xcconfig */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xcconfig; name = Default.xcconfig; path = ../utils/MacSDKConfigurations/Default.xcconfig; sourceTree = SOURCE_ROOT; };
+		BA8BFCA90AC30A0700AF4E32 /* Environment.xcconfig */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xcconfig; name = Environment.xcconfig; path = ../utils/MacSDKConfigurations/Environment.xcconfig; sourceTree = SOURCE_ROOT; };
+		BA8BFD410AC30A6D00AF4E32 /* Project_debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xcconfig; name = Project_debug.xcconfig; path = ../../utils/MacSDKConfigurations/Project_debug.xcconfig; sourceTree = "<group>"; };
+		BA8BFD420AC30A6D00AF4E32 /* Project_release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xcconfig; name = Project_release.xcconfig; path = ../../utils/MacSDKConfigurations/Project_release.xcconfig; sourceTree = "<group>"; };
+		BA8BFD430AC30A6D00AF4E32 /* ProjectDefault.xcconfig */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xcconfig; name = ProjectDefault.xcconfig; path = ../../utils/MacSDKConfigurations/ProjectDefault.xcconfig; sourceTree = "<group>"; };
+		BA8BFD440AC30A6D00AF4E32 /* ProjectResources.xcconfig */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xcconfig; name = ProjectResources.xcconfig; path = ../../utils/MacSDKConfigurations/ProjectResources.xcconfig; sourceTree = "<group>"; };
+		BA9364920B653CE200FE4E0A /* ToolkitInitEASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ToolkitInitEASF.h; path = ../../Include/Headers/ToolkitInitEASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364930B653CE200FE4E0A /* XtnMgrEASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = XtnMgrEASF.h; path = ../../Include/Headers/XtnMgrEASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364940B653CE200FE4E0A /* XtnMgrE.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = XtnMgrE.h; path = ../../Include/Headers/XtnMgrE.h; sourceTree = SOURCE_ROOT; };
+		BA9364950B653CE200FE4E0A /* EReturnValidator.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = EReturnValidator.h; path = ../../Include/Headers/EReturnValidator.h; sourceTree = SOURCE_ROOT; };
+		BA9364960B653CE200FE4E0A /* PDMetadataErrorASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDMetadataErrorASF.h; path = ../../Include/Headers/PDMetadataErrorASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364970B653CE200FE4E0A /* PDMetadataError.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDMetadataError.h; path = ../../Include/Headers/PDMetadataError.h; sourceTree = SOURCE_ROOT; };
+		BA9364980B653CE200FE4E0A /* PIExcept.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PIExcept.h; path = ../../Include/Headers/PIExcept.h; sourceTree = SOURCE_ROOT; };
+		BA9364990B653CE200FE4E0A /* PDSysFont.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDSysFont.h; path = ../../Include/Headers/PDSysFont.h; sourceTree = SOURCE_ROOT; };
+		BA93649A0B653CE200FE4E0A /* PDSWriteProcs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDSWriteProcs.h; path = ../../Include/Headers/PDSWriteProcs.h; sourceTree = SOURCE_ROOT; };
+		BA93649B0B653CE200FE4E0A /* ASProcs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ASProcs.h; path = ../../Include/Headers/ASProcs.h; sourceTree = SOURCE_ROOT; };
+		BA93649C0B653CE200FE4E0A /* ASKey.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ASKey.h; path = ../../Include/Headers/ASKey.h; sourceTree = SOURCE_ROOT; };
+		BA93649D0B653CE200FE4E0A /* FontSvrE.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = FontSvrE.h; path = ../../Include/Headers/FontSvrE.h; sourceTree = SOURCE_ROOT; };
+		BA93649E0B653CE200FE4E0A /* CosSynE.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = CosSynE.h; path = ../../Include/Headers/CosSynE.h; sourceTree = SOURCE_ROOT; };
+		BA93649F0B653CE200FE4E0A /* CosProcs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = CosProcs.h; path = ../../Include/Headers/CosProcs.h; sourceTree = SOURCE_ROOT; };
+		BA9364A00B653CE200FE4E0A /* PDFLPrint.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFLPrint.h; path = ../../Include/Headers/PDFLPrint.h; sourceTree = SOURCE_ROOT; };
+		BA9364A10B653CE200FE4E0A /* PDFLInitHFT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFLInitHFT.h; path = ../../Include/Headers/PDFLInitHFT.h; sourceTree = SOURCE_ROOT; };
+		BA9364A20B653CE200FE4E0A /* PDFLInitCommon.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFLInitCommon.h; path = ../../Include/Headers/PDFLInitCommon.h; sourceTree = SOURCE_ROOT; };
+		BA9364A30B653CE200FE4E0A /* PDFLHFTVers.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFLHFTVers.h; path = ../../Include/Headers/PDFLHFTVers.h; sourceTree = SOURCE_ROOT; };
+		BA9364A40B653CE200FE4E0A /* PDFLHFT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFLHFT.h; path = ../../Include/Headers/PDFLHFT.h; sourceTree = SOURCE_ROOT; };
+		BA9364A50B653CE200FE4E0A /* PDFLExpT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFLExpT.h; path = ../../Include/Headers/PDFLExpT.h; sourceTree = SOURCE_ROOT; };
+		BA9364A60B653CE200FE4E0A /* PDFLErrorsFromASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFLErrorsFromASF.h; path = ../../Include/Headers/PDFLErrorsFromASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364A70B653CE200FE4E0A /* ASGenE.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ASGenE.h; path = ../../Include/Headers/ASGenE.h; sourceTree = SOURCE_ROOT; };
+		BA9364A80B653CE200FE4E0A /* ASFileEASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ASFileEASF.h; path = ../../Include/Headers/ASFileEASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364A90B653CE200FE4E0A /* ASFileE.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ASFileE.h; path = ../../Include/Headers/ASFileE.h; sourceTree = SOURCE_ROOT; };
+		BA9364AA0B653CE200FE4E0A /* FontSvrEASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = FontSvrEASF.h; path = ../../Include/Headers/FontSvrEASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364AB0B653CE200FE4E0A /* Environ.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = Environ.h; path = ../../Include/Headers/Environ.h; sourceTree = SOURCE_ROOT; };
+		BA9364AC0B653CE200FE4E0A /* PIRequir.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PIRequir.h; path = ../../Include/Headers/PIRequir.h; sourceTree = SOURCE_ROOT; };
+		BA9364AD0B653CE200FE4E0A /* EncConvE.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = EncConvE.h; path = ../../Include/Headers/EncConvE.h; sourceTree = SOURCE_ROOT; };
+		BA9364AE0B653CE200FE4E0A /* CosSynEASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = CosSynEASF.h; path = ../../Include/Headers/CosSynEASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364AF0B653CE200FE4E0A /* PagePDECntCalls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PagePDECntCalls.h; path = ../../Include/Headers/PagePDECntCalls.h; sourceTree = SOURCE_ROOT; };
+		BA9364B00B653CE200FE4E0A /* PageE.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PageE.h; path = ../../Include/Headers/PageE.h; sourceTree = SOURCE_ROOT; };
+		BA9364B10B653CE200FE4E0A /* RasterE.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = RasterE.h; path = ../../Include/Headers/RasterE.h; sourceTree = SOURCE_ROOT; };
+		BA9364B20B653CE200FE4E0A /* ToolkitInitE.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ToolkitInitE.h; path = ../../Include/Headers/ToolkitInitE.h; sourceTree = SOURCE_ROOT; };
+		BA9364B30B653CE200FE4E0A /* SmartPDPage.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = SmartPDPage.h; path = ../../Include/Headers/SmartPDPage.h; sourceTree = SOURCE_ROOT; };
+		BA9364B40B653CE200FE4E0A /* RasterEASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = RasterEASF.h; path = ../../Include/Headers/RasterEASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364B50B653CE200FE4E0A /* Plugin.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = Plugin.h; path = ../../Include/Headers/Plugin.h; sourceTree = SOURCE_ROOT; };
+		BA9364B60B653CE200FE4E0A /* PIPokes.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PIPokes.h; path = ../../Include/Headers/PIPokes.h; sourceTree = SOURCE_ROOT; };
+		BA9364B70B653CE200FE4E0A /* PIMain.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PIMain.h; path = ../../Include/Headers/PIMain.h; sourceTree = SOURCE_ROOT; };
+		BA9364B80B653CE200FE4E0A /* PICommon.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PICommon.h; path = ../../Include/Headers/PICommon.h; sourceTree = SOURCE_ROOT; };
+		BA9364B90B653CE200FE4E0A /* PgCntProcs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PgCntProcs.h; path = ../../Include/Headers/PgCntProcs.h; sourceTree = SOURCE_ROOT; };
+		BA9364BA0B653CE200FE4E0A /* PEWProcs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PEWProcs.h; path = ../../Include/Headers/PEWProcs.h; sourceTree = SOURCE_ROOT; };
+		BA9364BB0B653CE200FE4E0A /* PEWCalls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PEWCalls.h; path = ../../Include/Headers/PEWCalls.h; sourceTree = SOURCE_ROOT; };
+		BA9364BC0B653CE200FE4E0A /* PETypes.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PETypes.h; path = ../../Include/Headers/PETypes.h; sourceTree = SOURCE_ROOT; };
+		BA9364BD0B653CE200FE4E0A /* PERProcs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PERProcs.h; path = ../../Include/Headers/PERProcs.h; sourceTree = SOURCE_ROOT; };
+		BA9364BE0B653CE200FE4E0A /* PERCalls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PERCalls.h; path = ../../Include/Headers/PERCalls.h; sourceTree = SOURCE_ROOT; };
+		BA9364BF0B653CE200FE4E0A /* PEExpT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PEExpT.h; path = ../../Include/Headers/PEExpT.h; sourceTree = SOURCE_ROOT; };
+		BA9364C00B653CE200FE4E0A /* PEErrorASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PEErrorASF.h; path = ../../Include/Headers/PEErrorASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364C10B653CE200FE4E0A /* PEVers.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PEVers.h; path = ../../Include/Headers/PEVers.h; sourceTree = SOURCE_ROOT; };
+		BA9364C20B653CE200FE4E0A /* PDSysFT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDSysFT.h; path = ../../Include/Headers/PDSysFT.h; sourceTree = SOURCE_ROOT; };
+		BA9364C30B653CE200FE4E0A /* PDSysFontExpT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDSysFontExpT.h; path = ../../Include/Headers/PDSysFontExpT.h; sourceTree = SOURCE_ROOT; };
+		BA9364C40B653CE200FE4E0A /* PDSReadCalls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDSReadCalls.h; path = ../../Include/Headers/PDSReadCalls.h; sourceTree = SOURCE_ROOT; };
+		BA9364C50B653CE200FE4E0A /* PDSExpT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDSExpT.h; path = ../../Include/Headers/PDSExpT.h; sourceTree = SOURCE_ROOT; };
+		BA9364C60B653CE200FE4E0A /* PDSErrorASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDSErrorASF.h; path = ../../Include/Headers/PDSErrorASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364C70B653CE200FE4E0A /* PDSError.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDSError.h; path = ../../Include/Headers/PDSError.h; sourceTree = SOURCE_ROOT; };
+		BA9364C80B653CE200FE4E0A /* PDProcs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDProcs.h; path = ../../Include/Headers/PDProcs.h; sourceTree = SOURCE_ROOT; };
+		BA9364C90B653CE200FE4E0A /* PDPageEASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDPageEASF.h; path = ../../Include/Headers/PDPageEASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364CA0B653CE200FE4E0A /* PSFCalls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PSFCalls.h; path = ../../Include/Headers/PSFCalls.h; sourceTree = SOURCE_ROOT; };
+		BA9364CB0B653CE200FE4E0A /* PDDocEASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDDocEASF.h; path = ../../Include/Headers/PDDocEASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364CC0B653CE200FE4E0A /* PDDocE.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDDocE.h; path = ../../Include/Headers/PDDocE.h; sourceTree = SOURCE_ROOT; };
+		BA9364CD0B653CE200FE4E0A /* PDClasses.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDClasses.h; path = ../../Include/Headers/PDClasses.h; sourceTree = SOURCE_ROOT; };
+		BA9364CE0B653CE200FE4E0A /* PIVersn.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PIVersn.h; path = ../../Include/Headers/PIVersn.h; sourceTree = SOURCE_ROOT; };
+		BA9364CF0B653CE200FE4E0A /* ASGenEASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ASGenEASF.h; path = ../../Include/Headers/ASGenEASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364D00B653CE200FE4E0A /* CosCalls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = CosCalls.h; path = ../../Include/Headers/CosCalls.h; sourceTree = SOURCE_ROOT; };
+		BA9364D10B653CE200FE4E0A /* CorProcs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = CorProcs.h; path = ../../Include/Headers/CorProcs.h; sourceTree = SOURCE_ROOT; };
+		BA9364D20B653CE200FE4E0A /* CoreExpT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = CoreExpT.h; path = ../../Include/Headers/CoreExpT.h; sourceTree = SOURCE_ROOT; };
+		BA9364D30B653CE200FE4E0A /* PageEASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PageEASF.h; path = ../../Include/Headers/PageEASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364D40B653CE200FE4E0A /* CosGenEASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = CosGenEASF.h; path = ../../Include/Headers/CosGenEASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364D50B653CE200FE4E0A /* ASExtraVers.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ASExtraVers.h; path = ../../Include/Headers/ASExtraVers.h; sourceTree = SOURCE_ROOT; };
+		BA9364D60B653CE200FE4E0A /* CosGenE.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = CosGenE.h; path = ../../Include/Headers/CosGenE.h; sourceTree = SOURCE_ROOT; };
+		BA9364D70B653CE200FE4E0A /* CosExpT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = CosExpT.h; path = ../../Include/Headers/CosExpT.h; sourceTree = SOURCE_ROOT; };
+		BA9364D80B653CE200FE4E0A /* PDClassDefs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDClassDefs.h; path = ../../Include/Headers/PDClassDefs.h; sourceTree = SOURCE_ROOT; };
+		BA9364D90B653CE200FE4E0A /* PDCalls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDCalls.h; path = ../../Include/Headers/PDCalls.h; sourceTree = SOURCE_ROOT; };
+		BA9364DA0B653CE200FE4E0A /* PDBasicExpT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDBasicExpT.h; path = ../../Include/Headers/PDBasicExpT.h; sourceTree = SOURCE_ROOT; };
+		BA9364DB0B653CE200FE4E0A /* ASExtraCalls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ASExtraCalls.h; path = ../../Include/Headers/ASExtraCalls.h; sourceTree = SOURCE_ROOT; };
+		BA9364DC0B653CE200FE4E0A /* ASExpT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ASExpT.h; path = ../../Include/Headers/ASExpT.h; sourceTree = SOURCE_ROOT; };
+		BA9364DD0B653CE200FE4E0A /* acroassert.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = acroassert.h; path = ../../Include/Headers/acroassert.h; sourceTree = SOURCE_ROOT; };
+		BA9364DE0B653CE200FE4E0A /* PDPageE.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDPageE.h; path = ../../Include/Headers/PDPageE.h; sourceTree = SOURCE_ROOT; };
+		BA9364DF0B653CE200FE4E0A /* PDModEASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDModEASF.h; path = ../../Include/Headers/PDModEASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364E00B653CE200FE4E0A /* PDModE.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDModE.h; path = ../../Include/Headers/PDModE.h; sourceTree = SOURCE_ROOT; };
+		BA9364E10B653CE200FE4E0A /* PDMetadataProcs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDMetadataProcs.h; path = ../../Include/Headers/PDMetadataProcs.h; sourceTree = SOURCE_ROOT; };
+		BA9364E20B653CE200FE4E0A /* PDMetadataHFTVers.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDMetadataHFTVers.h; path = ../../Include/Headers/PDMetadataHFTVers.h; sourceTree = SOURCE_ROOT; };
+		BA9364E30B653CE200FE4E0A /* PDMetadataExpT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDMetadataExpT.h; path = ../../Include/Headers/PDMetadataExpT.h; sourceTree = SOURCE_ROOT; };
+		BA9364E40B653CE200FE4E0A /* CorCalls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = CorCalls.h; path = ../../Include/Headers/CorCalls.h; sourceTree = SOURCE_ROOT; };
+		BA9364E50B653CE200FE4E0A /* ASRaiseAware.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ASRaiseAware.h; path = ../../Include/Headers/ASRaiseAware.h; sourceTree = SOURCE_ROOT; };
+		BA9364E60B653CE200FE4E0A /* ASCalls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ASCalls.h; path = ../../Include/Headers/ASCalls.h; sourceTree = SOURCE_ROOT; };
+		BA9364E70B653CE200FE4E0A /* AcroColorExpT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = AcroColorExpT.h; path = ../../Include/Headers/AcroColorExpT.h; sourceTree = SOURCE_ROOT; };
+		BA9364E80B653CE200FE4E0A /* PDSWriteHFTVers.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDSWriteHFTVers.h; path = ../../Include/Headers/PDSWriteHFTVers.h; sourceTree = SOURCE_ROOT; };
+		BA9364E90B653CE200FE4E0A /* PDSReadProcs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDSReadProcs.h; path = ../../Include/Headers/PDSReadProcs.h; sourceTree = SOURCE_ROOT; };
+		BA9364EA0B653CE200FE4E0A /* PDSReadHFTVers.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDSReadHFTVers.h; path = ../../Include/Headers/PDSReadHFTVers.h; sourceTree = SOURCE_ROOT; };
+		BA9364EB0B653CE200FE4E0A /* PDSWriteCalls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDSWriteCalls.h; path = ../../Include/Headers/PDSWriteCalls.h; sourceTree = SOURCE_ROOT; };
+		BA9364EC0B653CE200FE4E0A /* NSelExpT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = NSelExpT.h; path = ../../Include/Headers/NSelExpT.h; sourceTree = SOURCE_ROOT; };
+		BA9364ED0B653CE200FE4E0A /* MacPlatform.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = MacPlatform.h; path = ../../Include/Headers/MacPlatform.h; sourceTree = SOURCE_ROOT; };
+		BA9364EE0B653CE200FE4E0A /* PEError.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PEError.h; path = ../../Include/Headers/PEError.h; sourceTree = SOURCE_ROOT; };
+		BA9364EF0B653CE200FE4E0A /* ASExtraProcs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ASExtraProcs.h; path = ../../Include/Headers/ASExtraProcs.h; sourceTree = SOURCE_ROOT; };
+		BA9364F00B653CE200FE4E0A /* ASExtraExpT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = ASExtraExpT.h; path = ../../Include/Headers/ASExtraExpT.h; sourceTree = SOURCE_ROOT; };
+		BA9364F10B653CE200FE4E0A /* PDMetadataCalls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDMetadataCalls.h; path = ../../Include/Headers/PDMetadataCalls.h; sourceTree = SOURCE_ROOT; };
+		BA9364F20B653CE200FE4E0A /* PDFXEASF.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFXEASF.h; path = ../../Include/Headers/PDFXEASF.h; sourceTree = SOURCE_ROOT; };
+		BA9364F30B653CE200FE4E0A /* PDFXE.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFXE.h; path = ../../Include/Headers/PDFXE.h; sourceTree = SOURCE_ROOT; };
+		BA9364F40B653CE200FE4E0A /* PDFLProcs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFLProcs.h; path = ../../Include/Headers/PDFLProcs.h; sourceTree = SOURCE_ROOT; };
+		BA9364F50B653CE200FE4E0A /* PDFLCalls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFLCalls.h; path = ../../Include/Headers/PDFLCalls.h; sourceTree = SOURCE_ROOT; };
+		BA9364F60B653CE200FE4E0A /* PDFInit.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFInit.h; path = ../../Include/Headers/PDFInit.h; sourceTree = SOURCE_ROOT; };
+		BA9364F70B653CE200FE4E0A /* PDFErrorCodes.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFErrorCodes.h; path = ../../Include/Headers/PDFErrorCodes.h; sourceTree = SOURCE_ROOT; };
+		BA9364F80B653CE200FE4E0A /* PDExpT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDExpT.h; path = ../../Include/Headers/PDExpT.h; sourceTree = SOURCE_ROOT; };
+		BA9364F90B653CE200FE4E0A /* AcroColorCalls.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = AcroColorCalls.h; path = ../../Include/Headers/AcroColorCalls.h; sourceTree = SOURCE_ROOT; };
+		BA9364FA0B653CE200FE4E0A /* AcroErr.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = AcroErr.h; path = ../../Include/Headers/AcroErr.h; sourceTree = SOURCE_ROOT; };
+		BA9364FB0B653CE200FE4E0A /* AcroColorVers.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = AcroColorVers.h; path = ../../Include/Headers/AcroColorVers.h; sourceTree = SOURCE_ROOT; };
+		BA9364FC0B653CE200FE4E0A /* Library.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = Library.h; path = ../../Include/Headers/Library.h; sourceTree = SOURCE_ROOT; };
+		BA9364FD0B653CE200FE4E0A /* HFTLibrary.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = HFTLibrary.h; path = ../../Include/Headers/HFTLibrary.h; sourceTree = SOURCE_ROOT; };
+		BA9364FE0B653CE200FE4E0A /* PSFProcs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PSFProcs.h; path = ../../Include/Headers/PSFProcs.h; sourceTree = SOURCE_ROOT; };
+		BA9364FF0B653CE200FE4E0A /* PDFLRequir.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = PDFLRequir.h; path = ../../Include/Headers/PDFLRequir.h; sourceTree = SOURCE_ROOT; };
+		BA9365000B653CE200FE4E0A /* AcroColorHFT.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = AcroColorHFT.h; path = ../../Include/Headers/AcroColorHFT.h; sourceTree = SOURCE_ROOT; };
+		BA9365010B653CE200FE4E0A /* AcroColorProcs.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = AcroColorProcs.h; path = ../../Include/Headers/AcroColorProcs.h; sourceTree = SOURCE_ROOT; };
+		BA9365E50B653D1400FE4E0A /* extrURI.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = extrURI.h; path = ../utils/extrURI.h; sourceTree = SOURCE_ROOT; };
+		BA9365E60B653D1400FE4E0A /* macUtils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = macUtils.h; path = ../utils/macUtils.h; sourceTree = SOURCE_ROOT; };
+		BA9365E70B653D1400FE4E0A /* MyPDFLibUtils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = MyPDFLibUtils.h; path = ../utils/MyPDFLibUtils.h; sourceTree = SOURCE_ROOT; };
+		BA9365E90B653D1400FE4E0A /* SDKThreads.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = SDKThreads.h; path = ../utils/SDKThreads.h; sourceTree = SOURCE_ROOT; };
+		BA93C6F40B61809E002C5ED0 /* PDFLInitHFT.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = PDFLInitHFT.c; path = ../../Include/Source/PDFLInitHFT.c; sourceTree = SOURCE_ROOT; };
+		BAAFDE0808980F3600470124 /* MTPDFA-Debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MTPDFA-Debug.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D0C4E910486CD37000505A6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2E33C40A1E81757B000FA07B /* DL150PDFPort.framework in Frameworks */,
+				8D0C4E920486CD37000505A6 /* Foundation.framework in Frameworks */,
+				BA2E45960888421A0081FD28 /* ApplicationServices.framework in Frameworks */,
+				BA568C160A47467400825A50 /* CoreServices.framework in Frameworks */,
+				335728010C9B424E0095FC3D /* DL150ACE.framework in Frameworks */,
+				335728020C9B424E0095FC3D /* DL150AGM.framework in Frameworks */,
+				335728030C9B424E0095FC3D /* DL150ARE.framework in Frameworks */,
+				335728040C9B424E0095FC3D /* DL150AXE8SharedExpat.framework in Frameworks */,
+				335728050C9B424E0095FC3D /* DL150BIB.framework in Frameworks */,
+				335728060C9B424E0095FC3D /* DL150BIBUtils.framework in Frameworks */,
+				2E33C4051E817505000FA07B /* DL150PDFSettings.framework in Frameworks */,
+				335728070C9B424E0095FC3D /* DL150CoolType.framework in Frameworks */,
+				335728090C9B424E0095FC3D /* DL150PDFL.framework in Frameworks */,
+				3EC92F870F98F6CE00505316 /* DL150JP2KLib.framework in Frameworks */,
+				3EC92F8A0F98F6D400505316 /* DL150AdobeXMP.framework in Frameworks */,
+				3EC92F8E0F98F6E600505316 /* ICUData.framework in Frameworks */,
+				3EC92F8F0F98F6E600505316 /* ICUConverter.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		195DF8CFFE9D517E11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BAAFDE0808980F3600470124 /* MTPDFA-Debug.app */,
+			);
+			name = Products;
+			sourceTree = SOURCE_ROOT;
+		};
+		20286C29FDCF999611CA2CEA /* HelowrldX */ = {
+			isa = PBXGroup;
+			children = (
+				2E33C4091E81757B000FA07B /* DL150PDFPort.framework */,
+				2E33C4041E817505000FA07B /* DL150PDFSettings.framework */,
+				BA44EC200ADABD2000A1208A /* Precompiled Header */,
+				BA44EC210ADABD2900A1208A /* Headers */,
+				BA8BFB7D0AC2F69500AF4E32 /* Configurations */,
+				20286C2AFDCF999611CA2CEA /* Sources */,
+				20286C2CFDCF999611CA2CEA /* Resources */,
+				BA7F63E60A53393300BFE059 /* External Frameworks and Libraries */,
+				195DF8CFFE9D517E11CA2CBB /* Products */,
+			);
+			name = HelowrldX;
+			sourceTree = "<group>";
+		};
+		20286C2AFDCF999611CA2CEA /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				2E33C4001E81732B000FA07B /* MTmain.cpp */,
+				2E33C4011E81732B000FA07B /* MTWorker.cpp */,
+				BA93C6F40B61809E002C5ED0 /* PDFLInitHFT.c */,
+				BA6D7D4E0ACDCEFD00629526 /* WatchFolder.cpp */,
+				BA0654DA0AC34D340029CB3D /* PDFLInitCommon.c */,
+				BA18F3730885D7E400B9CC28 /* macutils.c */,
+				BA18F36F0885D7D300B9CC28 /* MyPDFLibApp.cpp */,
+				BA18F3710885D7DA00B9CC28 /* MyPDFLibUtils.cpp */,
+			);
+			name = Sources;
+			sourceTree = SOURCE_ROOT;
+		};
+		20286C2CFDCF999611CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				BA22726E0ACDCECE00DAC569 /* InfoPlist.strings */,
+				BA8BFB9A0AC2FB5500AF4E32 /* Info.plist */,
+			);
+			name = Resources;
+			sourceTree = SOURCE_ROOT;
+		};
+		BA44EC200ADABD2000A1208A /* Precompiled Header */ = {
+			isa = PBXGroup;
+			children = (
+				BA44EDBA0ADABD7B00A1208A /* PDFLPrecompile.pch */,
+			);
+			name = "Precompiled Header";
+			sourceTree = "<group>";
+		};
+		BA44EC210ADABD2900A1208A /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				BA9365E50B653D1400FE4E0A /* extrURI.h */,
+				BA9365E60B653D1400FE4E0A /* macUtils.h */,
+				BA9365E70B653D1400FE4E0A /* MyPDFLibUtils.h */,
+				BA9365E90B653D1400FE4E0A /* SDKThreads.h */,
+				BA9364920B653CE200FE4E0A /* ToolkitInitEASF.h */,
+				BA9364930B653CE200FE4E0A /* XtnMgrEASF.h */,
+				BA9364940B653CE200FE4E0A /* XtnMgrE.h */,
+				BA9364950B653CE200FE4E0A /* EReturnValidator.h */,
+				BA9364960B653CE200FE4E0A /* PDMetadataErrorASF.h */,
+				BA9364970B653CE200FE4E0A /* PDMetadataError.h */,
+				BA9364980B653CE200FE4E0A /* PIExcept.h */,
+				BA9364990B653CE200FE4E0A /* PDSysFont.h */,
+				BA93649A0B653CE200FE4E0A /* PDSWriteProcs.h */,
+				BA93649B0B653CE200FE4E0A /* ASProcs.h */,
+				BA93649C0B653CE200FE4E0A /* ASKey.h */,
+				BA93649D0B653CE200FE4E0A /* FontSvrE.h */,
+				BA93649E0B653CE200FE4E0A /* CosSynE.h */,
+				BA93649F0B653CE200FE4E0A /* CosProcs.h */,
+				BA9364A00B653CE200FE4E0A /* PDFLPrint.h */,
+				BA9364A10B653CE200FE4E0A /* PDFLInitHFT.h */,
+				BA9364A20B653CE200FE4E0A /* PDFLInitCommon.h */,
+				BA9364A30B653CE200FE4E0A /* PDFLHFTVers.h */,
+				BA9364A40B653CE200FE4E0A /* PDFLHFT.h */,
+				BA9364A50B653CE200FE4E0A /* PDFLExpT.h */,
+				BA9364A60B653CE200FE4E0A /* PDFLErrorsFromASF.h */,
+				BA9364A70B653CE200FE4E0A /* ASGenE.h */,
+				BA9364A80B653CE200FE4E0A /* ASFileEASF.h */,
+				BA9364A90B653CE200FE4E0A /* ASFileE.h */,
+				BA9364AA0B653CE200FE4E0A /* FontSvrEASF.h */,
+				BA9364AB0B653CE200FE4E0A /* Environ.h */,
+				BA9364AC0B653CE200FE4E0A /* PIRequir.h */,
+				BA9364AD0B653CE200FE4E0A /* EncConvE.h */,
+				BA9364AE0B653CE200FE4E0A /* CosSynEASF.h */,
+				BA9364AF0B653CE200FE4E0A /* PagePDECntCalls.h */,
+				BA9364B00B653CE200FE4E0A /* PageE.h */,
+				BA9364B10B653CE200FE4E0A /* RasterE.h */,
+				BA9364B20B653CE200FE4E0A /* ToolkitInitE.h */,
+				BA9364B30B653CE200FE4E0A /* SmartPDPage.h */,
+				BA9364B40B653CE200FE4E0A /* RasterEASF.h */,
+				BA9364B50B653CE200FE4E0A /* Plugin.h */,
+				BA9364B60B653CE200FE4E0A /* PIPokes.h */,
+				BA9364B70B653CE200FE4E0A /* PIMain.h */,
+				BA9364B80B653CE200FE4E0A /* PICommon.h */,
+				BA9364B90B653CE200FE4E0A /* PgCntProcs.h */,
+				BA9364BA0B653CE200FE4E0A /* PEWProcs.h */,
+				BA9364BB0B653CE200FE4E0A /* PEWCalls.h */,
+				BA9364BC0B653CE200FE4E0A /* PETypes.h */,
+				BA9364BD0B653CE200FE4E0A /* PERProcs.h */,
+				BA9364BE0B653CE200FE4E0A /* PERCalls.h */,
+				BA9364BF0B653CE200FE4E0A /* PEExpT.h */,
+				BA9364C00B653CE200FE4E0A /* PEErrorASF.h */,
+				BA9364C10B653CE200FE4E0A /* PEVers.h */,
+				BA9364C20B653CE200FE4E0A /* PDSysFT.h */,
+				BA9364C30B653CE200FE4E0A /* PDSysFontExpT.h */,
+				BA9364C40B653CE200FE4E0A /* PDSReadCalls.h */,
+				BA9364C50B653CE200FE4E0A /* PDSExpT.h */,
+				BA9364C60B653CE200FE4E0A /* PDSErrorASF.h */,
+				BA9364C70B653CE200FE4E0A /* PDSError.h */,
+				BA9364C80B653CE200FE4E0A /* PDProcs.h */,
+				BA9364C90B653CE200FE4E0A /* PDPageEASF.h */,
+				BA9364CA0B653CE200FE4E0A /* PSFCalls.h */,
+				BA9364CB0B653CE200FE4E0A /* PDDocEASF.h */,
+				BA9364CC0B653CE200FE4E0A /* PDDocE.h */,
+				BA9364CD0B653CE200FE4E0A /* PDClasses.h */,
+				BA9364CE0B653CE200FE4E0A /* PIVersn.h */,
+				BA9364CF0B653CE200FE4E0A /* ASGenEASF.h */,
+				BA9364D00B653CE200FE4E0A /* CosCalls.h */,
+				BA9364D10B653CE200FE4E0A /* CorProcs.h */,
+				BA9364D20B653CE200FE4E0A /* CoreExpT.h */,
+				BA9364D30B653CE200FE4E0A /* PageEASF.h */,
+				BA9364D40B653CE200FE4E0A /* CosGenEASF.h */,
+				BA9364D50B653CE200FE4E0A /* ASExtraVers.h */,
+				BA9364D60B653CE200FE4E0A /* CosGenE.h */,
+				BA9364D70B653CE200FE4E0A /* CosExpT.h */,
+				BA9364D80B653CE200FE4E0A /* PDClassDefs.h */,
+				BA9364D90B653CE200FE4E0A /* PDCalls.h */,
+				BA9364DA0B653CE200FE4E0A /* PDBasicExpT.h */,
+				BA9364DB0B653CE200FE4E0A /* ASExtraCalls.h */,
+				BA9364DC0B653CE200FE4E0A /* ASExpT.h */,
+				BA9364DD0B653CE200FE4E0A /* acroassert.h */,
+				BA9364DE0B653CE200FE4E0A /* PDPageE.h */,
+				BA9364DF0B653CE200FE4E0A /* PDModEASF.h */,
+				BA9364E00B653CE200FE4E0A /* PDModE.h */,
+				BA9364E10B653CE200FE4E0A /* PDMetadataProcs.h */,
+				BA9364E20B653CE200FE4E0A /* PDMetadataHFTVers.h */,
+				BA9364E30B653CE200FE4E0A /* PDMetadataExpT.h */,
+				BA9364E40B653CE200FE4E0A /* CorCalls.h */,
+				BA9364E50B653CE200FE4E0A /* ASRaiseAware.h */,
+				BA9364E60B653CE200FE4E0A /* ASCalls.h */,
+				BA9364E70B653CE200FE4E0A /* AcroColorExpT.h */,
+				BA9364E80B653CE200FE4E0A /* PDSWriteHFTVers.h */,
+				BA9364E90B653CE200FE4E0A /* PDSReadProcs.h */,
+				BA9364EA0B653CE200FE4E0A /* PDSReadHFTVers.h */,
+				BA9364EB0B653CE200FE4E0A /* PDSWriteCalls.h */,
+				BA9364EC0B653CE200FE4E0A /* NSelExpT.h */,
+				BA9364ED0B653CE200FE4E0A /* MacPlatform.h */,
+				BA9364EE0B653CE200FE4E0A /* PEError.h */,
+				BA9364EF0B653CE200FE4E0A /* ASExtraProcs.h */,
+				BA9364F00B653CE200FE4E0A /* ASExtraExpT.h */,
+				BA9364F10B653CE200FE4E0A /* PDMetadataCalls.h */,
+				BA9364F20B653CE200FE4E0A /* PDFXEASF.h */,
+				BA9364F30B653CE200FE4E0A /* PDFXE.h */,
+				BA9364F40B653CE200FE4E0A /* PDFLProcs.h */,
+				BA9364F50B653CE200FE4E0A /* PDFLCalls.h */,
+				BA9364F60B653CE200FE4E0A /* PDFInit.h */,
+				BA9364F70B653CE200FE4E0A /* PDFErrorCodes.h */,
+				BA9364F80B653CE200FE4E0A /* PDExpT.h */,
+				BA9364F90B653CE200FE4E0A /* AcroColorCalls.h */,
+				BA9364FA0B653CE200FE4E0A /* AcroErr.h */,
+				BA9364FB0B653CE200FE4E0A /* AcroColorVers.h */,
+				BA9364FC0B653CE200FE4E0A /* Library.h */,
+				BA9364FD0B653CE200FE4E0A /* HFTLibrary.h */,
+				BA9364FE0B653CE200FE4E0A /* PSFProcs.h */,
+				BA9364FF0B653CE200FE4E0A /* PDFLRequir.h */,
+				BA9365000B653CE200FE4E0A /* AcroColorHFT.h */,
+				BA9365010B653CE200FE4E0A /* AcroColorProcs.h */,
+			);
+			name = Headers;
+			sourceTree = "<group>";
+		};
+		BA7F63E60A53393300BFE059 /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				335727F70C9B424E0095FC3D /* DL150ACE.framework */,
+				335727F80C9B424E0095FC3D /* DL150AGM.framework */,
+				335727F90C9B424E0095FC3D /* DL150ARE.framework */,
+				335727FA0C9B424E0095FC3D /* DL150AXE8SharedExpat.framework */,
+				335727FB0C9B424E0095FC3D /* DL150BIB.framework */,
+				335727FC0C9B424E0095FC3D /* DL150BIBUtils.framework */,
+				335727FD0C9B424E0095FC3D /* DL150CoolType.framework */,
+				3EC92F860F98F6CE00505316 /* DL150JP2KLib.framework */,
+				3EC92F890F98F6D400505316 /* DL150AdobeXMP.framework */,
+				335727FF0C9B424E0095FC3D /* DL150PDFL.framework */,
+				3EC92F8C0F98F6E600505316 /* ICUData.framework */,
+				3EC92F8D0F98F6E600505316 /* ICUConverter.framework */,
+				BA568C150A47467400825A50 /* CoreServices.framework */,
+				20286C33FDCF999611CA2CEA /* Foundation.framework */,
+				BA2E45950888421A0081FD28 /* ApplicationServices.framework */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		BA8BFB7D0AC2F69500AF4E32 /* Configurations */ = {
+			isa = PBXGroup;
+			children = (
+				9C32A3CF0BDE9442002858C3 /* Debug.xcconfig */,
+				9C32A3D00BDE9442002858C3 /* Release.xcconfig */,
+				9C32A3D10BDE9442002858C3 /* Resources.xcconfig */,
+				BA8BFD400AC30A6D00AF4E32 /* ProjectConfigurations */,
+				BA8BFCA50AC30A0700AF4E32 /* Default.xcconfig */,
+				BA8BFCA90AC30A0700AF4E32 /* Environment.xcconfig */,
+			);
+			name = Configurations;
+			sourceTree = "<group>";
+		};
+		BA8BFD400AC30A6D00AF4E32 /* ProjectConfigurations */ = {
+			isa = PBXGroup;
+			children = (
+				BA8BFD410AC30A6D00AF4E32 /* Project_debug.xcconfig */,
+				BA8BFD420AC30A6D00AF4E32 /* Project_release.xcconfig */,
+				BA8BFD430AC30A6D00AF4E32 /* ProjectDefault.xcconfig */,
+				BA8BFD440AC30A6D00AF4E32 /* ProjectResources.xcconfig */,
+			);
+			path = ProjectConfigurations;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		BA44EC250ADABD3A00A1208A /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BA93648A0B653CD200FE4E0A /* PDFLPrecompile.pch in Headers */,
+				BA9365020B653CE200FE4E0A /* ToolkitInitEASF.h in Headers */,
+				BA9365030B653CE200FE4E0A /* XtnMgrEASF.h in Headers */,
+				BA9365040B653CE200FE4E0A /* XtnMgrE.h in Headers */,
+				BA9365050B653CE200FE4E0A /* EReturnValidator.h in Headers */,
+				BA9365060B653CE200FE4E0A /* PDMetadataErrorASF.h in Headers */,
+				BA9365070B653CE200FE4E0A /* PDMetadataError.h in Headers */,
+				BA9365080B653CE200FE4E0A /* PIExcept.h in Headers */,
+				BA9365090B653CE200FE4E0A /* PDSysFont.h in Headers */,
+				BA93650A0B653CE200FE4E0A /* PDSWriteProcs.h in Headers */,
+				BA93650B0B653CE200FE4E0A /* ASProcs.h in Headers */,
+				BA93650C0B653CE200FE4E0A /* ASKey.h in Headers */,
+				BA93650D0B653CE200FE4E0A /* FontSvrE.h in Headers */,
+				BA93650E0B653CE200FE4E0A /* CosSynE.h in Headers */,
+				BA93650F0B653CE200FE4E0A /* CosProcs.h in Headers */,
+				BA9365100B653CE200FE4E0A /* PDFLPrint.h in Headers */,
+				BA9365110B653CE200FE4E0A /* PDFLInitHFT.h in Headers */,
+				BA9365120B653CE200FE4E0A /* PDFLInitCommon.h in Headers */,
+				BA9365130B653CE200FE4E0A /* PDFLHFTVers.h in Headers */,
+				BA9365140B653CE200FE4E0A /* PDFLHFT.h in Headers */,
+				BA9365150B653CE200FE4E0A /* PDFLExpT.h in Headers */,
+				BA9365160B653CE200FE4E0A /* PDFLErrorsFromASF.h in Headers */,
+				BA9365170B653CE200FE4E0A /* ASGenE.h in Headers */,
+				BA9365180B653CE200FE4E0A /* ASFileEASF.h in Headers */,
+				BA9365190B653CE200FE4E0A /* ASFileE.h in Headers */,
+				BA93651A0B653CE200FE4E0A /* FontSvrEASF.h in Headers */,
+				BA93651B0B653CE200FE4E0A /* Environ.h in Headers */,
+				BA93651C0B653CE200FE4E0A /* PIRequir.h in Headers */,
+				BA93651D0B653CE200FE4E0A /* EncConvE.h in Headers */,
+				BA93651E0B653CE200FE4E0A /* CosSynEASF.h in Headers */,
+				BA93651F0B653CE200FE4E0A /* PagePDECntCalls.h in Headers */,
+				BA9365200B653CE200FE4E0A /* PageE.h in Headers */,
+				BA9365210B653CE200FE4E0A /* RasterE.h in Headers */,
+				BA9365220B653CE200FE4E0A /* ToolkitInitE.h in Headers */,
+				BA9365230B653CE200FE4E0A /* SmartPDPage.h in Headers */,
+				BA9365240B653CE200FE4E0A /* RasterEASF.h in Headers */,
+				BA9365250B653CE200FE4E0A /* Plugin.h in Headers */,
+				BA9365260B653CE200FE4E0A /* PIPokes.h in Headers */,
+				BA9365270B653CE200FE4E0A /* PIMain.h in Headers */,
+				BA9365280B653CE200FE4E0A /* PICommon.h in Headers */,
+				BA9365290B653CE200FE4E0A /* PgCntProcs.h in Headers */,
+				BA93652A0B653CE200FE4E0A /* PEWProcs.h in Headers */,
+				BA93652B0B653CE200FE4E0A /* PEWCalls.h in Headers */,
+				BA93652C0B653CE200FE4E0A /* PETypes.h in Headers */,
+				BA93652D0B653CE200FE4E0A /* PERProcs.h in Headers */,
+				BA93652E0B653CE200FE4E0A /* PERCalls.h in Headers */,
+				BA93652F0B653CE200FE4E0A /* PEExpT.h in Headers */,
+				BA9365300B653CE200FE4E0A /* PEErrorASF.h in Headers */,
+				BA9365310B653CE200FE4E0A /* PEVers.h in Headers */,
+				BA9365320B653CE200FE4E0A /* PDSysFT.h in Headers */,
+				BA9365330B653CE200FE4E0A /* PDSysFontExpT.h in Headers */,
+				BA9365340B653CE200FE4E0A /* PDSReadCalls.h in Headers */,
+				BA9365350B653CE200FE4E0A /* PDSExpT.h in Headers */,
+				BA9365360B653CE200FE4E0A /* PDSErrorASF.h in Headers */,
+				BA9365370B653CE200FE4E0A /* PDSError.h in Headers */,
+				BA9365380B653CE200FE4E0A /* PDProcs.h in Headers */,
+				BA9365390B653CE200FE4E0A /* PDPageEASF.h in Headers */,
+				BA93653A0B653CE200FE4E0A /* PSFCalls.h in Headers */,
+				BA93653B0B653CE200FE4E0A /* PDDocEASF.h in Headers */,
+				BA93653C0B653CE200FE4E0A /* PDDocE.h in Headers */,
+				BA93653D0B653CE200FE4E0A /* PDClasses.h in Headers */,
+				BA93653E0B653CE200FE4E0A /* PIVersn.h in Headers */,
+				BA93653F0B653CE200FE4E0A /* ASGenEASF.h in Headers */,
+				BA9365400B653CE200FE4E0A /* CosCalls.h in Headers */,
+				BA9365410B653CE200FE4E0A /* CorProcs.h in Headers */,
+				BA9365420B653CE200FE4E0A /* CoreExpT.h in Headers */,
+				BA9365430B653CE200FE4E0A /* PageEASF.h in Headers */,
+				BA9365440B653CE200FE4E0A /* CosGenEASF.h in Headers */,
+				BA9365450B653CE200FE4E0A /* ASExtraVers.h in Headers */,
+				BA9365460B653CE200FE4E0A /* CosGenE.h in Headers */,
+				BA9365470B653CE200FE4E0A /* CosExpT.h in Headers */,
+				BA9365480B653CE200FE4E0A /* PDClassDefs.h in Headers */,
+				BA9365490B653CE200FE4E0A /* PDCalls.h in Headers */,
+				BA93654A0B653CE200FE4E0A /* PDBasicExpT.h in Headers */,
+				BA93654B0B653CE200FE4E0A /* ASExtraCalls.h in Headers */,
+				BA93654C0B653CE200FE4E0A /* ASExpT.h in Headers */,
+				BA93654D0B653CE200FE4E0A /* acroassert.h in Headers */,
+				BA93654E0B653CE200FE4E0A /* PDPageE.h in Headers */,
+				BA93654F0B653CE200FE4E0A /* PDModEASF.h in Headers */,
+				BA9365500B653CE200FE4E0A /* PDModE.h in Headers */,
+				BA9365510B653CE200FE4E0A /* PDMetadataProcs.h in Headers */,
+				BA9365520B653CE200FE4E0A /* PDMetadataHFTVers.h in Headers */,
+				BA9365530B653CE200FE4E0A /* PDMetadataExpT.h in Headers */,
+				BA9365540B653CE200FE4E0A /* CorCalls.h in Headers */,
+				BA9365550B653CE200FE4E0A /* ASRaiseAware.h in Headers */,
+				BA9365560B653CE200FE4E0A /* ASCalls.h in Headers */,
+				BA9365570B653CE200FE4E0A /* AcroColorExpT.h in Headers */,
+				BA9365580B653CE200FE4E0A /* PDSWriteHFTVers.h in Headers */,
+				BA9365590B653CE200FE4E0A /* PDSReadProcs.h in Headers */,
+				BA93655A0B653CE200FE4E0A /* PDSReadHFTVers.h in Headers */,
+				BA93655B0B653CE200FE4E0A /* PDSWriteCalls.h in Headers */,
+				BA93655C0B653CE200FE4E0A /* NSelExpT.h in Headers */,
+				BA93655D0B653CE200FE4E0A /* MacPlatform.h in Headers */,
+				BA93655E0B653CE200FE4E0A /* PEError.h in Headers */,
+				BA93655F0B653CE200FE4E0A /* ASExtraProcs.h in Headers */,
+				BA9365600B653CE200FE4E0A /* ASExtraExpT.h in Headers */,
+				BA9365610B653CE200FE4E0A /* PDMetadataCalls.h in Headers */,
+				BA9365620B653CE200FE4E0A /* PDFXEASF.h in Headers */,
+				BA9365630B653CE200FE4E0A /* PDFXE.h in Headers */,
+				BA9365640B653CE200FE4E0A /* PDFLProcs.h in Headers */,
+				BA9365650B653CE200FE4E0A /* PDFLCalls.h in Headers */,
+				BA9365660B653CE200FE4E0A /* PDFInit.h in Headers */,
+				BA9365670B653CE200FE4E0A /* PDFErrorCodes.h in Headers */,
+				BA9365680B653CE200FE4E0A /* PDExpT.h in Headers */,
+				BA9365690B653CE200FE4E0A /* AcroColorCalls.h in Headers */,
+				BA93656A0B653CE200FE4E0A /* AcroErr.h in Headers */,
+				BA93656B0B653CE200FE4E0A /* AcroColorVers.h in Headers */,
+				BA93656C0B653CE200FE4E0A /* Library.h in Headers */,
+				BA93656D0B653CE200FE4E0A /* HFTLibrary.h in Headers */,
+				BA93656E0B653CE200FE4E0A /* PSFProcs.h in Headers */,
+				BA93656F0B653CE200FE4E0A /* PDFLRequir.h in Headers */,
+				BA9365700B653CE200FE4E0A /* AcroColorHFT.h in Headers */,
+				BA9365710B653CE200FE4E0A /* AcroColorProcs.h in Headers */,
+				BA9365EA0B653D1400FE4E0A /* extrURI.h in Headers */,
+				BA9365EB0B653D1400FE4E0A /* macUtils.h in Headers */,
+				BA9365EC0B653D1400FE4E0A /* MyPDFLibUtils.h in Headers */,
+				BA9365EE0B653D1400FE4E0A /* SDKThreads.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		8D0C4E890486CD37000505A6 /* MTPDFA */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BACCD184089AA4370006D315 /* Build configuration list for PBXNativeTarget "MTPDFA" */;
+			buildPhases = (
+				BA44EC250ADABD3A00A1208A /* Headers */,
+				8D0C4E8F0486CD37000505A6 /* Sources */,
+				8D0C4E910486CD37000505A6 /* Frameworks */,
+				BAD19408088F1C5600DCC249 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MTPDFA;
+			productInstallPath = "$(HOME)/Applications";
+			productName = HelowrldX;
+			productReference = BAAFDE0808980F3600470124 /* MTPDFA-Debug.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		20286C28FDCF999611CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0450;
+			};
+			buildConfigurationList = BACCD188089AA4370006D315 /* Build configuration list for PBXProject "MTPDFA" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 20286C29FDCF999611CA2CEA /* HelowrldX */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D0C4E890486CD37000505A6 /* MTPDFA */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D0C4E8F0486CD37000505A6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2E33C4031E81732B000FA07B /* MTWorker.cpp in Sources */,
+				BA18F3700885D7D300B9CC28 /* MyPDFLibApp.cpp in Sources */,
+				BA18F3720885D7DA00B9CC28 /* MyPDFLibUtils.cpp in Sources */,
+				BA18F3740885D7E400B9CC28 /* macutils.c in Sources */,
+				BA0654DB0AC34D340029CB3D /* PDFLInitCommon.c in Sources */,
+				BA6D7D520ACDCEFD00629526 /* WatchFolder.cpp in Sources */,
+				BA93C6F50B61809E002C5ED0 /* PDFLInitHFT.c in Sources */,
+				2E33C4021E81732B000FA07B /* MTmain.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		9C32A4010BDE94B0002858C3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BA8BFD420AC30A6D00AF4E32 /* Project_release.xcconfig */;
+			buildSettings = {
+				BASE_GCC_PREPROCESSOR_DEFINITIONS = "LOAD_PLUGIN=1 AS_DEBUG=1 DEBUG=1 _DEBUG=1 DISABLECPLUSPLUSDURING=0 EXCEPTIONS_ALWAYS_CPLUSPLUS=1";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../Binaries\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../../Binaries\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../Binaries\"";
+			};
+			name = Release;
+		};
+		9C32A4020BDE94B0002858C3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BA8BFD430AC30A6D00AF4E32 /* ProjectDefault.xcconfig */;
+			buildSettings = {
+				CLANG_LINK_OBJC_RUNTIME = NO;
+			};
+			name = Release;
+		};
+		BACCD187089AA4370006D315 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BA8BFD410AC30A6D00AF4E32 /* Project_debug.xcconfig */;
+			buildSettings = {
+				BASE_GCC_PREPROCESSOR_DEFINITIONS = "LOAD_PLUGIN=1 AS_DEBUG=1 DEBUG=1 _DEBUG=1 DISABLECPLUSPLUSDURING=0 EXCEPTIONS_ALWAYS_CPLUSPLUS=1";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../Binaries\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../../Binaries\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../Binaries\"";
+			};
+			name = Debug;
+		};
+		BACCD18B089AA4370006D315 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BA8BFD430AC30A6D00AF4E32 /* ProjectDefault.xcconfig */;
+			buildSettings = {
+				CLANG_LINK_OBJC_RUNTIME = NO;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BACCD184089AA4370006D315 /* Build configuration list for PBXNativeTarget "MTPDFA" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BACCD187089AA4370006D315 /* Debug */,
+				9C32A4010BDE94B0002858C3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BACCD188089AA4370006D315 /* Build configuration list for PBXProject "MTPDFA" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BACCD18B089AA4370006D315 /* Debug */,
+				9C32A4020BDE94B0002858C3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 20286C28FDCF999611CA2CEA /* Project object */;
+}
