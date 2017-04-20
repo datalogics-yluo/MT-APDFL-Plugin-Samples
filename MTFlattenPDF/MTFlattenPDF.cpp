@@ -14,8 +14,8 @@
 
 #include "WatchFolder.h"
 #include "FlattenPDFWorker.h"
-#include "stdio.h"
 #ifndef WIN_PLATFORM
+#include "stdio.h"
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -72,20 +72,19 @@ int MainProc(int argc, char *argv[] )
     ASInt32 loop = numFiles;
     if (numFiles < numThreads)
         loop = numThreads;
-    char *firstFile = static_cast<char *>(ASmalloc(256));
-    char *otherFile = static_cast<char *>(ASmalloc(256));
+    char firstFile[1024], otherFile[1024];
 
 
 #ifdef WIN_PLATFORM
-    strcpy_safe(firstFile, "TransPDF.pdf");
+    strcpy_safe(firstFile, 1024, "TransPDF.pdf");
     for(ASInt32 index = 0; index < loop; index++)
     {
         //Copy Input.pdf to Input-[index].pdf
-        strcpy_safe(otherFile, folderName);
-        strcat_safe(otherFile, "\\TransPDF");
+        strcpy_safe(otherFile, 1024, folderName);
+        strcat_safe(otherFile, 1024, "\\TransPDF");
         char str[50];
         sprintf_safe(str, "-%d.pdf", index);
-        strcat_safe(otherFile, str);
+        strcat_safe(otherFile, 1024, str);
         BOOL b = CopyFile(firstFile, otherFile, 0);
     }
     
