@@ -38,14 +38,19 @@ ThreadFuncReturnType FlattenPDF(ThreadArgs *pArgs)
 	INIT_AUTO_POOL(autoReleasePool);	/* Required only on MAC platform */
 	
 	WatchFolder *theWF = pArgs->watchFolder;
+    // we intitialise outside the loop
+    MyPDFLInit();
+    gPDFlattenerHFT = InitPDFlattenerHFT;
+    //initialize flattener plugin
+    if (!PDFlattenerInitialize())
+    {
+        fprintf(stderr, "Error initializing PDFlattener Plugin -- aborting\n");
+        return NULL;
+    }
 
 	while (1){
-		// we intitialise inside the loop to remove the risk of internal library leaks
-		// this has the effect of deleting all the thread specific PDFL data.
-		MyPDFLInit();
 		
 		// first thing we do is get the path from the WatchFolder
-
 		char* fileToExtract;
 		if(theWF->numToReturn > 0)
 			fileToExtract = (char*) theWF->getFile();
@@ -55,6 +60,8 @@ ThreadFuncReturnType FlattenPDF(ThreadArgs *pArgs)
 		// we terminate the main loop if the watchFolder abstraction
 		// gives us a NULL token. This thread can now die.
 		if (fileToExtract == NULL) {
+            //Terminate flattener plugin
+            PDFlattenerTerminate();
 			MyPDFLTerm();
 			/////break;
 			return 0;
@@ -89,30 +96,20 @@ ThreadFuncReturnType FlattenPDF(ThreadArgs *pArgs)
         printf("%s\n", outputbuffer);
 
         DURING
-            gPDFlattenerHFT = InitPDFlattenerHFT;
 
-        //initialize flattener plugin
-        if (gPDFlattenerHFT  &&   PDFlattenerInitialize())
-        {
-            //Flatten PDF using API PDFlattenerConvertEx() with Callback
-            printf("\nFlattening using PDFlattenerConvertEx (with Callback)\n");
-            ASBool progressData = false;
-            FlattenPDFMain(inputbuffer, outputbuffer,
-                FlattenProgressMonitorCB, /* Progress Monitor Callback with Cancel Option */
-                (void*)&progressData /* Client Supplied Data for Callback*/);
+        //Flatten PDF using API PDFlattenerConvertEx() with Callback
+        printf("\nFlattening using PDFlattenerConvertEx (with Callback)\n");
+        ASBool progressData = false;
+        FlattenPDFMain(inputbuffer, outputbuffer,
+                       FlattenProgressMonitorCB, /* Progress Monitor Callback with Cancel Option */
+                       (void*)&progressData /* Client Supplied Data for Callback*/);
 
-            //Terminate flattener plugin
-            PDFlattenerTerminate();
-        }
-        else
-            /* DLADD: kshahn 13Aug2009 - Plugin is PDFlattener. */
-            printf("Initialization of PDFlattener Plugin failed...\n");
+
         HANDLER
-            printf("MainProc has thrown an exception...\n");
+        printf("MainProc has thrown an exception...\n");
         DisplayError(ERRORCODE);
         END_HANDLER
 
-		MyPDFLTerm();
 	}
 	
 	RELEASE_AUTO_POOL(autoReleasePool); /* Required only on MAC platform */
