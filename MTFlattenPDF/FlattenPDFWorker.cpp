@@ -31,6 +31,9 @@
 #ifdef UNIX_ENV
 #include "string.h"
 #endif
+
+#define	UsingSingleInput	        1	/* Using single inputfile TransPDF.pdf for all thread */
+
 void FlattenPDFMain(const char * input, char * output, FlattenProgressMonitor = 0, void * clientData = 0);
 ASBool FlattenProgressMonitorCB(ASInt32 pageNum, ASInt32 totalPages, float current, ASInt32 reserved, void *clientData);
 ThreadFuncReturnType FlattenPDF(ThreadArgs *pArgs)
@@ -88,7 +91,11 @@ ThreadFuncReturnType FlattenPDF(ThreadArgs *pArgs)
 		strcpy_safe(newFilename, strlen(fileToExtract)+1, fileToExtract);
 
 		char inputbuffer[400], outputbuffer[400];
+#if UsingSingleInput
+		sprintf_safe(inputbuffer, sizeof(inputbuffer), "TransPDF.pdf");
+#else
         sprintf_safe(inputbuffer, sizeof(inputbuffer), newFilename);
+#endif
         printf("\ninput - %s\n", inputbuffer);
 
         sprintf_safe(outputbuffer, sizeof(outputbuffer), pathnm);
@@ -142,11 +149,14 @@ void FlattenPDFMain(const char * input, char * output, FlattenProgressMonitor, v
 {
     DURING
     PDDoc pddoc = NULL;
-
+#if UsingSingleInput
+    string filename(input);
+#else
     string tmpstr(input);
     ASSize_t sentinal = tmpstr.rfind('/');
     string filename = tmpstr.substr(sentinal,string::npos);
     filename = string("indir") + filename;
+#endif
     char *pathnm = static_cast<char *>(ASmalloc(filename.length() + 1));
     sprintf_safe(pathnm, filename.length() + 1, "%s", filename.c_str());
 
