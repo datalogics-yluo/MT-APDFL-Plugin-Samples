@@ -71,14 +71,13 @@ ThreadFuncReturnType FlattenPDF(ThreadArgs *pArgs)
 		// the destination file is filenmae.txt, in the parent directory.
 		// this code is intentionally simple, a real implementation would
 		// have a robust implementation.
+		printf("fileToExtract -%s\n", fileToExtract);
 		string tmpstr(fileToExtract);
 		ASSize_t sentinal = tmpstr.rfind('/');
 		string filename = tmpstr.substr(sentinal,string::npos);
 		filename.replace(filename.end() - 4, filename.end(), "-out.pdf");
-		tmpstr = tmpstr.substr(0,sentinal);
-		sentinal = tmpstr.rfind('/');
-		tmpstr = tmpstr.substr(0,sentinal);
-		tmpstr += string("/outdir") + filename;
+
+		tmpstr = string("outdir") + filename;
 		char *pathnm = static_cast<char *>(ASmalloc(tmpstr.length()+1));
 		sprintf_safe(pathnm,tmpstr.length()+1,"%s",tmpstr.c_str());
 		
@@ -90,10 +89,10 @@ ThreadFuncReturnType FlattenPDF(ThreadArgs *pArgs)
 
 		char inputbuffer[400], outputbuffer[400];
         sprintf_safe(inputbuffer, sizeof(inputbuffer), newFilename);
-        printf("\n%s\n", inputbuffer);
+        printf("\ninput - %s\n", inputbuffer);
 
         sprintf_safe(outputbuffer, sizeof(outputbuffer), pathnm);
-        printf("%s\n", outputbuffer);
+        printf("output - %s\n", outputbuffer);
 
         DURING
 
