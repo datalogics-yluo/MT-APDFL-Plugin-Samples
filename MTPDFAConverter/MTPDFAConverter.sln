@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MTPDFAConverter", "MTPDFACOnverter.vcxproj", "{F3684309-62C2-469E-9E2A-CC61CF46B0D5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MTapp", "MTPDFAConverter.vcxproj", "{F3684309-62C2-469E-9E2A-CC61CF46B0D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
