@@ -131,7 +131,7 @@ class NonAPDFLWorker : public workerclass
     /* This thread will copy a specified file N times, into new specified files.
     */
 public:
-    NonAPDFLWorker () { Repetitions = 0; };
+    NonAPDFLWorker () { Repetitions[0] = 0; RepetitionsCount = 0; };
     ~NonAPDFLWorker () { };
 
     /* Parse the non-APDFL conversion thread options into attributes */
@@ -140,9 +140,17 @@ public:
         parseCommonOptions (values, inputPath "AddRedaction.pdf", "Output");
 
         if (threadAttributes->IsKeyPresent ("Repetitions"))
-            Repetitions = threadAttributes->GetKeyValueInt ("Repetitions");
+        {
+            valuelist *values = threadAttributes->GetKeyValue ("Repetitions");
+            RepetitionsCount = values->size ();
+            for (int index = 0; index < RepetitionsCount; index++)
+                Repetitions[index] = values->GetValueInt (index);
+        }
         else
-            Repetitions = 5;
+        {
+            RepetitionsCount = 1;
+            Repetitions[0] = 5;
+        }
     };
 
     /* One thread worker procedure */
@@ -155,15 +163,17 @@ public:
         /* Presume we willcomplete cleanly */
         info->result = 0;
 
-        /* This process willopen an input file, read it's contents to memory, close the file, and write it N times into
-        ** new files inthe output directory
+        /* This process will open an input file, read it's contents to memory, close the file, and write it N times into
+        ** new files in the output directory
         */
-        char fullFileName[2048];
-        char SepChar[2] = { PathSep, 0 };
-        sprintf (fullFileName, "%s%s%s.%s", InFilePath, SepChar, InFileName, InFileSuffix);
+        char *fullFileName = GetInFileName (sequence);
 
         /* Open the file, and get it's size */
         FILE *input = fopen (fullFileName, "rb");
+
+        /* free the file name */
+        free (fullFileName);
+
         if (!input)
             /* if we could not open the file, mark as failed or reason 1 */
             info->result = 1;
@@ -189,10 +199,17 @@ public:
             else
             {
                 /* Create n new copies of the file */
-                for (int x = 0; x < Repetitions; x++)
+                for (int x = 0; x < Repetitions[sequence % RepetitionsCount]; x++)
                 {
-                    sprintf (fullFileName, "%s%s%s_%01d_%01d.%s", OutFilePath, SepChar, InFileName, sequence + 1, x + 1, InFileSuffix);
+                    /* Build file name from options */
+                    fullFileName = GetOutFileName (sequence, x);
+
+                    /* Open the output file */
                     FILE *output = fopen (fullFileName, "wb");
+
+                    /* Free the file name */
+                    free (fullFileName);
+
                     if (!output)
                         /* If we could not open the output, fail for reason 3 */
                         info->result = 3;
@@ -214,10 +231,12 @@ public:
     }
 
 private:
-    ASInt32     Repetitions;
+    ASInt32     Repetitions[100];
+    ASInt32     RepetitionsCount;
 };
 
 
+#include "PDFProcessorCalls.h"
 class PDFaWorker : public workerclass
 {
 public:
@@ -229,8 +248,33 @@ public:
     void ParseOptions (valuelist *values)
     {
         parseCommonOptions (values, inputPath "AddRedaction.pdf", "Output");
-    };
 
+        if (threadAttributes->IsKeyPresent ("RasterizeFontErrors"))
+        {
+            valuelist *values = threadAttributes->GetKeyValue ("RasterizeFontErrors");
+            rasterizeFontErrorsCount = values->size ();
+            for (int index = 0; index < rasterizeFontErrorsCount; index++)
+                rasterizeFontErrors[index] = values->GetValueBool (index);
+        }
+        else
+        {
+            rasterizeFontErrorsCount = 1;
+            rasterizeFontErrors[0] = false;
+        }
+
+        if (threadAttributes->IsKeyPresent ("RemoveAllAnnotations"))
+        {
+            valuelist *values = threadAttributes->GetKeyValue ("RemoveAllAnnotations");
+            removeAllAnnotationsCount = values->size ();
+            for (int index = 0; index < removeAllAnnotationsCount; index++)
+                removeAllAnnotations[index] = values->GetValueBool (index);
+        }
+        else
+        {
+            removeAllAnnotationsCount = 1;
+            removeAllAnnotations[0] = false;
+        }
+    };
 
     /* One thread worker procedure */
     void WorkerThread (ThreadInfo *info)
@@ -239,12 +283,71 @@ public:
         if (!silent)
             printf ("PDF/a Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
+        /* Generate input and output file names */
+        char *fullFileName = GetInFileName (sequence);
+        char *fullOutputFileName = GetOutFileName (sequence, -1);
+
+        DURING
+            /* Open the input document */
+            APDFLDoc inDoc (fullFileName, true);
+
+            /* Free the input file names */
+            free (fullFileName);
+
+            /* Initialize the HFT for the plugin */
+            gPDFProcessorHFT = InitPDFProcessorHFT;
+
+            //initialize PDFProcessor plugin
+            if (!PDFProcessorInitialize ())
+                /* If the plugin cannot be initilized! */
+                info->result = 1;
+            else
+            {
+                /* COnstruct the user params recor for the PDF/A conversion */
+                PDFProcessorPDFAConvertParamsRec userParams;
+
+                memset ((char *)&userParams, 0, sizeof (PDFProcessorPDFAConvertParamsRec));
+                userParams.size = sizeof (PDFProcessorPDFAConvertParamsRec);
+                userParams.abortIfXFAPresent = false;
+                userParams.colorCompression = kPDFProcessorColorJpegCompression;
+                userParams.grayCompression = kPDFProcessorGrayZipCompression;
+                userParams.monoCompression = kPDFProcessorMonoCCITTGroup4Compression;
+                userParams.noRasterizationOnFontErrors = rasterizeFontErrors[sequence % rasterizeFontErrorsCount];
+                userParams.removeAllAnnotations = removeAllAnnotations[sequence % removeAllAnnotationsCount];
+
+
+                /* Create the ouput file ASPath name */
+#if !MAC_ENV	
+                ASPathName destFilePath = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullOutputFileName, NULL);
+#else
+                ASPathName destFilePath = GetMacPath (outputPath);
+#endif
+
+                /* Release the output file name */
+                free (fullOutputFileName);
+                
+                /* Perform the conversions */
+                PDFProcessorConvertAndSaveToPDFA (inDoc.getPDDoc (), destFilePath, ASGetDefaultFileSys (), kPDFProcessorConvertToPDFA1bRGB, &userParams);
+
+                /* Release the output path name */
+                ASFileSysReleasePath (NULL, destFilePath);
+
+                /* terminate the plugin */
+                PDFProcessorTerminate ();
+            }
+        HANDLER
+                info->result = 2;
+        END_HANDLER
+
         if (!silent)
             printf ("PDF/a Worker Thread Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
     }
 
 private:
-
+    bool rasterizeFontErrors[100];
+    int  rasterizeFontErrorsCount;
+    bool removeAllAnnotations[100];
+    int  removeAllAnnotationsCount;
 };
 
 class PDFxWorker : public workerclass
@@ -257,6 +360,20 @@ public:
     void ParseOptions (valuelist *values)
     {
         parseCommonOptions (values, inputPath "AddRedaction.pdf", "Output");
+
+        if (threadAttributes->IsKeyPresent ("RemoveAllAnnotations"))
+        {
+            valuelist *values = threadAttributes->GetKeyValue ("RemoveAllAnnotations");
+            removeAllAnnotationsCount = values->size ();
+            for (int index = 0; index < removeAllAnnotationsCount; index++)
+                removeAllAnnotations[index] = values->GetValueBool (index);
+        }
+        else
+        {
+            removeAllAnnotationsCount = 1;
+            removeAllAnnotations[0] = false;
+        }
+
     };
 
 
@@ -268,14 +385,73 @@ public:
         if (!silent)
             printf ("PDF/x Worker Thread started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
+        /* Generate input and output file names */
+        char *fullFileName = GetInFileName (sequence);
+        char *fullOutputFileName = GetOutFileName (sequence, -1);
+
+        DURING
+            /* Open the input document */
+            APDFLDoc inDoc (fullFileName, true);
+
+            /* Free the input file names */
+            free (fullFileName);
+
+            /* Initialize the HFT for the plugin */
+            gPDFProcessorHFT = InitPDFProcessorHFT;
+
+            //initialize PDFProcessor plugin
+            if (!PDFProcessorInitialize ())
+                /* If the plugin cannot be initilized! */
+                info->result = 1;
+            else
+            {
+                /* COnstruct the user params recor for the PDF/x conversion */
+                PDFProcessorPDFXConvertParamsRec userParams;
+
+                memset ((char *)&userParams, 0, sizeof (PDFProcessorPDFXConvertParamsRec));
+                userParams.size = sizeof (PDFProcessorPDFXConvertParamsRec);
+                userParams.abortIfXFAPresent = false;
+                userParams.colorCompression = kPDFProcessorColorJpegCompression;
+                userParams.grayCompression = kPDFProcessorGrayZipCompression;
+                userParams.monoCompression = kPDFProcessorMonoCCITTGroup4Compression;
+                removeAllAnnotations[sequence % removeAllAnnotationsCount];
+
+            /* Create the ouput file ASPath name */
+#if !MAC_ENV	
+                ASPathName destFilePath = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullOutputFileName, NULL);
+#else
+                ASPathName destFilePath = GetMacPath (outputPath);
+#endif
+
+                /* Release the output file name */
+                free (fullOutputFileName);
+
+                /* Perform the conversions */
+                PDFProcessorConvertAndSaveToPDFX (inDoc.getPDDoc (), destFilePath, ASGetDefaultFileSys (), kPDFProcessorConvertToPDFX32003, &userParams);
+
+                /* Release the output path name */
+                ASFileSysReleasePath (NULL, destFilePath);
+
+                /* terminate the plugin */
+                PDFProcessorTerminate ();
+            }
+        HANDLER
+            info->result = 2;
+        END_HANDLER
+
+
         if (!silent)
             printf ("PDF/x Worker Thread Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
     }
 
+private:
+
+    bool removeAllAnnotations[100];
+    int  removeAllAnnotationsCount;
 };
 
-
+#include "XPS2PDFCalls.h"
 class XPS2PDFWorker : public workerclass
 {
 public:
@@ -296,6 +472,75 @@ public:
         if (!silent)
             printf ("XPS to PDF Worker Thread! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
+        DURING
+
+            /* Set up the HFT for XPS2PDF */
+            gXPS2PDFHFT = InitXPS2PDFHFT;
+
+                /* Load and initialize the XPS2PDF plugin */
+            if (!XPS2PDFInitialize ())
+                info->result = 1;
+            else
+            {
+                /* Set up the job options. */
+                ASCab settings = ASCabNew ();
+
+                //The .joboptions file specifies a great number of settings which determine exactly how the PDF document
+                //is created by the converter.
+                ASText jobNameText = ASTextFromUnicode ((ASUTF16Val*)"../../../../Resources/joboptions/Standard.joboptions", kUTF8);
+                ASCabPutText (settings, "PDFSettings", jobNameText);
+
+                //Specify which description in the .joboptions file we will use.
+                //There are many others, for different langauges. See the file.
+                ASText language = ASTextFromUnicode ((ASUTF16Val*)"ENU", kUTF8);
+                ASCabPutText (settings, "PDFSettingsLang", language);
+
+                /* Generate input and output file names */
+                char *fullFileName = GetInFileName (sequence);
+                char *fullOutputFileName = GetOutFileName (sequence, -1);
+
+                /* The automatic logic will use he same suffix for the output as the input, so change the suffix here */
+                char *suffix = &fullOutputFileName[strlen (fullOutputFileName) - 3];
+                suffix[0] = 0;
+                strcat (fullOutputFileName, "pdf");
+
+                /* Create the ASPathName for the input (XPS) document */
+                ASPathName asInPathName = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullFileName, 0);
+
+                /* release the input file name */
+                free (fullFileName);
+
+                /* Convert the document */
+                PDDoc outputDoc = NULL;
+                int ret_val = XPS2PDFConvert (settings, 0, asInPathName, NULL, &outputDoc, NULL);
+
+                //If we succeeded, XPS2PDFConvert returns 1.
+                if (ret_val != 1)
+                    info->result = 2;
+                else
+                {
+                    /* Save the output PDF Document */
+                    APDFLDoc outAPDoc;
+                    outAPDoc.pdDoc = outputDoc;
+                    outAPDoc.saveDoc (fullOutputFileName);
+                }
+
+                /* release the output file name */
+                free (fullOutputFileName);
+
+                /* Release other resources created */
+                ASCabDestroy (settings);
+                ASFileSysReleasePath (NULL, asInPathName);
+
+            }
+
+            /* Terminate the plugin */
+            XPS2PDFTerminate ();
+
+        HANDLER
+                info->result = 3;
+        END_HANDLER
+
         if (!silent)
             printf ("XPS to PDF Worker Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
     }
@@ -313,7 +558,7 @@ public:
     /* Parse the text extract conversion thread options into attributes */
     void ParseOptions (valuelist *values)
     {
-        parseCommonOptions (values, inputPath "ExtractText.pdf", "Output");
+        parseCommonOptions (values, inputPath "constitution.pdf", "Output");
     };
 
 
@@ -323,6 +568,68 @@ public:
         int sequence = getNextSequence ();
         if (!silent)
             printf ("Text Extraction Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+
+        /* Generate input and output file names */
+        char *fullFileName = GetInFileName (sequence);
+        char *fullOutputFileName = GetOutFileName (sequence, -1);
+
+        /* The automatic logic will use he same suffix for the output as the input, so change the suffix here */
+        char *suffix = &fullOutputFileName[strlen (fullOutputFileName) - 3];
+        suffix[0] = 0;
+        strcat (fullOutputFileName, "txt");
+
+        DURING
+            /* Open the input document */
+            APDFLDoc inDoc (fullFileName, true);
+            PDDoc pdDoc = inDoc.getPDDoc ();
+
+            /* free input file name  */
+            free (fullFileName);
+
+            /* Get the number of pages */
+            size_t pages = PDDocGetNumPages (pdDoc);
+
+            /* */
+            PDWordFinderConfigRec wfConfig;
+            memset (&wfConfig, 0, sizeof (PDWordFinderConfigRec));
+            wfConfig.recSize = sizeof (PDWordFinderConfigRec);
+
+            /* Create a word finder */
+            PDWordFinder wordFinder = PDDocCreateWordFinderEx (pdDoc, WF_LATEST_VERSION, false, &wfConfig);
+
+            /* Acquire the words for the Nth page */
+            PDWord wordList;
+            ASInt32 numWordsFound;
+            PDWordFinderAcquireWordList (wordFinder, sequence % pages, &wordList, NULL, NULL, &numWordsFound);
+
+            /* Create a file to hold the words */
+            FILE *wordFile = fopen (fullOutputFileName, "w");
+
+            /* Release the file name */
+            free (fullOutputFileName);
+
+
+            for (int i = 0; i < numWordsFound; ++i)
+            {
+                /* Get the next word */
+                PDWord nextWord = PDWordFinderGetNthWord (wordFinder, i);
+
+                char workWord[1024];
+                PDWordGetString (nextWord, workWord, 1024);
+                fprintf (wordFile, "(%3d)  %s\n", i, workWord);
+            }
+
+            /* Close the word file */
+            fclose (wordFile);
+
+            /* Release the word finder results, and the word finder itself*/
+            PDWordFinderReleaseWordList (wordFinder, 0);
+            PDWordFinderDestroy (wordFinder);
+
+
+        HANDLER
+            info->result = 1;
+        END_HANDLER
 
         if (!silent)
             printf ("Text Extraction Worker Thread Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
@@ -488,7 +795,7 @@ int main(int argc, char** argv)
     /* THis is used interna;y to identify the thread that finished 
     ** (So we don't have to search the list, looking for the the matching thread ID)
     */
-    ThreadInfo *activeThreadInfo[1000]; /* NOTE! This fixed array puts a ceiling on the active thread value! */
+    ThreadInfo **activeThreadInfo = (ThreadInfo **)malloc (sizeof (ThreadInfo *) * activeThreads);
 
     while (completedThreads < totalThreads)
     {

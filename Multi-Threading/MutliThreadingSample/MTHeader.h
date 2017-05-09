@@ -66,6 +66,8 @@ public:
                 {
                     char *end = strstr (start, ",");
                     if (!end)
+                        end = strstr (start, " ");
+                    if (!end)
                         end = strstr (start, "]");
                     if (!end)
                         end = start + strlen (start);
@@ -98,6 +100,28 @@ public:
     int size () { return list.size (); }
 
     char *value (int index) { return list[index]; }
+
+    int GetValueInt (unsigned int index)
+    {
+        if (index >= list.size())
+                return 0;
+        return (atoi (list[index]));
+    }
+
+    bool GetValueBool (unsigned int Index)
+    {
+        if (Index >= list.size ())
+            return false;
+        char *value = list[Index];
+        for (int i = 0; value[i] != 0; i++)
+            value[i] = toupper (value[i]);
+        if (!strcmp (value, "TRUE"))
+            return true;
+        if (!strcmp (value, "FALSE"))
+            return false;
+        return false;
+    }
+
 };
 
 class attributes
@@ -171,7 +195,8 @@ public:
                             /* append following groups until we find a close array */
                             if ((!endarray) && ((count + 1) < argc))
                             {
-                                value = (char *)realloc (value, strlen (value) + strlen (argv[count + 1]) + 1);
+                                value = (char *)realloc (value, strlen (value) + strlen (argv[count + 1]) + 2);
+                                strcat (value, " ");
                                 strcat (value, argv[count + 1]);
                                 count++;
                                 continue;
@@ -197,9 +222,9 @@ public:
 
                             if (count == argc - 1)
                             {
-                                /* this is an unbalanced array !*/
-                                printf ("The command line contained an unbalanced array of values!.\n");
-                                exit (-1);
+                                /* If we reach the end, and there is a group open, just close it.*/
+                                nest--;
+                                continue;
                             }
                         }
 
@@ -284,9 +309,9 @@ public:
             char *value = values->value (0);
             for (int index = 0; value[index] != 0; index++)
                 value[index] = toupper (value[index]);
-            if (!_stricmp (value, "TRUE"))
+            if (!strcmp (value, "TRUE"))
                 return true;
-            if (!_stricmp (value, "FALSE"))
+            if (!strcmp (value, "FALSE"))
                 return false;
             return default;
         }
@@ -387,6 +412,15 @@ typedef struct
     bool            silent;
 } ThreadInfo;
 
+/* For platform dependent file name construction */
+#ifdef WIN_PLATFORM
+#define PathSep '\\'
+#define access _access
+#else
+#define PathSep  '/'
+#endif
+
+
 /* This is a base class for the worker threads
 **   At this point, it provides for a guarenteed
 ** sequence number, for the sequence within this set of
@@ -400,23 +434,41 @@ private:
     CSMutex     mutex;
 
 public:
-    /* Every worker thread needs an input and output file */
-    char       *InFilePath;
-    char       *InFileName;
-    char       *InFileSuffix;
-    char       *OutFilePath;
+    /* Every worker thread needs an input and output file 
+    ** The ideal worker has a sequence of them, so that we may 
+    ** eiher select all workers to be identical, orforce them to behave differently, 
+    ** and reveal diferent conflicts.
+    */
+    int          InFileCount;
+    char       **InFilePath;
+    char       **InFileName;
+    char       **InFileSuffix;
+
+    /* I don't ever see a real reason for seperate output paths,  But leave this for Symmetry */
+    int          OutPathCount;
+    char       **OutFilePath;
+
+    /* When true (defautlt) do not print messages from this object */
     bool        silent;
+
+    /* Dictionary of options for this object */
     attributes *threadAttributes;
 
     workerclass () { sequence = 0;
+                     InFileCount = 0;
+                     OutPathCount = 0;
                      silent = true;
                      InitCS (mutex); 
                      InFilePath = InFileName = InFileSuffix = OutFilePath = NULL;
     }
     ~workerclass () { DestroyCS (mutex); 
+                      for (int index = 0; index < InFileCount; index++) 
+                          { free (InFilePath[index]); free (InFileName[index]); free (InFileSuffix[index]); }
                       if (InFilePath) free (InFilePath); 
                       if (InFileName) free (InFileName); 
                       if (InFileSuffix) free (InFileSuffix); 
+                      for (int index = 0; index < OutPathCount; index++)
+                          { free (OutFilePath[index]);}
                       if (OutFilePath) free (OutFilePath);
                       delete threadAttributes;
     }
@@ -433,6 +485,30 @@ public:
         result = sequence++;
         LeaveCS (mutex);
         return result;
+    }
+
+    char *GetInFileName (int threadSequence)
+    {
+        char workname[2048];
+        int index = threadSequence % InFileCount;
+        sprintf (workname, "%s%c%s.%s", InFilePath[index], PathSep, InFileName[index], InFileSuffix[index]);
+        char *result = (char *)malloc (strlen (workname) + 1);
+        strcpy (result, workname);
+        return (result);
+    }
+
+    char * GetOutFileName (int threadSequence, int inner = -1)
+    {
+        int indexOut = threadSequence % OutPathCount;
+        int indexIn = threadSequence % InFileCount;
+        char workname[2048];
+        if (inner == -1)
+            sprintf (workname, "%s%c%s_%01d.%s", OutFilePath[indexOut], PathSep, InFileName[indexIn], threadSequence + 1, InFileSuffix[indexIn]);
+        else
+            sprintf (workname, "%s%c%s_%01d_%01d.%s", OutFilePath[indexOut], PathSep, InFileName[indexIn], threadSequence + 1, inner + 1, InFileSuffix[indexIn]);
+        char *result = (char *)malloc (strlen (workname) + 1);
+        strcpy (result, workname);
+        return (result);
     }
 
     void startThreadWorker (ThreadInfo *info)
@@ -457,13 +533,6 @@ public:
 #endif
 
     }
-
-#ifdef WIN_PLATFORM
-#define PathSep '\\'
-#define access _access
-#else
-#define PathSep  '/'
-#endif
 
 
     void splitpath (char *path, char **toPath, char **filename, char **suffix)
@@ -494,9 +563,21 @@ public:
         }
     }
 
+    void parseOneFileName (int index, char *inname)
+    { 
+        char *path, *name, *suffix;
+        workerclass::splitpath (inname, &path, &name, &suffix);
+
+        InFilePath[index] = (char *)malloc (strlen (path) + 1);
+        strcpy (InFilePath[index], path);
+        InFileName[index] = (char *)malloc (strlen (name) + 1);
+        strcpy (InFileName[index], name);
+        InFileSuffix[index] = (char *)malloc (strlen (suffix) + 1);
+        strcpy (InFileSuffix[index], suffix);
+    }
+
     void    parseCommonOptions (valuelist *values, char *defaultInFileName, char *defaultOutFilePath)
     {
-        char *rawFileName;
 
         if (values)
         {
@@ -515,47 +596,70 @@ public:
         }
 
         if (threadAttributes->IsKeyPresent ("InFileName"))
-            rawFileName = threadAttributes->GetKeyValue ("InFileName")->value (0);
+        {
+            valuelist *nameValues = threadAttributes->GetKeyValue ("InFileName");
+            InFileCount = nameValues->size ();
+            InFilePath = (char **)malloc (sizeof (char*) * InFileCount);
+            InFileName = (char **)malloc (sizeof (char*) * InFileCount);
+            InFileSuffix = (char **)malloc (sizeof (char*) * InFileCount);
+
+            for (int index = 0; index < InFileCount; index++)
+                parseOneFileName (index, nameValues->value (index));
+        }
         else
-            rawFileName = defaultInFileName;
+        {
+            InFileCount = 1;
+            InFilePath = (char **)malloc (sizeof (char*));
+            InFileName = (char **)malloc (sizeof (char*));
+            InFileSuffix = (char **)malloc (sizeof (char*));
+            parseOneFileName (0, defaultInFileName);
+        }
 
-
-        char *path, *name, *suffix;
-        workerclass::splitpath (rawFileName, &path, &name, &suffix);
-
-        InFilePath = (char *)malloc (strlen (path) + 1);
-        strcpy (InFilePath, path);
-        InFileName = (char *)malloc (strlen (name) + 1);
-        strcpy (InFileName, name);
-        InFileSuffix = (char *)malloc (strlen (suffix) + 1);
-        strcpy (InFileSuffix, suffix);
 
         if (threadAttributes->IsKeyPresent ("OutFilePath"))
-            rawFileName = threadAttributes->GetKeyValue ("OutFilePath")->value (0);
+        {
+            valuelist *nameValues = threadAttributes->GetKeyValue ("OutFilePath");
+            OutPathCount = nameValues->size ();
+            OutFilePath = (char **)malloc (sizeof (char *) * OutPathCount);
+            for (int index = 0; index < OutPathCount; index++)
+            {
+                char *value = nameValues->value (index);
+                OutFilePath[index] = (char *)malloc (strlen (value) + 1);
+                strcpy (OutFilePath[index], value);
+            }
+        }
         else
-            rawFileName = defaultOutFilePath;
-
-        OutFilePath = (char *)malloc (strlen (rawFileName) + 1);
-        strcpy (OutFilePath, rawFileName);
+        {
+            OutFilePath = (char **)malloc (sizeof (char *));
+            OutPathCount = 1;
+            OutFilePath[0] = (char *)malloc (strlen (defaultOutFilePath) + 1);
+            strcpy (OutFilePath[0], defaultOutFilePath);
+        }
 
         if (threadAttributes->IsKeyPresent ("Silent"))
             silent = threadAttributes->GetKeyValueBool ("Silent", true);
 
         char workpath[2048];
-        sprintf (workpath, "%s%c%s.%s", InFilePath, PathSep, InFileName, InFileSuffix);
-        if (access (workpath, 04))
+        for (int index = 0; index < InFileCount; index++)
         {
-            printf ("The input file does not exist? \n%   \"%s\"\n", workpath);
-            exit (-1);
+            sprintf (workpath, "%s%c%s.%s", InFilePath[index], PathSep, InFileName[index], InFileSuffix[index]);
+            if (access (workpath, 04))
+            {
+                printf ("The input file does not exist? \n%   \"%s\"\n", workpath);
+                exit (-1);
+            }
         }
 
-        if (access (OutFilePath, 6))
+        for (int index = 0; index < OutPathCount; index++)
         {
-            _mkdir (OutFilePath);
-            if (access (OutFilePath, 6))
+            if (access (OutFilePath[index], 6))
             {
-                printf ("The output path cannot be found or created!\n    \"%s\"\n", OutFilePath);
-                exit (-1);
+                _mkdir (OutFilePath[index]);
+                if (access (OutFilePath[index], 6))
+                {
+                    printf ("The output path cannot be found or created!\n    \"%s\"\n", OutFilePath);
+                    exit (-1);
+                }
             }
         }
     }
