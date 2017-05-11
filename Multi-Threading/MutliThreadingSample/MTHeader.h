@@ -299,13 +299,13 @@ public:
         return (found != keys.end());
     }
 
-    bool GetKeyValueBool (char *key, bool default)
+    bool GetKeyValueBool (char *key)
     {
         if (IsKeyPresent (key))
         {
             valuelist *values = GetKeyValue (key);
             if (values->size () == 0)
-                return default;
+                return false;
             char *value = values->value (0);
             for (int index = 0; value[index] != 0; index++)
                 value[index] = toupper (value[index]);
@@ -313,10 +313,10 @@ public:
                 return true;
             if (!strcmp (value, "FALSE"))
                 return false;
-            return default;
+            return false;
         }
         else
-            return default;
+            return false;
     }
 
     int GetKeyValueInt (char *key)
@@ -668,10 +668,10 @@ public:
         }
 
         if (threadAttributes->IsKeyPresent ("Silent"))
-            silent = threadAttributes->GetKeyValueBool ("Silent", true);
+            silent = threadAttributes->GetKeyValueBool ("Silent");
 
         if (threadAttributes->IsKeyPresent ("NoAPDFL"))
-            noAPDFL = threadAttributes->GetKeyValueBool ("NoAPDFL", false);
+            noAPDFL = threadAttributes->GetKeyValueBool ("NoAPDFL");
 
         char workpath[2048];
         for (int index = 0; index < InFileCount; index++)

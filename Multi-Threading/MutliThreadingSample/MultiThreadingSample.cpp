@@ -154,8 +154,34 @@ public:
         }
 
         /* Do not initialize library per thread! */
-        noAPDFL = true;
+//        noAPDFL = true;
     };
+
+    int FindPrimes (ASUns32 *primes, ASUns32 limit)
+    {
+        ASUns32 primeCount = 3;
+        primes[0] = 1;
+        primes[1] = 2;
+        primes[2] = 3;
+        for (ASUns32 isItPrime = 4; primeCount < limit; isItPrime++)
+        {
+            ASBool notPrime = false;
+            for (ASUns32 lastPrime = 1; lastPrime < primeCount; lastPrime++)
+            {
+                if (isItPrime % primes[lastPrime] == 0)
+                {
+                    notPrime = true;
+                    break;
+                }
+            }
+            if (notPrime)
+                continue;
+            primes[primeCount] = isItPrime;
+            primeCount++;
+        }
+        return (primeCount);
+    }
+
 
     /* One thread worker procedure */
     void WorkerThread (ThreadInfo *info)
@@ -225,6 +251,11 @@ public:
                             info->result = 4;
                         fclose (output);
                     }
+
+                    /* Burn some CPU as well */
+#define HowManyPrimes 10000
+                    ASUns32 primes[HowManyPrimes];
+                    ASUns32 primesFound = FindPrimes (primes, HowManyPrimes);
                 }
             }
             free (buffer);
@@ -700,7 +731,7 @@ int main(int argc, char** argv)
 
     /* If we are using a base thread library, start it now */
     APDFLib *baseInstance = NULL;
-    if (SampleAttributes.GetKeyValueBool ("BaseInit", false))
+    if (SampleAttributes.GetKeyValueBool ("BaseInit"))
         baseInstance = new APDFLib ();
 
     /* Construct the array of worker types 
@@ -892,7 +923,7 @@ int main(int argc, char** argv)
         delete (workerClasses[index].NonAPDFL);
 
     /* If we are using a base thread library, stop it now */
-    if (SampleAttributes.GetKeyValueBool ("BaseInit", false))
+    if (SampleAttributes.GetKeyValueBool ("BaseInit"))
         delete baseInstance;
 
     return errCode;
