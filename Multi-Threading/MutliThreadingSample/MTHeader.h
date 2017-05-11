@@ -352,7 +352,7 @@ typedef LPVOID ThreadFuncArgType;
 typedef ThreadFuncReturnType ThreadFuncType (ThreadFuncArgType);
 #define createThread( func, tinfo ) ((tinfo.threadID = (SDKThreadID)_beginthreadex( \
 	NULL, 0, (ThreadFuncType *)(&func), &tinfo, 0, NULL)) != 0)
-#define destroyThread( tinfo ) CloseHandle( tinfo.threadID )
+#define destroyThread( tinfo ) CloseHandle( tinfo->threadID )
 
 #define WaitForAnyThreadComplete(list, size) \
     WaitForMultipleObjects (size, (HANDLE *)list, false, INFINITE) - WAIT_OBJECT_0;
@@ -374,9 +374,17 @@ typedef void * ThreadFuncReturnType;
 typedef void * ThreadFuncArgType;
 typedef ThreadFuncReturnType ThreadFuncType (ThreadFuncArgType);
 #define createThread( func, tinfo ) (pthread_create( &tinfo.threadID, NULL, (ThreadFuncType *)func, tinfo.threadArgs ) == 0)
+#define destroyThread( tinfo ) pthread_detach( tinfo->threadID )
 
-// #define createThread( func, args, ptid ) (pthread_create( ptid, NULL, func, args ) == 0)
-#define destroyThread( tinfo ) pthread_detach( tinfo.threadID )
+int WaitForAnyThreadComplete(list, size)
+{
+    while (0)
+    {
+        for (int index = 0; index < runningThreads; index++ )
+            if (activeThreadInfo[index]->threadCompleted))
+                return (index);
+        usleep (1000);
+    }
 
 
 typedef pthread_mutex_t *CSMutex;
@@ -400,16 +408,18 @@ class workerclass;
 
 typedef struct
 {
-    ASInt32         threadNumber;
-    SDKThreadID     threadID;
-    void           *object;
-    int             objectType;
-    APDFLib        *instance;
-    ASInt32         result; 
-    time_t          startTime, endTime;
-    clock_t         startCPU, endCPU;
-    double          wallTimeUsed, cpuTimeUsed;
-    bool            silent;
+    ASInt32         threadNumber;                       /* Serial number of thread in set of threads */
+    SDKThreadID     threadID;                           /* Platform dependent thread "handle" */
+    void           *object;                             /* Worker Thread Object */
+    int             objectType;                         /* Enumerator giving thread type */
+    APDFLib        *instance;                           /* APDFL Library instance */
+    ASInt32         result;                             /* Numeric result, unique to worker type. But "zero" is always "No Problem" */
+    time_t          startTime, endTime;                 /* Used in Unix only, wall time started/stopped */
+    clock_t         startCPU, endCPU;                   /* Used in Unix only to track CPU time used. */
+    double          wallTimeUsed, cpuTimeUsed;          /* Walltime start to finish, and CPU time (user and kernal) consumed */
+    bool            silent;                             /* When true, write nothing to stdout! */
+    bool            noAPDFL;                            /* When true, do not init/term the library in this thread! */
+    bool            threadCompleted;                    /* Mark the thread complete for unix to locate it */
 } ThreadInfo;
 
 /* For platform dependent file name construction */
@@ -436,20 +446,35 @@ private:
 public:
     /* Every worker thread needs an input and output file 
     ** The ideal worker has a sequence of them, so that we may 
-    ** eiher select all workers to be identical, orforce them to behave differently, 
+    ** eiher select all workers to be identical, or force them to behave differently, 
     ** and reveal diferent conflicts.
+    ** These will be set in the standard options logic (parseCommonOptions()) from the command
+    ** line keyword "InFileName".
     */
     int          InFileCount;
     char       **InFilePath;
     char       **InFileName;
     char       **InFileSuffix;
 
-    /* I don't ever see a real reason for seperate output paths,  But leave this for Symmetry */
+    /* I don't ever see a real reason for seperate output paths,  But leave this for Symmetry 
+    ** These will be set in the standard options logic (parseCommonOptions()) from the command
+    ** line keyword "OutFilePath".
+    */
     int          OutPathCount;
     char       **OutFilePath;
 
-    /* When true (defautlt) do not print messages from this object */
+    /* When true (default) do not print messages from this object 
+    ** This will be set in the standard options logic (parseCommonOptions()) from the command
+    ** line keyword "Silent".*/
     bool        silent;
+
+    /* When true (Default false) do not initiate/terminate the library per thread!
+    ** (This may be set to true by default for a given worker class, overridding both 
+    **  the setting from the options, and the default) 
+    ** This will be set in the standard options logic (parseCommonOptions()) from the command
+    ** line keyword "noAPDFL".
+    */
+    bool        noAPDFL;
 
     /* Dictionary of options for this object */
     attributes *threadAttributes;
@@ -458,6 +483,7 @@ public:
                      InFileCount = 0;
                      OutPathCount = 0;
                      silent = true;
+                     noAPDFL = false;
                      InitCS (mutex); 
                      InFilePath = InFileName = InFileSuffix = OutFilePath = NULL;
     }
@@ -517,13 +543,17 @@ public:
         info->startTime = time (&info->startTime);
         info->startCPU = clock ();
 #endif
-        info->instance = new APDFLib ();
+        if (noAPDFL)
+            info->instance = NULL;
+        else
+            info->instance = new APDFLib ();
         info->silent = silent;
     }
 
     void endThreadWorker (ThreadInfo *info)
     {
-        delete info->instance;
+        if (info->instance)
+            delete info->instance;
 
 #ifndef WIN_PLATFORM
         info->endTime= time (&info->EndTime);
@@ -532,6 +562,7 @@ public:
         info->cpuTimeUsed = ((endCPU - startCPU) * 1.0) / CLOCKS_PER_SEC;
 #endif
 
+        info->threadCompleted = true;
     }
 
 
@@ -638,6 +669,9 @@ public:
 
         if (threadAttributes->IsKeyPresent ("Silent"))
             silent = threadAttributes->GetKeyValueBool ("Silent", true);
+
+        if (threadAttributes->IsKeyPresent ("NoAPDFL"))
+            noAPDFL = threadAttributes->GetKeyValueBool ("NoAPDFL", false);
 
         char workpath[2048];
         for (int index = 0; index < InFileCount; index++)
