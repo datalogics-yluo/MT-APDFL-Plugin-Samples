@@ -62,6 +62,7 @@
 **               Add a new class derived from workerclass. This class must have a ParseOptions method, 
 **                  and a WorkerThread method.
 **               Create an initialize an instance of the worker class inthe main procedure.
+**               Add a class to the switch in OuterWorker()
 */
 class NonAPDFLWorker;
 class PDFaWorker ;
@@ -151,6 +152,9 @@ public:
             RepetitionsCount = 1;
             Repetitions[0] = 5;
         }
+
+        /* Do not initialize library per thread! */
+        noAPDFL = true;
     };
 
     /* One thread worker procedure */
@@ -637,6 +641,13 @@ public:
 
 };
 
+/* This procedure is the one called by all threads!
+**  it uses the workerclass object to create the library, and 
+** collect startup information, then call the WorkerThread of the 
+** approrpriate worker object to handle the bulk of the processing. 
+** finally, it uses the workerclass to close the library, and collect 
+** timing information.
+*/
 void outerWorker (ThreadInfo *info)
 {
     workerclass *baseObject = (workerclass *)(info->object);
@@ -838,15 +849,18 @@ int main(int argc, char** argv)
             ASUns64 *start64 = (ASUns64*)&start, *end64 = (ASUns64 *)&end, *kernel64 = (ASUns64 *)&kernel, *cpu64 = (ASUns64 *)&cpuTime;
             GetThreadTimes (doneThread->threadID, &start, &end, &kernel, &cpuTime);
             end64[0] -= start64[0];
+            cpu64[0] += kernel64[0];
             doneThread->wallTimeUsed = ((((end64[0] * 1.0) / 1000) /* nano to micro */ / 1000) /* Micro to milli */ / 1000 /* Milli to seconds*/);
             doneThread->cpuTimeUsed = ((((cpu64[0] * 1.0) / 1000) /* nano to micro */ / 1000) /* Micro to milli */ / 1000 /* Milli to seconds*/);
 #endif
 
             /* If we are not silent, then display a status for the thread completing */
             if (!doneThread->silent)
-                printf ("Thread %01d completed in %0.6g seconds wall, %0.6g seconds CPU, with code %01d.\n",
+                printf ("Thread %01d completed in %0.6g seconds wall, %0.10g seconds CPU, with code %01d.\n",
                 doneThread->threadNumber, doneThread->wallTimeUsed, doneThread->cpuTimeUsed, doneThread->result);
 
+            /* end the thread */
+            destroyThread (doneThread);
 
             /* If the thread to finish was NOT the last thread, then shift all of the arrays
             ** up to remove this thread from the array 
