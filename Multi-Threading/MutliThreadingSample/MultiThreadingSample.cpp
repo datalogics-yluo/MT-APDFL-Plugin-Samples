@@ -418,7 +418,7 @@ public:
 #if !MAC_ENV	
                 ASPathName destFilePath = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullOutputFileName, NULL);
 #else
-                ASPathName destFilePath = GetMacPath (outputPath);
+                ASPathName destFilePath = GetMacPath (fullOutputFileName);
 #endif
 
                 /* Release the output file name */
@@ -560,7 +560,7 @@ public:
 #if !MAC_ENV	
                 ASPathName destFilePath = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullOutputFileName, NULL);
 #else
-                ASPathName destFilePath = GetMacPath (outputPath);
+                ASPathName destFilePath = GetMacPath (fullOutputFileName);
 #endif
 
                 /* Release the output file name */
@@ -1048,7 +1048,25 @@ int main(int argc, char** argv)
         {
             /* Wait for the first in the list of threads to complete
             */
+#ifdef WIN_PLATFORM
             ASInt32 index = WaitForAnyThreadComplete (activeThreadArray, runningThreads);
+#else
+            ASInt32 index = -1;
+            while (0)
+            {
+                for (int x = 0; x < runningThreads; x++)
+                {
+                    if (activeThreadInfo[x]->threadCompleted)
+                    {
+                        index = x;
+                        break;
+                    }
+                }
+                if (index != -1)
+                    break;
+                usleep (1000);
+            }
+#endif
 
             /* A thread completed! */
             completedThreads++;

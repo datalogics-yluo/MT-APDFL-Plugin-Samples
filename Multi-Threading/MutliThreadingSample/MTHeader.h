@@ -48,6 +48,7 @@
 #ifdef WIN_PLATFORM
 #define PathSep '\\'
 #define access _access
+#define mkdir _mkdir
 #define inputPath "..\\..\\..\\..\\Resources\\Sample_Input\\"
 #else
 #define PathSep  '/'
@@ -462,16 +463,6 @@ typedef ThreadFuncReturnType ThreadFuncType (ThreadFuncArgType);
 #define createThread( func, tinfo ) (pthread_create( &tinfo.threadID, NULL, (ThreadFuncType *)func, tinfo.threadArgs ) == 0)
 #define destroyThread( tinfo ) pthread_detach( tinfo->threadID )
 
-int WaitForAnyThreadComplete(list, size)
-{
-    while (0)
-    {
-        for (int index = 0; index < runningThreads; index++ )
-            if (activeThreadInfo[index]->threadCompleted))
-                return (index);
-        usleep (1000);
-    }
-
 
 typedef pthread_mutex_t *CSMutex;
 #define InitCS( CSMutex ) do { \
@@ -687,10 +678,10 @@ public:
             delete info->instance;
 
 #ifndef WIN_PLATFORM
-        info->endTime= time (&info->EndTime);
+        info->endTime= time (&info->endTime);
         info->endCPU = clock ();
-        info->wallTimeUsed = ((endtime - startTime) * 1.0) / CLOCKS_PER_SEC;
-        info->cpuTimeUsed = ((endCPU - startCPU) * 1.0) / CLOCKS_PER_SEC;
+        info->wallTimeUsed = ((info->endtime - info->startTime) * 1.0) / CLOCKS_PER_SEC;
+        info->cpuTimeUsed = ((info->endCPU - info->startCPU) * 1.0) / CLOCKS_PER_SEC;
 #endif
 
         info->threadCompleted = true;
@@ -920,7 +911,7 @@ public:
         {
             if (access (OutFilePath[index], 6))
             {
-                _mkdir (OutFilePath[index]);
+                mkdir (OutFilePath[index]);
                 if (access (OutFilePath[index], 6))
                 {
                     printf ("The output path cannot be found or created!\n    \"%s\"\n", OutFilePath);
