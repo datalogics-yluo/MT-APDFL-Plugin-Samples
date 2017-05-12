@@ -110,16 +110,6 @@ WorkerType workers[] = {
 
 WorkerClassPtr workerClasses[NumberOfWorkers];
 
-/* Each orker class must define a default for it's input file. 
-** These are generally in terms of the distribution directories 
-** file structure. For that reason, it is easiest to define 
-** the path here, as a single, platform specific define
-*/
-#ifdef WIN_PLATFORM
-#define inputPath "..\\..\\..\\..\\Resources\\Sample_Input\\"
-#else
-#define inputPath "../_Input/"
-#endif
 
 /* These are the worker class objects that define the process to be 
 ** executed in a given thread
@@ -127,18 +117,36 @@ WorkerClassPtr workerClasses[NumberOfWorkers];
 ** The set can be expanded indefinately.
 */
 
+
+/*
+** NonAPDFL Worker
+** This worker type will simply perform some I/O and some CPU intensive work. It is intended to validate the 
+** framework itself, and to provide a baseline against other workers. 
+**
+** If "NoAPDFL=true", the thread will not even init/term the library. If false, it will Init/Term the library, and give us a picture of behaviour
+** doing only init term. Setting "NoAPDFL=true, Reptitions=0" will do nothing EXCEPT init/term the libraries!
+**
+**  NonAPDFLOptions=[
+**                   silent=true                                        When true, do not display status lines
+**                   InFileName=[test data path\AddRedactions.pdf]      A list of file to copy, One file will be copied by each thread, sequcence % #files.
+**                   OutFilePath=[Output]                               Directory where output is written
+**                   noAPDFL=false                                      When true, we will NOT init/term the library for each thread
+**                   Repetitions=[5]                                    How many time shall we do the inner loop (100 values max!)
+**                   Primes=[1000]                                      How many prime numbers shall we find in CPU loading (100 values max!)
+*/
 class NonAPDFLWorker : public workerclass
 {
     /* This thread will copy a specified file N times, into new specified files.
+    ** Each time the file is copied, it will also find the fist 1000 prime numbers!
     */
 public:
-    NonAPDFLWorker () { Repetitions[0] = 0; RepetitionsCount = 0; };
+    NonAPDFLWorker () { Repetitions[0] = 0; RepetitionsCount = 0; Primes[0] = 0; PrimesCount = 0; };
     ~NonAPDFLWorker () { };
 
     /* Parse the non-APDFL conversion thread options into attributes */
     void ParseOptions (valuelist *values)
     {
-        parseCommonOptions (values, inputPath "AddRedaction.pdf", "Output");
+        workerclass::ParseOptions (values, "%AddRedaction.pdf", "Output");
 
         if (threadAttributes->IsKeyPresent ("Repetitions"))
         {
@@ -153,8 +161,19 @@ public:
             Repetitions[0] = 5;
         }
 
-        /* Do not initialize library per thread! */
-//        noAPDFL = true;
+        if (threadAttributes->IsKeyPresent ("Primes"))
+        {
+            valuelist *values = threadAttributes->GetKeyValue ("Primes");
+            PrimesCount = values->size ();
+            for (int index = 0; index < PrimesCount; index++)
+                Primes[index] = values->GetValueInt (index);
+        }
+        else
+        {
+            PrimesCount = 1;
+            Primes[0] = 5;
+        }
+
     };
 
     int FindPrimes (ASUns32 *primes, ASUns32 limit)
@@ -253,9 +272,8 @@ public:
                     }
 
                     /* Burn some CPU as well */
-#define HowManyPrimes 10000
-                    ASUns32 primes[HowManyPrimes];
-                    ASUns32 primesFound = FindPrimes (primes, HowManyPrimes);
+                    ASUns32 *primes = (ASUns32 *)malloc (sizeof (ASUns32) * Primes[sequence % PrimesCount]);
+                    ASUns32 primesFound = FindPrimes (primes, Primes[sequence % PrimesCount]);
                 }
             }
             free (buffer);
@@ -268,21 +286,45 @@ public:
 private:
     ASInt32     Repetitions[100];
     ASInt32     RepetitionsCount;
+    ASInt32     Primes[100];
+    ASInt32     PrimesCount;
 };
 
+/*
+** PDF/a worker
+** This thread willconvertone document to PDF/a.
+** NoAPDFL MUST be false, or the thread will not function.
+** InFileName as a list will use the Nth entry of the list, modulus the number of entries in the list, for each worker thread.
 
+**  PDFaOptions=[
+**                   silent=true                                        When true, do not display status lines
+**                   InFileName=[test data path\AddRedactions.pdf]      A list of file to copy, One file will be copied by each thread, sequcence % #files.
+**                   OutFilePath=[Output]                               Directory where output is written
+**                   noAPDFL=false                                      When true, we will NOT init/term the library for each thread
+**                   ConvertOption=[1]                                  Convertor Option selector, 1 to 4. (100 values max!)
+**                   RasterizeFontErrors=[false]                        SettingforPDF/a conversion option "rasterizeFontErrors" (100 values max!)
+**                   RemoveAllAnnotations=[false]                        SettingforPDF/a conversion option "removeAllAnnotations" (100 values max!)
+*/
 #include "PDFProcessorCalls.h"
 class PDFaWorker : public workerclass
 {
+#define NumberOfPDFAConvertOptions 4
+
 public:
-    PDFaWorker () { };
+    PDFaWorker () {
+                    ConvertOptions[0] = kPDFProcessorConvertToPDFA1aRGB;
+                    ConvertOptions[1] = kPDFProcessorConvertToPDFA1aCMYK;
+                    ConvertOptions[2] = kPDFProcessorConvertToPDFA1bRGB;
+                    ConvertOptions[3] = kPDFProcessorConvertToPDFA1bCMYK;
+                  };
+
     ~PDFaWorker ()
     { };
 
     /* Parse the PDF/a conversion thread options into attributes */
     void ParseOptions (valuelist *values)
     {
-        parseCommonOptions (values, inputPath "AddRedaction.pdf", "Output");
+        workerclass::ParseOptions (values, "%AddRedaction.pdf", "Output");
 
         if (threadAttributes->IsKeyPresent ("RasterizeFontErrors"))
         {
@@ -309,6 +351,27 @@ public:
             removeAllAnnotationsCount = 1;
             removeAllAnnotations[0] = false;
         }
+
+        if (threadAttributes->IsKeyPresent ("ConvertorOption"))
+        {
+            valuelist *values = threadAttributes->GetKeyValue ("ConvertorOption");
+            convertorOptionsCount = values->size ();
+            for (int index = 0; index < convertorOptionsCount; index++)
+            {
+                /* The value should be specified as 1 to 4 
+                ** but must be here converted to 0 to 3
+                */
+                convertorOptions[index] = values->GetValueInt (index);
+                convertorOptions[index] -= 1;
+                convertorOptions[index] %= 4;
+            }
+        }
+        else
+        {
+            convertorOptionsCount = 1;
+            convertorOptions[0] = 0;
+        }
+
     };
 
     /* One thread worker procedure */
@@ -347,7 +410,7 @@ public:
                 userParams.colorCompression = kPDFProcessorColorJpegCompression;
                 userParams.grayCompression = kPDFProcessorGrayZipCompression;
                 userParams.monoCompression = kPDFProcessorMonoCCITTGroup4Compression;
-                userParams.noRasterizationOnFontErrors = rasterizeFontErrors[sequence % rasterizeFontErrorsCount];
+                userParams.noRasterizationOnFontErrors = rasterizeFontErrors[sequence % rasterizeFontErrorsCount]; 
                 userParams.removeAllAnnotations = removeAllAnnotations[sequence % removeAllAnnotationsCount];
 
 
@@ -362,7 +425,8 @@ public:
                 free (fullOutputFileName);
                 
                 /* Perform the conversions */
-                PDFProcessorConvertAndSaveToPDFA (inDoc.getPDDoc (), destFilePath, ASGetDefaultFileSys (), kPDFProcessorConvertToPDFA1bRGB, &userParams);
+                PDFProcessorConvertAndSaveToPDFA (inDoc.getPDDoc (), destFilePath, ASGetDefaultFileSys (), 
+                                                  ConvertOptions[convertorOptions[sequence % convertorOptionsCount]], &userParams);
 
                 /* Release the output path name */
                 ASFileSysReleasePath (NULL, destFilePath);
@@ -383,18 +447,40 @@ private:
     int  rasterizeFontErrorsCount;
     bool removeAllAnnotations[100];
     int  removeAllAnnotationsCount;
+    ASUns32 convertorOptions[100];
+    int  convertorOptionsCount;
+
+    PDFProcessorPDFAConversionOption ConvertOptions[4];
 };
 
+
+/*
+** PDF/x worker
+** This thread willconvert one document to PDF/x.
+** NoAPDFL MUST be false, or the thread will not function.
+** InFileName as a list will use the Nth entry of the list, modulus the number of entries in the list, for each worker thread.
+
+**  PDFxOptions=[
+**                   silent=true                                        When true, do not display status lines
+**                   InFileName=[test data path\AddRedactions.pdf]      A list of file to copy, One file will be copied by each thread, sequcence % #files.
+**                   OutFilePath=[Output]                               Directory where output is written
+**                   noAPDFL=false                                      When true, we will NOT init/term the library for each thread
+**                   ConvertOption=[1]                                  Convertor Option selector, 1 to 2. (100 values max!)
+**                   RemoveAllAnnotations=[false]                        SettingforPDF/a conversion option "removeAllAnnotations" (100 values max!)
+*/
 class PDFxWorker : public workerclass
 {
 public:
-    PDFxWorker () { };
+    PDFxWorker () {
+                        ConvertOptions[0] = kPDFProcessorConvertToPDFX1a2001;
+                        ConvertOptions[1] = kPDFProcessorConvertToPDFX32003;
+                  };
     ~PDFxWorker () { };
 
     /* Parse the PDF/x conversion thread options into attributes */
     void ParseOptions (valuelist *values)
     {
-        parseCommonOptions (values, inputPath "AddRedaction.pdf", "Output");
+        workerclass::ParseOptions (values, "%AddRedaction.pdf", "Output");
 
         if (threadAttributes->IsKeyPresent ("RemoveAllAnnotations"))
         {
@@ -409,6 +495,25 @@ public:
             removeAllAnnotations[0] = false;
         }
 
+        if (threadAttributes->IsKeyPresent ("ConvertorOption"))
+        {
+            valuelist *values = threadAttributes->GetKeyValue ("ConvertorOption");
+            convertorOptionsCount = values->size ();
+            for (int index = 0; index < convertorOptionsCount; index++)
+            {
+                /* The value should be specified as 1 to 2
+                ** but must be here converted to 0 to 1
+                */
+                convertorOptions[index] = values->GetValueInt (index);
+                convertorOptions[index] -= 1;
+                convertorOptions[index] %= 2;
+            }
+        }
+        else
+        {
+            convertorOptionsCount = 1;
+            convertorOptions[0] = 0;
+        }
     };
 
 
@@ -462,7 +567,8 @@ public:
                 free (fullOutputFileName);
 
                 /* Perform the conversions */
-                PDFProcessorConvertAndSaveToPDFX (inDoc.getPDDoc (), destFilePath, ASGetDefaultFileSys (), kPDFProcessorConvertToPDFX32003, &userParams);
+                PDFProcessorConvertAndSaveToPDFX (inDoc.getPDDoc (), destFilePath, ASGetDefaultFileSys (), 
+                                                  ConvertOptions[convertorOptions[sequence % convertorOptionsCount]], &userParams);
 
                 /* Release the output path name */
                 ASFileSysReleasePath (NULL, destFilePath);
@@ -484,8 +590,25 @@ private:
 
     bool removeAllAnnotations[100];
     int  removeAllAnnotationsCount;
+
+    ASUns32 convertorOptions[100];
+    int  convertorOptionsCount;
+
+    PDFProcessorPDFXConversionOption ConvertOptions[2];
 };
 
+/*
+** XPS2PDF worker
+** This thread will convert one document from XPS to PDF.
+** NoAPDFL MUST be false, or the thread will not function.
+** InFileName as a list will use the Nth entry of the list, modulus the number of entries in the list, for each worker thread.
+
+**  XPS2PDFOptions=[
+**                   silent=true                                        When true, do not display status lines
+**                   InFileName=[test data path\AddRedactions.pdf]      A list of file to copy, One file will be copied by each thread, sequcence % #files.
+**                   OutFilePath=[Output]                               Directory where output is written
+**                   noAPDFL=false                                      When true, we will NOT init/term the library for each thread
+*/
 #include "XPS2PDFCalls.h"
 class XPS2PDFWorker : public workerclass
 {
@@ -496,7 +619,7 @@ public:
     /* Parse the PDFtoXPS conversion thread options into attributes */
     void ParseOptions (valuelist *values)
     {
-        parseCommonOptions (values, inputPath "XPStoPDF.xps", "Output");
+        workerclass::ParseOptions(values, "%XPStoPDF.xps", "Output");
     };
 
 
@@ -583,7 +706,19 @@ public:
 
 };
 
+/*
+** TextExtract  worker
+** This thread extract the content of N pages (Specified in page count, below)
+** NoAPDFL MUST be false, or the thread will not function.
+** InFileName as a list will use the Nth entry of the list, modulus the number of entries in the list, for each worker thread.
 
+**  PDFxOptions=[
+**                   silent=true                                        When true, do not display status lines
+**                   InFileName=[test data path\AddRedactions.pdf]      A list of file to copy, One file will be copied by each thread, sequcence % #files.
+**                   OutFilePath=[Output]                               Directory where output is written
+**                   noAPDFL=false                                      When true, we will NOT init/term the library for each thread
+**                   NumberOfPages=[1]                                  Number of pages of content to extract in this thread (100 values max!)
+*/
 class TextextWorker : public workerclass
 {
 public:
@@ -593,7 +728,21 @@ public:
     /* Parse the text extract conversion thread options into attributes */
     void ParseOptions (valuelist *values)
     {
-        parseCommonOptions (values, inputPath "constitution.pdf", "Output");
+        workerclass::ParseOptions (values, "%constitution.pdf", "Output");
+
+        if (threadAttributes->IsKeyPresent ("NumberOfPages"))
+        {
+            valuelist *values = threadAttributes->GetKeyValue ("NumberOfPages");
+            pagesCount = values->size ();
+            for (ASUns32 index = 0; index < pagesCount; index++)
+                pages[index] = values->GetValueInt (index);
+        }
+        else
+        {
+            pagesCount = 1;
+            pages[0] = 1;
+        }
+
     };
 
 
@@ -604,25 +753,18 @@ public:
         if (!silent)
             printf ("Text Extraction Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
-        /* Generate input and output file names */
+        /* Generate input name */
         char *fullFileName = GetInFileName (sequence);
-        char *fullOutputFileName = GetOutFileName (sequence, -1);
 
-        /* The automatic logic will use he same suffix for the output as the input, so change the suffix here */
-        char *suffix = &fullOutputFileName[strlen (fullOutputFileName) - 3];
-        suffix[0] = 0;
-        strcat (fullOutputFileName, "txt");
 
         DURING
             /* Open the input document */
             APDFLDoc inDoc (fullFileName, true);
             PDDoc pdDoc = inDoc.getPDDoc ();
 
-            /* free input file name  */
-            free (fullFileName);
 
             /* Get the number of pages */
-            size_t pages = PDDocGetNumPages (pdDoc);
+            size_t pagesInDocument = PDDocGetNumPages (pdDoc);
 
             /* */
             PDWordFinderConfigRec wfConfig;
@@ -632,34 +774,70 @@ public:
             /* Create a word finder */
             PDWordFinder wordFinder = PDDocCreateWordFinderEx (pdDoc, WF_LATEST_VERSION, false, &wfConfig);
 
-            /* Acquire the words for the Nth page */
-            PDWord wordList;
-            ASInt32 numWordsFound;
-            PDWordFinderAcquireWordList (wordFinder, sequence % pages, &wordList, NULL, NULL, &numWordsFound);
+            /* Figure out what the first page to do is
+            ** (Kind of tricky, when each runmay doa differnt number of pages)
+            **/
+            ASUns32 position = sequence % pagesCount;
+            ASUns64 numberOfPagesDone = 0;
+            for (int index = 0; index < sequence; index++)
+                numberOfPagesDone += pages[index % pagesCount];
 
-            /* Create a file to hold the words */
-            FILE *wordFile = fopen (fullOutputFileName, "w");
+            ASUns32 numberOfPagesPerCycle = 0;
+            for (ASUns32 index = 0; index < pagesCount; index++)
+                numberOfPagesPerCycle += pages[index];
 
-            /* Release the file name */
-            free (fullOutputFileName);
+            ASUns32 firstPageToDo = numberOfPagesDone %= numberOfPagesPerCycle;
+            firstPageToDo %= pagesInDocument;
 
+            ASUns32 numberOfPagesToDo = pages[sequence % pagesCount];
 
-            for (int i = 0; i < numWordsFound; ++i)
-            {
-                /* Get the next word */
-                PDWord nextWord = PDWordFinderGetNthWord (wordFinder, i);
+            for (ASUns32 indexPage = 0; indexPage < pages[sequence % pagesCount]; indexPage++)
+            { 
 
-                char workWord[1024];
-                PDWordGetString (nextWord, workWord, 1024);
-                fprintf (wordFile, "(%3d)  %s\n", i, workWord);
+                /* Acquire the words for the Nth page */
+                PDWord wordList;
+                ASInt32 numWordsFound;
+                ASUns32 pageToDo = (firstPageToDo + indexPage) % pagesInDocument;
+
+                PDWordFinderAcquireWordList (wordFinder, pageToDo, &wordList, NULL, NULL, &numWordsFound);
+
+                /* The automatic logic will use he same suffix for the output as the input, so change the suffix here */
+                char *fullOutputFileName = GetOutFileName (sequence, pageToDo + 1);
+                char *suffix = &fullOutputFileName[strlen (fullOutputFileName) - 3];
+                suffix[0] = 0;
+                strcat (fullOutputFileName, "txt");
+
+                /* Create a file to hold the words */
+                FILE *wordFile = fopen (fullOutputFileName, "w");
+
+                /* Release the file name */
+                free (fullOutputFileName);
+
+                /* Write document and page name to result file */
+                fprintf (wordFile, "%s Page: %01d", fullFileName, pageToDo);
+
+                /* free input file name  */
+                free (fullFileName);
+
+                for (int i = 0; i < numWordsFound; ++i)
+                {
+                    /* Get the next word */
+                    PDWord nextWord = PDWordFinderGetNthWord (wordFinder, i);
+
+                    char workWord[1024];
+                    PDWordGetString (nextWord, workWord, 1024);
+                    fprintf (wordFile, "(%3d)  %s\n", i, workWord);
+                }
+
+                /* Close the word file */
+                fclose (wordFile);
+
+                  /* Release the word finder results */
+                PDWordFinderReleaseWordList (wordFinder, 0);
             }
 
-            /* Close the word file */
-            fclose (wordFile);
-
-            /* Release the word finder results, and the word finder itself*/
-            PDWordFinderReleaseWordList (wordFinder, 0);
-            PDWordFinderDestroy (wordFinder);
+            /* Release the word finder itself*/
+                PDWordFinderDestroy (wordFinder);
 
 
         HANDLER
@@ -669,6 +847,10 @@ public:
         if (!silent)
             printf ("Text Extraction Worker Thread Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
     }
+
+    private:
+        ASUns32 pages[100];
+        ASUns32 pagesCount;
 
 };
 
@@ -719,6 +901,11 @@ void outerWorker (ThreadInfo *info)
 **      Each worker thread may also define a command line attribute. It is in the form:
 **          threadtype=[Attribute=value attribute=value ...]. 
 **      It will be parsed into a dictionary in the thread, and used as attributes to control that particular thread.
+**
+** if the argument count is 2, and argument 1 is the name of a file, which can be opened and read, 
+** argument 2 will be presumed to be a command file, in the form of the command line options, and will be opened, 
+** read, and interpreted.
+**
 **/
 
 int main(int argc, char** argv)
@@ -854,7 +1041,7 @@ int main(int argc, char** argv)
             continue;
         }
 
-        /* If we get here, we have as manny threads running as we can,.
+        /* If we get here, we have as many threads running as we can,.
         ** So wait for some to complete!
         */
         if (runningThreads)
