@@ -34,7 +34,25 @@
 **    TotalThreads=100 Threads=10 processes=[PDFX, PDFA,TextExtract]
 **
 ** Keys and Values will always be stored upper cased, and tested upper cased.
+**
+** When a file name is required, providing the file name, with a leading "%", will 
+** replace the % with the "standard" path to the release diretory sample test data.
 */
+
+/* For platform dependent file name construction */
+/* Each worker class must define a default for it's input file.
+** These are generally in terms of the distribution directories
+** file structure. For that reason, it is easiest to define
+** the path here, as a single, platform specific define
+*/
+#ifdef WIN_PLATFORM
+#define PathSep '\\'
+#define access _access
+#define inputPath "..\\..\\..\\..\\Resources\\Sample_Input\\"
+#else
+#define PathSep  '/'
+#define inputPath "../_Input/"
+#endif
 
 class valuelist
 {
@@ -124,14 +142,73 @@ public:
 
 };
 
+
+/* Attributes takes a count, and a list of strings
+** initially, this is intended as the argument intput to a 
+** standard "main", argC and argV.
+**
+** However, we are using the same construct to parse substrings
+** (classIdOptions) as well.
+**
+/* Finally, if the arg count is 2, argument 1 is not null, and 
+** argument 2 is the name of a file that can be opened for read access,
+** we will presume argument 2 desribes a file containing arguments in the 
+** same form as the command line, and us it in place of the command line.
+*/
 class attributes
 {
-private:
+public:
     typedef std::map<std::string, valuelist *> attributeDict;
     attributeDict keys;
-public:
-    attributes (int argc, char **argv)
+
+    attributes (int argcIn, char **argvIn)
     {
+        int argc = argcIn;
+        char **argv = argvIn;
+        char *buffer = NULL;
+
+        /*
+        ** Special case:
+        **
+        ** Argument count is 2
+        ** Argument 1 is not a null pointer,
+        ** Argument 2 is a readable file name
+        **   Then read the file, and pare it into the form of command lines, and parse it into
+        ** the attributes dictionary
+        */
+        if ((argc == 2) && (argv[0] != NULL))
+        {
+            if (!access (argv[1], 04))
+            {
+                FILE *commandFile = fopen (argv[1], "r");
+                fseek (commandFile, 0, SEEK_END);
+                size_t fileSize = ftell (commandFile);
+                char *buffer = (char *)malloc (fileSize + 10);
+                fseek (commandFile, 0, SEEK_SET);
+                fread (buffer, 1, fileSize, commandFile);
+                fclose (commandFile);
+
+#define maxArguments 1000
+                char **argumentList = (char **)malloc (sizeof (char *) * maxArguments);
+                argumentList[0] = NULL;
+                int argumentCount = 1;
+                ASUns32 position = 0;
+                while (position < fileSize)
+                {
+                    argumentList[argumentCount] = buffer + position;
+                    argumentCount++;
+                    while ((buffer[position] > ' ') && (position < fileSize))
+                        position++;
+                    buffer[position] = 0;
+                    position++;
+                    while ((buffer[position] <= ' ') && (position < fileSize))
+                        position++;
+                }
+                argc = argumentCount;
+                argv = argumentList;
+            }
+        }
+
         /* for each command line argument.
         ** NOTE: Command line arguments are delimted by spaces. so is you write a list
         ** value for an argument that includes spaces, put the argument in quotes!
@@ -257,6 +334,15 @@ public:
                 key[index] = toupper (key[index]);
             valuelist *values = new valuelist (value);
             AddKeyValue (key, values);
+        }
+
+        /* If we parsed a file, 
+        ** free resources here
+        */
+        if (buffer)
+        {
+            free (buffer);
+            free (argv);
         }
     }
 
@@ -422,14 +508,6 @@ typedef struct
     bool            threadCompleted;                    /* Mark the thread complete for unix to locate it */
 } ThreadInfo;
 
-/* For platform dependent file name construction */
-#ifdef WIN_PLATFORM
-#define PathSep '\\'
-#define access _access
-#else
-#define PathSep  '/'
-#endif
-
 
 /* This is a base class for the worker threads
 **   At this point, it provides for a guarenteed
@@ -448,7 +526,7 @@ public:
     ** The ideal worker has a sequence of them, so that we may 
     ** eiher select all workers to be identical, or force them to behave differently, 
     ** and reveal diferent conflicts.
-    ** These will be set in the standard options logic (parseCommonOptions()) from the command
+    ** These will be set in the standard options logic (workerclass::ParserOptions()) from the command
     ** line keyword "InFileName".
     */
     int          InFileCount;
@@ -456,22 +534,35 @@ public:
     char       **InFileName;
     char       **InFileSuffix;
 
+    /* Some classes (Ergo: merge documents) may have more than one input file
+    ** The following two options are established to allow for 2 or three input
+    ** files
+    */
+    int          InFile2Count;
+    char       **InFile2Path;
+    char       **InFile2Name;
+    char       **InFile2Suffix;
+    int          InFile3Count;
+    char       **InFile3Path;
+    char       **InFile3Name;
+    char       **InFile3Suffix;
+
     /* I don't ever see a real reason for seperate output paths,  But leave this for Symmetry 
-    ** These will be set in the standard options logic (parseCommonOptions()) from the command
+    ** These will be set in the standard options logic (workerclass::ParserOptions()) from the command
     ** line keyword "OutFilePath".
     */
     int          OutPathCount;
     char       **OutFilePath;
 
     /* When true (default) do not print messages from this object 
-    ** This will be set in the standard options logic (parseCommonOptions()) from the command
+    ** This will be set in the standard options logic (workerclass::ParserOptions()) from the command
     ** line keyword "Silent".*/
     bool        silent;
 
     /* When true (Default false) do not initiate/terminate the library per thread!
     ** (This may be set to true by default for a given worker class, overridding both 
     **  the setting from the options, and the default) 
-    ** This will be set in the standard options logic (parseCommonOptions()) from the command
+    ** This will be set in the standard options logic (workerclass::ParserOptions()) from the command
     ** line keyword "noAPDFL".
     */
     bool        noAPDFL;
@@ -481,6 +572,8 @@ public:
 
     workerclass () { sequence = 0;
                      InFileCount = 0;
+                     InFile2Count = 0;
+                     InFile3Count = 0;
                      OutPathCount = 0;
                      silent = true;
                      noAPDFL = false;
@@ -490,9 +583,19 @@ public:
     ~workerclass () { DestroyCS (mutex); 
                       for (int index = 0; index < InFileCount; index++) 
                           { free (InFilePath[index]); free (InFileName[index]); free (InFileSuffix[index]); }
+                      for (int index = 0; index < InFile2Count; index++)
+                          { free (InFile2Path[index]); free (InFile2Name[index]); free (InFile2Suffix[index]); }
+                      for (int index = 0; index < InFile3Count; index++)
+                          {free (InFile3Path[index]); free (InFile3Name[index]); free (InFile3Suffix[index]); }
                       if (InFilePath) free (InFilePath); 
                       if (InFileName) free (InFileName); 
                       if (InFileSuffix) free (InFileSuffix); 
+                      if (InFile2Path) free (InFilePath);
+                      if (InFile2Name) free (InFileName);
+                      if (InFile2Suffix) free (InFileSuffix);
+                      if (InFile3Path) free (InFilePath);
+                      if (InFile3Name) free (InFileName);
+                      if (InFile3Suffix) free (InFileSuffix);
                       for (int index = 0; index < OutPathCount; index++)
                           { free (OutFilePath[index]);}
                       if (OutFilePath) free (OutFilePath);
@@ -515,24 +618,52 @@ public:
 
     char *GetInFileName (int threadSequence)
     {
-        char workname[2048];
+        char workname[2048], *result;
         int index = threadSequence % InFileCount;
         sprintf (workname, "%s%c%s.%s", InFilePath[index], PathSep, InFileName[index], InFileSuffix[index]);
-        char *result = (char *)malloc (strlen (workname) + 1);
+        result = (char *)malloc (strlen (workname) + 1);
         strcpy (result, workname);
         return (result);
     }
+
+    char *GetInFile2Name (int threadSequence)
+    {
+        if (InFile2Count == 0)
+            return (NULL);
+
+        char workname[2048], *result;
+        int index = threadSequence % InFile2Count;
+        sprintf (workname, "%s%c%s.%s", InFile2Path[index], PathSep, InFile2Name[index], InFile2Suffix[index]);
+        result = (char *)malloc (strlen (workname) + 1);
+        strcpy (result, workname);
+        return (result);
+    }
+
+
+    char *GetInFile3Name (int threadSequence)
+    {
+        if (InFile3Count == 0)
+            return (NULL);
+
+        char workname[2048], *result;
+        int index = threadSequence % InFile3Count;
+        sprintf (workname, "%s%c%s.%s", InFile3Path[index], PathSep, InFile3Name[index], InFile3Suffix[index]);
+        result = (char *)malloc (strlen (workname) + 1);
+        strcpy (result, workname);
+        return (result);
+    }
+
 
     char * GetOutFileName (int threadSequence, int inner = -1)
     {
         int indexOut = threadSequence % OutPathCount;
         int indexIn = threadSequence % InFileCount;
-        char workname[2048];
+        char workname[2048], *result;;
         if (inner == -1)
             sprintf (workname, "%s%c%s_%01d.%s", OutFilePath[indexOut], PathSep, InFileName[indexIn], threadSequence + 1, InFileSuffix[indexIn]);
         else
             sprintf (workname, "%s%c%s_%01d_%01d.%s", OutFilePath[indexOut], PathSep, InFileName[indexIn], threadSequence + 1, inner + 1, InFileSuffix[indexIn]);
-        char *result = (char *)malloc (strlen (workname) + 1);
+        result = (char *)malloc (strlen (workname) + 1);
         strcpy (result, workname);
         return (result);
     }
@@ -594,10 +725,34 @@ public:
         }
     }
 
+    /* If we get here, and the file name start with a 
+    ** percent sign, then expand the name by preceedingit with the
+    ** standard path to sample input
+    */
+    char *expandFileName (char *inname)
+    {
+        char *result;
+        if (inname[0] == '%')
+        {
+            result = (char *)malloc (strlen (inname) + strlen (inputPath) + 1);
+            sprintf (result, "%s%c%s", inputPath, PathSep, &inname[1]);
+        }
+        else
+        {
+            result = (char *)malloc (strlen (inname) + 1);
+            strcpy (result, inname);
+        }
+        return (result);
+    }
+
     void parseOneFileName (int index, char *inname)
     { 
+        char *expandedName = expandFileName (inname);
+
         char *path, *name, *suffix;
-        workerclass::splitpath (inname, &path, &name, &suffix);
+        workerclass::splitpath (expandedName, &path, &name, &suffix);
+
+        free (expandedName);
 
         InFilePath[index] = (char *)malloc (strlen (path) + 1);
         strcpy (InFilePath[index], path);
@@ -607,7 +762,41 @@ public:
         strcpy (InFileSuffix[index], suffix);
     }
 
-    void    parseCommonOptions (valuelist *values, char *defaultInFileName, char *defaultOutFilePath)
+    void parseTwoFileName (int index, char *inname)
+    {
+        char *expandedName = expandFileName (inname);
+
+        char *path, *name, *suffix;
+        workerclass::splitpath (expandedName, &path, &name, &suffix);
+
+        free (expandedName);
+
+        InFile2Path[index] = (char *)malloc (strlen (path) + 1);
+        strcpy (InFilePath[index], path);
+        InFile2Name[index] = (char *)malloc (strlen (name) + 1);
+        strcpy (InFileName[index], name);
+        InFile2Suffix[index] = (char *)malloc (strlen (suffix) + 1);
+        strcpy (InFile2Suffix[index], suffix);
+    }
+
+    void parseThreeFileName (int index, char *inname)
+    {
+        char *expandedName = expandFileName (inname);
+
+        char *path, *name, *suffix;
+        workerclass::splitpath (expandedName, &path, &name, &suffix);
+
+        free (expandedName);
+
+        InFile3Path[index] = (char *)malloc (strlen (path) + 1);
+        strcpy (InFilePath[index], path);
+        InFile3Name[index] = (char *)malloc (strlen (name) + 1);
+        strcpy (InFile3Name[index], name);
+        InFile3Suffix[index] = (char *)malloc (strlen (suffix) + 1);
+        strcpy (InFile3Suffix[index], suffix);
+    }
+
+    void    ParseOptions (valuelist *values, char *defaultInFileName, char *defaultOutFilePath)
     {
 
         if (values)
@@ -646,6 +835,29 @@ public:
             parseOneFileName (0, defaultInFileName);
         }
 
+        if (threadAttributes->IsKeyPresent ("InFile2Name"))
+        {
+            valuelist *nameValues = threadAttributes->GetKeyValue ("InFile2Name");
+            InFile2Count = nameValues->size ();
+            InFile2Path = (char **)malloc (sizeof (char*) * InFile2Count);
+            InFile2Name = (char **)malloc (sizeof (char*) * InFile2Count);
+            InFile2Suffix = (char **)malloc (sizeof (char*) * InFile2Count);
+
+            for (int index = 0; index < InFileCount; index++)
+                parseTwoFileName (index, nameValues->value (index));
+        }
+
+        if (threadAttributes->IsKeyPresent ("InFile3Name"))
+        {
+            valuelist *nameValues = threadAttributes->GetKeyValue ("InFile3Name");
+            InFile3Count = nameValues->size ();
+            InFile3Path = (char **)malloc (sizeof (char*) * InFile3Count);
+            InFile3Name = (char **)malloc (sizeof (char*) * InFile3Count);
+            InFile3Suffix = (char **)malloc (sizeof (char*) * InFile3Count);
+
+            for (int index = 0; index < InFileCount; index++)
+                parseThreeFileName (index, nameValues->value (index));
+        }
 
         if (threadAttributes->IsKeyPresent ("OutFilePath"))
         {
@@ -677,6 +889,26 @@ public:
         for (int index = 0; index < InFileCount; index++)
         {
             sprintf (workpath, "%s%c%s.%s", InFilePath[index], PathSep, InFileName[index], InFileSuffix[index]);
+            if (access (workpath, 04))
+            {
+                printf ("The input file does not exist? \n%   \"%s\"\n", workpath);
+                exit (-1);
+            }
+        }
+
+        for (int index = 0; index < InFile2Count; index++)
+        {
+            sprintf (workpath, "%s%c%s.%s", InFile2Path[index], PathSep, InFile2Name[index], InFile2Suffix[index]);
+            if (access (workpath, 04))
+            {
+                printf ("The input file does not exist? \n%   \"%s\"\n", workpath);
+                exit (-1);
+            }
+        }
+
+        for (int index = 0; index < InFile3Count; index++)
+        {
+            sprintf (workpath, "%s%c%s.%s", InFile3Path[index], PathSep, InFile3Name[index], InFile3Suffix[index]);
             if (access (workpath, 04))
             {
                 printf ("The input file does not exist? \n%   \"%s\"\n", workpath);
