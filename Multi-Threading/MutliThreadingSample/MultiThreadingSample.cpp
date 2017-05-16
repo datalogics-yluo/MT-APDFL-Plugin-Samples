@@ -1146,7 +1146,7 @@ public:
                 numberOfPagesDone += pages[index % pagesCount];
 
             ASUns32 numberOfPagesPerCycle = 0;
-            for (ASUns32 index = 0; index < pagesCount; index++)
+            for (ASInt32 index = 0; index < pagesCount; index++)
                 numberOfPagesPerCycle += pages[index];
 
             ASUns32 firstPageToDo = numberOfPagesDone %= numberOfPagesPerCycle;
@@ -1164,7 +1164,7 @@ public:
             for (ASInt32 loop = 0; loop < Repetitions[sequence % RepetitionsCount]; loop++)
             {
                 /* Do the requires set of pages */
-                for (ASUns32 indexPage = 0; indexPage < pages[sequence % pagesCount]; indexPage++)
+                for (ASInt32 indexPage = 0; indexPage < pages[sequence % pagesCount]; indexPage++)
                 {
                     /* Obtain the current page */
                     ASUns32 pageToDo = (firstPageToDo + indexPage) % pagesInDocument;
@@ -1315,8 +1315,8 @@ int main(int argc, char** argv)
     workerClasses[TextExtract].TextExtract = new TextextWorker ();
     workerClasses[TextExtract].TextExtract->ParseOptions (SampleAttributes.GetKeyValue (workers[TextExtract].paramName));
 
-    workerClasses[Rasterizer].TextExtract = new TextextWorker ();
-    workerClasses[Rasterizer].TextExtract->ParseOptions (SampleAttributes.GetKeyValue (workers[Rasterizer].paramName));
+    workerClasses[Rasterizer].Rasterizer = new RasterizerWorker ();
+    workerClasses[Rasterizer].Rasterizer->ParseOptions (SampleAttributes.GetKeyValue (workers[Rasterizer].paramName));
 
 
     /* construct an array of threads to be run */
