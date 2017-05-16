@@ -27,12 +27,6 @@
 #include "APDFLDoc.h"
 
 #include "DLExtrasCalls.h"
-#include "PSFCalls.h"
-#include "PERCalls.h"
-#include "PEWCalls.h"
-#include "PagePDECntCalls.h"
-#include "PDPageDrawM.h"
-#include "DLExtrasCalls.h"
 
 /* There will be an expandable collection of thread worker method classes that may be run. 
 ** Each class will have an initialization method, that will set it's unique variables, from a command line array.
@@ -712,6 +706,9 @@ public:
 
 };
 
+#include "PSFCalls.h"
+#include "PERCalls.h"
+#include "PEWCalls.h"
 /*
 ** TextExtract  worker
 ** This thread extract the content of N pages (Specified in page count, below)
@@ -780,20 +777,13 @@ public:
             /* Create a word finder */
             PDWordFinder wordFinder = PDDocCreateWordFinderEx (pdDoc, WF_LATEST_VERSION, false, &wfConfig);
 
-            /* Figure out what the first page to do is
-            ** (Kind of tricky, when each runmay doa differnt number of pages)
-            **/
-            ASUns32 position = sequence % pagesCount;
+            /* How many pages have we already done*/
             ASUns64 numberOfPagesDone = 0;
             for (int index = 0; index < sequence; index++)
                 numberOfPagesDone += pages[index % pagesCount];
 
-            ASUns32 numberOfPagesPerCycle = 0;
-            for (ASUns32 index = 0; index < pagesCount; index++)
-                numberOfPagesPerCycle += pages[index];
-
-            ASUns32 firstPageToDo = numberOfPagesDone %= numberOfPagesPerCycle;
-            firstPageToDo %= pagesInDocument;
+            /* reduce modulos the number of pages in the document */
+            ASUns32 firstPageToDo = numberOfPagesDone % pagesInDocument;
 
             ASUns32 numberOfPagesToDo = pages[sequence % pagesCount];
 
@@ -880,6 +870,8 @@ public:
 **                   ColorModel={RGB,CMYK,GRAY,DeviceN]                 Which color model to use. RGB is the default.
 */
 #include "PagePDECntCalls.h"
+#include "PDPageDrawM.h"
+#include "DLExtrasCalls.h"
 class RasterizerWorker : public workerclass
 {
     /* This thread will copy a specified file N times, into new specified files.
@@ -938,26 +930,26 @@ public:
                 name[i] = toupper (name[i]);
             if (!strcmp (name, "DEVICEN"))
             {
-                colorModel = ASAtomFromString ("DeviceN");
+                strcpy (colorModel, name);
                 colorComponents = 4;
             }
             else
             {
                 if (!strcmp (name, "DEVICEGRAY"))
                 {
-                    colorModel = ASAtomFromString ("DeviceGray");
+                    strcpy (colorModel, name);
                     colorComponents = 1;
                 }
                 else
                 {
                     if (!strcmp (name, "DEVICECMYK"))
                     {
-                        colorModel = ASAtomFromString ("DeviceCMYK");
+                        strcpy (colorModel, name);
                         colorComponents = 4;
                     }
                     else
                     {
-                        colorModel = ASAtomFromString ("DeviceRGB");
+                        strcpy (colorModel, "DeviceRGB");
                         colorComponents = 3;
                     }
                 }
@@ -965,7 +957,7 @@ public:
         }
         else
         {
-            colorModel = ASAtomFromString ("DeviceRGB");
+            strcpy (colorModel, "DeviceRGB");
             colorComponents = 3;
         }
 
@@ -996,6 +988,18 @@ public:
         ASFixedRect destRect;
         ASFixedMatrixTransformRect (&destRect, &scaleMatrix, &pageRect);
 
+        /* If the page is offset, remove the offset here */
+        if (destRect.left != 0)
+        {
+            destRect.right -= destRect.left;
+            destRect.left = 0;
+        }
+        if (destRect.bottom != 0)
+        {
+            destRect.top -= destRect.bottom;
+            destRect.bottom = 0;
+        }
+
         /* Generate width and depth */
 
         /* Construct the draw params record */
@@ -1004,7 +1008,7 @@ public:
         drawParams.size = sizeof (PDPageDrawMParamsRec);
         drawParams.destRect = &destRect;
         drawParams.matrix = &matrix;
-        drawParams.csAtom = colorModel;
+        drawParams.csAtom = ASAtomFromString(colorModel);
         drawParams.bpc = 8;
         drawParams.flags = kPDPageDoLazyErase;
 
@@ -1088,7 +1092,7 @@ public:
         **  add logic to create a color space from ink table is we want to support
         ** deviceN colors. Too much to do for now.
         */
-        PDEColorSpace cs = PDEColorSpaceCreateFromName (colorModel);
+        PDEColorSpace cs = PDEColorSpaceCreateFromName (ASAtomFromString(colorModel));
 
         /* Create a PDE Image (One that can be added to a PDF page */
         PDEImage image = PDEImageCreate (&attrs, sizeof (attrs), &matrix, 0, cs, NULL, &filterArray, NULL, (ASUns8*)map, length);
@@ -1137,20 +1141,13 @@ public:
             /* Get the number of pages */
             size_t pagesInDocument = PDDocGetNumPages (pdDoc);
 
-            /* Figure out what the first page to do is
-            ** (Kind of tricky, when each runmay doa differnt number of pages)
-            **/
-            ASUns32 position = sequence % pagesCount;
+            /* How many pages have we already done*/
             ASUns64 numberOfPagesDone = 0;
             for (int index = 0; index < sequence; index++)
                 numberOfPagesDone += pages[index % pagesCount];
 
-            ASUns32 numberOfPagesPerCycle = 0;
-            for (ASInt32 index = 0; index < pagesCount; index++)
-                numberOfPagesPerCycle += pages[index];
-
-            ASUns32 firstPageToDo = numberOfPagesDone %= numberOfPagesPerCycle;
-            firstPageToDo %= pagesInDocument;
+            /* reduce modulos the number of pages in the document */
+            ASUns32 firstPageToDo = numberOfPagesDone % pagesInDocument;
 
             ASUns32 numberOfPagesToDo = pages[sequence % pagesCount];
 
@@ -1222,7 +1219,7 @@ private:
     ASInt32     pagesCount;
     ASBool      saveImages;
     double      Resolution;
-    ASAtom      colorModel;
+    char        colorModel[20];
     ASInt8      colorComponents;
 };
 
