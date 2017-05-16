@@ -49,10 +49,10 @@
 #define PathSep '\\'
 #define access _access
 #define mkdir _mkdir
-#define inputPath "..\\..\\..\\..\\Resources\\Sample_Input\\"
+#define inputPath "..\\..\\..\\..\\Resources\\Sample_Input"
 #else
 #define PathSep  '/'
-#define inputPath "../_Input/"
+#define inputPath "../_Input"
 #endif
 
 class valuelist
@@ -422,6 +422,20 @@ public:
         }
         else
             return 0;
+    }
+
+    double GetKeyValueDouble (char *key)
+    {
+        if (IsKeyPresent (key))
+        {
+            valuelist *values = GetKeyValue (key);
+            if (values->size () == 0)
+                return 0;
+            char *value = values->value (0);
+            return (atof (value));
+        }
+        else
+            return 0.0;
     }
 };
 
