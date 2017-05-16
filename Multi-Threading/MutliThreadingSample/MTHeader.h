@@ -515,6 +515,8 @@ typedef struct
     bool            silent;                             /* When true, write nothing to stdout! */
     bool            noAPDFL;                            /* When true, do not init/term the library in this thread! */
     bool            threadCompleted;                    /* Mark the thread complete for unix to locate it */
+    FILE           *logFile;                            /* Write status message to this file */
+    bool            logFileSet;                         /* If log file is set, then default "silent" to "false". */
 } ThreadInfo;
 
 
