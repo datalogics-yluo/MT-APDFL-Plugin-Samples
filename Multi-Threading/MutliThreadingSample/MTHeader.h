@@ -179,6 +179,8 @@ public:
         */
         if ((argc == 2) && (argv[0] != NULL))
         {
+
+
             if (!access (argv[1], 04))
             {
                 FILE *commandFile = fopen (argv[1], "r");
@@ -186,7 +188,9 @@ public:
                 size_t fileSize = ftell (commandFile);
                 char *buffer = (char *)malloc (fileSize + 10);
                 fseek (commandFile, 0, SEEK_SET);
+                memset (buffer, 0, fileSize + 10);
                 fread (buffer, 1, fileSize, commandFile);
+                buffer[fileSize] = 0;
                 fclose (commandFile);
 
 #define maxArguments 1000

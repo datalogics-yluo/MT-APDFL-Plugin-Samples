@@ -171,7 +171,7 @@ public:
         else
         {
             PrimesCount = 1;
-            Primes[0] = 5;
+            Primes[0] = 1000;
         }
 
     };
@@ -1093,7 +1093,7 @@ int main(int argc, char** argv)
             /* If we are not silent, then display a status for the thread completing */
             if (!doneThread->silent)
                 printf ("Thread %01d completed in %0.6g seconds wall, %0.10g seconds CPU, with code %01d.\n",
-                doneThread->threadNumber, doneThread->wallTimeUsed, doneThread->cpuTimeUsed, doneThread->result);
+                doneThread->threadNumber+1, doneThread->wallTimeUsed, doneThread->cpuTimeUsed, doneThread->result);
 
             /* end the thread */
             destroyThread (doneThread);
