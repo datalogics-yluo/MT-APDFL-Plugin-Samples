@@ -31,6 +31,8 @@
 #include "PERCalls.h"
 #include "PEWCalls.h"
 #include "PagePDECntCalls.h"
+#include "PDPageDrawM.h"
+#include "DLExtrasCalls.h"
 
 /* There will be an expandable collection of thread worker method classes that may be run. 
 ** Each class will have an initialization method, that will set it's unique variables, from a command line array.
@@ -69,6 +71,7 @@ class PDFaWorker ;
 class PDFxWorker;
 class XPS2PDFWorker;
 class TextextWorker;
+class RasterizerWorker;
 
 typedef union workerclassptr
 {
@@ -77,6 +80,7 @@ typedef union workerclassptr
     PDFxWorker          *PDFx;
     XPS2PDFWorker       *XPS2PDF;
     TextextWorker       *TextExtract;
+    RasterizerWorker    *Rasterizer;
 } WorkerClassPtr;
 
 
@@ -86,7 +90,8 @@ typedef enum
     PDFA,
     PDFX,
     XPS2PDF,
-    TextExtract
+    TextExtract,
+    Rasterizer
 };
 
 typedef struct worktypes
@@ -104,7 +109,8 @@ WorkerType workers[] = {
     {"PDFa",        "PDFaOptions",           PDFA },
     {"PDFx",        "PDFxOptions",           PDFX },
     {"XPS2PDF",     "XPS2PDFOptions",        XPS2PDF },
-    {"TextExtract", "TextExtractOptions",    TextExtract }
+    {"TextExtract", "TextExtractOptions",    TextExtract },
+    { "Rasterizer", "RasterizerOptions",     Rasterizer }
 };
 #define NumberOfWorkers (sizeof (workers)/sizeof (WorkerType))
 
@@ -605,7 +611,7 @@ private:
 
 **  XPS2PDFOptions=[
 **                   silent=true                                        When true, do not display status lines
-**                   InFileName=[test data path\AddRedactions.pdf]      A list of file to copy, One file will be copied by each thread, sequcence % #files.
+**                   InFileName=[test data path\XPStoPDF.xps]      A list of file to copy, One file will be copied by each thread, sequcence % #files.
 **                   OutFilePath=[Output]                               Directory where output is written
 **                   noAPDFL=false                                      When true, we will NOT init/term the library for each thread
 */
@@ -714,7 +720,7 @@ public:
 
 **  PDFxOptions=[
 **                   silent=true                                        When true, do not display status lines
-**                   InFileName=[test data path\AddRedactions.pdf]      A list of file to copy, One file will be copied by each thread, sequcence % #files.
+**                   InFileName=[test data path\constitution.pdf]      A list of file to copy, One file will be copied by each thread, sequcence % #files.
 **                   OutFilePath=[Output]                               Directory where output is written
 **                   noAPDFL=false                                      When true, we will NOT init/term the library for each thread
 **                   NumberOfPages=[1]                                  Number of pages of content to extract in this thread (100 values max!)
@@ -816,8 +822,6 @@ public:
                 /* Write document and page name to result file */
                 fprintf (wordFile, "%s Page: %01d", fullFileName, pageToDo);
 
-                /* free input file name  */
-                free (fullFileName);
 
                 for (int i = 0; i < numWordsFound; ++i)
                 {
@@ -839,6 +843,8 @@ public:
             /* Release the word finder itself*/
                 PDWordFinderDestroy (wordFinder);
 
+            /* free input file name  */
+            free (fullFileName);
 
         HANDLER
             info->result = 1;
@@ -853,6 +859,373 @@ public:
         ASUns32 pagesCount;
 
 };
+
+
+
+/*
+** Rasterizer Worker
+** This worker type will open a document, rasterize one or more pages, one or more times, Optoiopnally placiong the 
+** results into a new PDF file. 
+**
+** If "NoAPDFL=true" must not be specified for this worker type!
+**
+**  RasterizerOptions=[
+**                   silent=true                                        When true, do not display status lines
+**                   InFileName=[test data path\constitution.pdf]      A list of file to copy, One file will be copied by each thread, sequcence % #files.
+**                   OutFilePath=[Output]                               Directory where output is written
+**                   NumberOfPages=[1]                                  How many pages shall we rasterize (100 values max!)
+**                   Repetitions=[1]                                    How many times shall we rasterize each page done (100 values max!)
+**                   SaveImages=false                                   When true, we will save the inages in a PDf document, when false, we will not
+**                   Resolution=300                                     Resolution to render image too.
+**                   ColorModel={RGB,CMYK,GRAY,DeviceN]                 Which color model to use. RGB is the default.
+*/
+#include "PagePDECntCalls.h"
+class RasterizerWorker : public workerclass
+{
+    /* This thread will copy a specified file N times, into new specified files.
+    ** Each time the file is copied, it will also find the fist 1000 prime numbers!
+    */
+public:
+    RasterizerWorker () { };
+    ~RasterizerWorker () { };
+
+    /* Parse the non-APDFL conversion thread options into attributes */
+    void ParseOptions (valuelist *values)
+    {
+        workerclass::ParseOptions (values, "%AddRedaction.pdf", "Output");
+
+        if (threadAttributes->IsKeyPresent ("Repetitions"))
+        {
+            valuelist *values = threadAttributes->GetKeyValue ("Repetitions");
+            RepetitionsCount = values->size ();
+            for (int index = 0; index < RepetitionsCount; index++)
+                Repetitions[index] = values->GetValueInt (index);
+        }
+        else
+        {
+            RepetitionsCount = 1;
+            Repetitions[0] = 5;
+        }
+
+        if (threadAttributes->IsKeyPresent ("NumberOfPages"))
+        {
+            valuelist *values = threadAttributes->GetKeyValue ("NumberOfPages");
+            pagesCount = values->size ();
+            for (ASInt32 index = 0; index < pagesCount; index++)
+                pages[index] = values->GetValueInt (index);
+        }
+        else
+        {
+            pagesCount = 1;
+            pages[0] = 1;
+        }
+
+        if (threadAttributes->IsKeyPresent ("SaveImages"))
+            saveImages = threadAttributes->GetKeyValueBool ("SaveImages");
+        else
+            saveImages = false;
+
+        if (threadAttributes->IsKeyPresent ("Resolution"))
+            Resolution = threadAttributes->GetKeyValueDouble ("Resolution");
+        else
+            Resolution = 300.0;
+
+        if (threadAttributes->IsKeyPresent ("ColorModel"))
+        {
+            valuelist *values = threadAttributes->GetKeyValue ("ColorModel");
+            char *name = values->value (0);
+            for (int i = 0;name[i] != 0; i++)
+                name[i] = toupper (name[i]);
+            if (!strcmp (name, "DEVICEN"))
+            {
+                colorModel = ASAtomFromString ("DeviceN");
+                colorComponents = 4;
+            }
+            else
+            {
+                if (!strcmp (name, "DEVICEGRAY"))
+                {
+                    colorModel = ASAtomFromString ("DeviceGray");
+                    colorComponents = 1;
+                }
+                else
+                {
+                    if (!strcmp (name, "DEVICECMYK"))
+                    {
+                        colorModel = ASAtomFromString ("DeviceCMYK");
+                        colorComponents = 4;
+                    }
+                    else
+                    {
+                        colorModel = ASAtomFromString ("DeviceRGB");
+                        colorComponents = 3;
+                    }
+                }
+            }
+        }
+        else
+        {
+            colorModel = ASAtomFromString ("DeviceRGB");
+            colorComponents = 3;
+        }
+
+    };
+
+    char *RenderPageToBitmap (PDPage page, ASSize_t *mapSize, ASSize_t *width, ASSize_t *depth)
+    {
+
+        /* Get the matrix that transforms user space coordinates to rotated and cropped upright image coordinates.
+        **  The origin of this space is the top-left of the rotated, cropped page. Y is decreasing
+        */
+        ASFixedMatrix matrix;
+        PDPageGetFlippedMatrix (page, &matrix);
+
+        //Gets the crop box for a page. The crop box is the region of the page to display and print
+        ASFixedRect pageRect;
+        PDPageGetCropBox (page, &pageRect);
+
+        /* Set the scale matrix that will be concatenated to the user space matrix
+        ** to accomplish the desired resolution 
+        */
+        ASFixedMatrix scaleMatrix = { FloatToASFixed (Resolution / 72.0), 0, 0, FloatToASFixed (Resolution / 72.0), 0, 0 };
+
+        //Apply the scale to the default matrix
+        ASFixedMatrixConcat (&matrix, &scaleMatrix, &matrix);
+
+        /* Apply scale to the destination rectangle*/
+        ASFixedRect destRect;
+        ASFixedMatrixTransformRect (&destRect, &scaleMatrix, &pageRect);
+
+        /* Generate width and depth */
+
+        /* Construct the draw params record */
+        PDPageDrawMParamsRec drawParams;
+        memset ((char *)&drawParams, 0, sizeof (PDPageDrawMParamsRec));
+        drawParams.size = sizeof (PDPageDrawMParamsRec);
+        drawParams.destRect = &destRect;
+        drawParams.matrix = &matrix;
+        drawParams.csAtom = colorModel;
+        drawParams.bpc = 8;
+        drawParams.flags = kPDPageDoLazyErase;
+
+        /* Call draw to memory to get buffer size */
+        size_t bufferSize = PDPageDrawContentsToMemoryWithParams (page, &drawParams);
+
+        /* If we are doing deviceN, pickup the number of inks here */
+        if (drawParams.deviceNColorCount)
+            colorComponents = drawParams.deviceNColorCount[0];
+
+        /* If bufferSize is zero, then we set up inks inthe previous call (DeviceN)
+        ** So call again to get buffer size
+        */
+        if (bufferSize == 0)
+            bufferSize = PDPageDrawContentsToMemoryWithParams (page, &drawParams);
+
+        /* if buffer size is still zero, something is wrong. Error out!
+        */
+        if (bufferSize == 0)
+            return (NULL);
+
+        /* Allocate a buffer to hold the bitmap */
+        char *buffer = (char *)malloc (bufferSize);
+
+        /* Point to it int he draw params.*/
+        drawParams.buffer = buffer;
+        drawParams.bufferSize = bufferSize;
+
+        /* Draw the page !*/
+        PDPageDrawContentsToMemoryWithParams (page, &drawParams);
+
+        /* Tell the caller the size of the map, width, and depth */
+        *mapSize = bufferSize;
+        *width = abs (ASFixedRoundToInt16 (destRect.right) - ASFixedRoundToInt16 (destRect.left));
+        *depth = abs (ASFixedRoundToInt16 (destRect.top) - ASFixedRoundToInt16 (destRect.bottom));
+
+        /* Return the map to the caller */
+        return (buffer);
+    }
+
+    void AddImageToDoc (PDDoc doc, size_t mapSize, char *map, size_t width, size_t depth, ThreadInfo *info)
+    { 
+        /* Set upimage Attributes.
+        ** Always an XObject image
+        */
+        PDEImageAttrs attrs;
+        memset ((char *)&attrs, 0, sizeof (PDEImageAttrs));
+        attrs.flags = kPDEImageExternal;
+        attrs.width = width;
+        attrs.height = depth;
+        attrs.bitsPerComponent = 8;
+
+        /* Always compress image flate */
+        PDEFilterArray filterArray;
+        memset (&filterArray, 0, sizeof (PDEFilterArray));
+        filterArray.numFilters = 1;
+        filterArray.spec[0].name = ASAtomFromString ("FlateDecode");
+
+        /* Image is created passed to a 32 bit boundary per row.
+        ** For image usage, it must be padded to 8 bits per row
+        */
+        ASUns32 rowWidthPacked = width * colorComponents;
+        ASUns32 rowWidthPadded = (((width * colorComponents * 8) + 31) / 32) * 4;
+
+        /* Repack rows, as needed */
+        if (rowWidthPacked != rowWidthPadded)
+        {
+            /* Remove the row padding bytes */
+            for (ASUns16 row = 1; row < depth; row++)
+                memmove (&map[row * rowWidthPacked], &map[row * rowWidthPadded], rowWidthPacked);
+        }
+
+        /* New size */
+        size_t length = width * colorComponents * depth;
+
+        /* Image is erect, and sized 1 point per pixel */
+        ASFixedMatrix matrix = { width * fixedOne, 0, 0, depth * fixedOne, 0, 0 };
+
+        /* Color space as per creation
+        ** (NOTE: This will not work for deviceN color spaces, will have to 
+        **  add logic to create a color space from ink table is we want to support
+        ** deviceN colors. Too much to do for now.
+        */
+        PDEColorSpace cs = PDEColorSpaceCreateFromName (colorModel);
+
+        /* Create a PDE Image (One that can be added to a PDF page */
+        PDEImage image = PDEImageCreate (&attrs, sizeof (attrs), &matrix, 0, cs, NULL, &filterArray, NULL, (ASUns8*)map, length);
+
+        /* Create a page to hold the image 
+        ** Just the size of the image.
+        */
+        ASFixedRect pageSize = { 0, depth * fixedOne, width * fixedOne, 0 };
+        PDPage page = PDDocCreatePage (doc, PDDocGetNumPages (doc)-1, pageSize);
+
+        /* Get the PDE Content */
+        PDEContent content = PDPageAcquirePDEContent (page, 0);
+
+        /* Set the image into the page */
+        PDEContentAddElem (content, kPDEAfterLast, (PDEElement)image);
+
+        /* Bind he content back into the page */
+        PDPageSetPDEContent (page, 0);
+
+        /* Release resources */
+        PDERelease ((PDEObject)image);
+        PDPageReleasePDEContent (page, 0);
+        PDERelease ((PDEObject)cs);
+
+    }
+
+
+
+
+    void WorkerThread (ThreadInfo *info)
+    {
+        int sequence = getNextSequence ();
+        if (!silent)
+            printf ("Rasterizer Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+
+        /* Generate input name */
+        char *fullFileName = GetInFileName (sequence);
+
+
+        DURING
+            /* Open the input document */
+            APDFLDoc inDoc (fullFileName, true);
+            PDDoc pdDoc = inDoc.getPDDoc ();
+
+
+            /* Get the number of pages */
+            size_t pagesInDocument = PDDocGetNumPages (pdDoc);
+
+            /* Figure out what the first page to do is
+            ** (Kind of tricky, when each runmay doa differnt number of pages)
+            **/
+            ASUns32 position = sequence % pagesCount;
+            ASUns64 numberOfPagesDone = 0;
+            for (int index = 0; index < sequence; index++)
+                numberOfPagesDone += pages[index % pagesCount];
+
+            ASUns32 numberOfPagesPerCycle = 0;
+            for (ASUns32 index = 0; index < pagesCount; index++)
+                numberOfPagesPerCycle += pages[index];
+
+            ASUns32 firstPageToDo = numberOfPagesDone %= numberOfPagesPerCycle;
+            firstPageToDo %= pagesInDocument;
+
+            ASUns32 numberOfPagesToDo = pages[sequence % pagesCount];
+
+            PDDoc outDoc;
+            if (saveImages)
+                outDoc = PDDocCreate ();
+            else
+                outDoc = NULL;
+
+            /* Do the pages fromfirst to last, N times */
+            for (ASInt32 loop = 0; loop < Repetitions[sequence % RepetitionsCount]; loop++)
+            {
+                /* Do the requires set of pages */
+                for (ASUns32 indexPage = 0; indexPage < pages[sequence % pagesCount]; indexPage++)
+                {
+                    /* Obtain the current page */
+                    ASUns32 pageToDo = (firstPageToDo + indexPage) % pagesInDocument;
+                    PDPage page = PDDocAcquirePage (inDoc.getPDDoc(), pageToDo);
+
+                    /* Render the current page */
+                    ASSize_t mapsize, width, depth;
+                    char *mapBuffer = RenderPageToBitmap (page, &mapsize, &width, &depth);
+
+                    /* Release the current page */
+                    PDPageRelease (page);
+
+                    /* If we are saving the images, make the map and image, and 
+                    ** add it to the images document
+                    */
+                    if (saveImages)
+                    {
+                        AddImageToDoc (outDoc, mapsize, mapBuffer, width, depth, info);
+                    }
+
+                    /* Free the bitmap */
+                    free (mapBuffer);
+
+                }
+            }
+
+            if (saveImages)
+            {
+                /* The automatic logic will use he same suffix for the output as the input, so change the suffix here */
+                char *fullOutputFileName = GetOutFileName (sequence, -1);
+#if !MAC_ENV	
+                ASPathName destFilePath = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullOutputFileName, NULL);
+#else
+                ASPathName destFilePath = GetMacPath (fullOutputFileName);
+#endif
+
+                PDDocSave (outDoc, PDSaveFull | PDSaveCollectGarbage, destFilePath, NULL, NULL, NULL);
+                ASFileSysReleasePath (NULL, destFilePath);
+                free (fullOutputFileName);
+                PDDocClose (outDoc);
+            }
+
+        HANDLER
+            info->result = 1;
+        END_HANDLER
+
+        if (!silent)
+            printf ("Rasterizer Worker Thread completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+    }
+
+private:
+    ASInt32     Repetitions[100];
+    ASInt32     RepetitionsCount;
+    ASInt32     pages[100];
+    ASInt32     pagesCount;
+    ASBool      saveImages;
+    double      Resolution;
+    ASAtom      colorModel;
+    ASInt8      colorComponents;
+};
+
 
 /* This procedure is the one called by all threads!
 **  it uses the workerclass object to create the library, and 
@@ -883,6 +1256,9 @@ void outerWorker (ThreadInfo *info)
         break;
     case TextExtract:
         ((TextextWorker *)baseObject)->WorkerThread (info);
+        break;
+    case Rasterizer:
+        ((RasterizerWorker *)baseObject)->WorkerThread (info);
         break;
     default:
          baseObject->WorkerThread (info);
@@ -936,9 +1312,11 @@ int main(int argc, char** argv)
     workerClasses[XPS2PDF].XPS2PDF = new XPS2PDFWorker ();
     workerClasses[XPS2PDF].XPS2PDF->ParseOptions (SampleAttributes.GetKeyValue (workers[XPS2PDF].paramName));
 
-
     workerClasses[TextExtract].TextExtract = new TextextWorker ();
     workerClasses[TextExtract].TextExtract->ParseOptions (SampleAttributes.GetKeyValue (workers[TextExtract].paramName));
+
+    workerClasses[Rasterizer].TextExtract = new TextextWorker ();
+    workerClasses[Rasterizer].TextExtract->ParseOptions (SampleAttributes.GetKeyValue (workers[Rasterizer].paramName));
 
 
     /* construct an array of threads to be run */
