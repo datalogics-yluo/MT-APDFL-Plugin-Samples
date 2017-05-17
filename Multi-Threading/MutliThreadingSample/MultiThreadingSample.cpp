@@ -48,6 +48,7 @@
 **       "OutFilePath="  The name of an directory tohold output. If there directory does not exist, it will be created.
 **                       if the path to the directory does not exist, it willnot be created, and the run will fail!
 **       "Silent="  may be true of false. If true, the process will write no messages to the display. Default is true.
+**       "TempMemFileSys=" may be true or false. If true, set default temp file sys to ASMemFileSys at startup.
 */
 
 /* This is the current set of known workers 
@@ -206,7 +207,7 @@ public:
     /* One thread worker procedure */
     void WorkerThread (ThreadInfo *info)
     {
-        int sequence = getNextSequence ();
+        int sequence = info->sequence;
         if (!silent)
             fprintf (info->logFile, "Non APDFL Worker Thread started! (Sequence: %01d, Thread: %01d\n", sequence+1, info->threadNumber + 1);
 
@@ -378,7 +379,7 @@ public:
     /* One thread worker procedure */
     void WorkerThread (ThreadInfo *info)
     {
-        int sequence = getNextSequence ();
+        int sequence = info->sequence;
         if (!silent)
             fprintf (info->logFile, "PDF/a Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
@@ -521,7 +522,7 @@ public:
     /* One thread worker procedure */
     void WorkerThread (ThreadInfo *info)
     {
-        int sequence = getNextSequence ();
+        int sequence = info->sequence;
 
         if (!silent)
             fprintf (info->logFile, "PDF/x Worker Thread started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
@@ -628,7 +629,7 @@ public:
     /* One thread worker procedure */
     void WorkerThread (ThreadInfo *info)
     {
-        int sequence = getNextSequence ();
+        int sequence = info->sequence;
         if (!silent)
             fprintf (info->logFile, "XPS to PDF Worker Thread! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
@@ -707,7 +708,7 @@ public:
 
 
 };
-#endif  //!Mac_ENV for XPS2PDF
+
 #include "PSFCalls.h"
 #include "PERCalls.h"
 #include "PEWCalls.h"
@@ -754,7 +755,7 @@ public:
     /* One thread worker procedure */
     void WorkerThread (ThreadInfo *info)
     {
-        int sequence = getNextSequence ();
+        int sequence = info->sequence;
         if (!silent)
             fprintf (info->logFile, "Text Extraction Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
@@ -1126,7 +1127,7 @@ public:
 
     void WorkerThread (ThreadInfo *info)
     {
-        int sequence = getNextSequence ();
+        int sequence = info->sequence;
         if (!silent)
             fprintf (info->logFile, "Rasterizer Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
@@ -1333,9 +1334,15 @@ int main(int argc, char** argv)
             fprintf (logFile, "TextExtract].\n");
 
         if (SampleAttributes.GetKeyValueBool ("BaseInit"))
-            fprintf (logFile, "  We will initialize the library on the base thread.\n\n");
+            fprintf (logFile, "  We will initialize the library on the base thread.\n");
         else
-            fprintf (logFile, "  We will NOT initialize the library on the base thread.\n\n");
+            fprintf (logFile, "  We will NOT initialize the library on the base thread.\n");
+
+        if (SampleAttributes.GetKeyValueBool ("TempMemFileSys"))
+            fprintf (logFile, "  We will use RamFileSys for temporary files.\n\n");
+        else
+            fprintf (logFile, "  We will NOT use RamFileSys for temporary files.\n\n");
+
     }
 
     /* If we are using a base thread library, start it now */
@@ -1421,6 +1428,7 @@ int main(int argc, char** argv)
             type = 0;
         memset ((char *)&threads[index], 0, sizeof (ThreadInfo));
         threads[index].threadNumber = index;
+        threads[index].sequence = index / processes;
         threads[index].object = (void *)workerList[type].PDFa;
         threads[index].objectType = workerTypeList[type];
         threads[index].logFile = logFile;
