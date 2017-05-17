@@ -33,6 +33,7 @@
 ** Each class will have a "worker" method that will be executed for it's process.
 **
 ** The command line controls processing
+**  "LogFile=" Given tha name of a file to hold a progress log. If this is given, the default for "silent" will change to "false".
 **  "TotalThreads=" gives the total number of threads to run. Default is 100 threads.
 **  "ActiveThreads=" gives the number of threads to be run at a given time. Default is 5.
 **  "BaseInit=" may be true or false. If true, the library isinitialized inthe base threads. Default is true;
@@ -47,6 +48,7 @@
 **       "OutFilePath="  The name of an directory tohold output. If there directory does not exist, it will be created.
 **                       if the path to the directory does not exist, it willnot be created, and the run will fail!
 **       "Silent="  may be true of false. If true, the process will write no messages to the display. Default is true.
+**       "TempMemFileSys=" may be true or false. If true, set default temp file sys to ASMemFileSys at startup.
 */
 
 /* This is the current set of known workers 
@@ -205,9 +207,9 @@ public:
     /* One thread worker procedure */
     void WorkerThread (ThreadInfo *info)
     {
-        int sequence = getNextSequence ();
+        int sequence = info->sequence;
         if (!silent)
-            printf ("Non APDFL Worker Thread started! (Sequence: %01d, Thread: %01d\n", sequence+1, info->threadNumber + 1);
+            fprintf (info->logFile, "Non APDFL Worker Thread started! (Sequence: %01d, Thread: %01d\n", sequence+1, info->threadNumber + 1);
 
         /* Presume we willcomplete cleanly */
         info->result = 0;
@@ -280,7 +282,7 @@ public:
         }
 
         if (!silent)
-            printf ("Non APDFL Worker Thread completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+            fprintf (info->logFile, "Non APDFL Worker Thread completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
     }
 
 private:
@@ -377,9 +379,9 @@ public:
     /* One thread worker procedure */
     void WorkerThread (ThreadInfo *info)
     {
-        int sequence = getNextSequence ();
+        int sequence = info->sequence;
         if (!silent)
-            printf ("PDF/a Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+            fprintf (info->logFile, "PDF/a Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
         /* Generate input and output file names */
         char *fullFileName = GetInFileName (sequence);
@@ -439,7 +441,7 @@ public:
         END_HANDLER
 
         if (!silent)
-            printf ("PDF/a Worker Thread Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+            fprintf (info->logFile, "PDF/a Worker Thread Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
     }
 
 private:
@@ -520,10 +522,10 @@ public:
     /* One thread worker procedure */
     void WorkerThread (ThreadInfo *info)
     {
-        int sequence = getNextSequence ();
+        int sequence = info->sequence;
 
         if (!silent)
-            printf ("PDF/x Worker Thread started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+            fprintf (info->logFile, "PDF/x Worker Thread started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
         /* Generate input and output file names */
         char *fullFileName = GetInFileName (sequence);
@@ -582,7 +584,7 @@ public:
 
 
         if (!silent)
-            printf ("PDF/x Worker Thread Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+            fprintf (info->logFile, "PDF/x Worker Thread Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
     }
 
@@ -627,9 +629,9 @@ public:
     /* One thread worker procedure */
     void WorkerThread (ThreadInfo *info)
     {
-        int sequence = getNextSequence ();
+        int sequence = info->sequence;
         if (!silent)
-            printf ("XPS to PDF Worker Thread! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+            fprintf (info->logFile, "XPS to PDF Worker Thread! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
         DURING
 
@@ -701,12 +703,12 @@ public:
         END_HANDLER
 
         if (!silent)
-            printf ("XPS to PDF Worker Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+            fprintf (info->logFile, "XPS to PDF Worker Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
     }
 
 
 };
-#endif  //!Mac_ENV for XPS2PDF
+
 #include "PSFCalls.h"
 #include "PERCalls.h"
 #include "PEWCalls.h"
@@ -753,9 +755,9 @@ public:
     /* One thread worker procedure */
     void WorkerThread (ThreadInfo *info)
     {
-        int sequence = getNextSequence ();
+        int sequence = info->sequence;
         if (!silent)
-            printf ("Text Extraction Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+            fprintf (info->logFile, "Text Extraction Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
         /* Generate input name */
         char *fullFileName = GetInFileName (sequence);
@@ -842,7 +844,7 @@ public:
         END_HANDLER
 
         if (!silent)
-            printf ("Text Extraction Worker Thread Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+            fprintf (info->logFile, "Text Extraction Worker Thread Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
     }
 
     private:
@@ -1125,9 +1127,9 @@ public:
 
     void WorkerThread (ThreadInfo *info)
     {
-        int sequence = getNextSequence ();
+        int sequence = info->sequence;
         if (!silent)
-            printf ("Rasterizer Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+            fprintf (info->logFile, "Rasterizer Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
         /* Generate input name */
         char *fullFileName = GetInFileName (sequence);
@@ -1210,7 +1212,7 @@ public:
         END_HANDLER
 
         if (!silent)
-            printf ("Rasterizer Worker Thread completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+            fprintf (info->logFile, "Rasterizer Worker Thread completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
     }
 
 private:
@@ -1291,6 +1293,57 @@ int main(int argc, char** argv)
     /* Parse the comand line */
     attributes SampleAttributes = attributes (argc, argv);
 
+    /* Establish a file to log output to */
+    FILE *logFile = stdout;;
+    bool logFileSet = false;
+    valuelist  *list = SampleAttributes.GetKeyValue ("LogFile");
+    if (list != NULL)
+    {
+        char *logFileName = list->value (0);
+        logFile = fopen (logFileName, "w");
+        logFileSet = true;
+    }
+
+    /* construct an array of threads to be run */
+    int totalThreads = 100;
+    if (SampleAttributes.IsKeyPresent ("TotalThreads"))
+        totalThreads = SampleAttributes.GetKeyValueInt ("TotalThreads");
+
+    int activeThreads = 5;
+    if (SampleAttributes.IsKeyPresent ("ActiveThreads"))
+        activeThreads = SampleAttributes.GetKeyValueInt ("ActiveThreads");
+
+
+    /* If there is a log file established, write some information about this run into it! */
+    if (logFileSet)
+    {
+        fprintf (logFile, "Running %01d threads, %01d at a time. Processes: [", totalThreads, activeThreads);
+        valuelist *procs = SampleAttributes.GetKeyValue ("Processes");
+        if (procs != NULL)
+        {
+            for (int index = 0; index < procs->size (); index++)
+            {
+                fprintf (logFile, "%s", procs->value (index));
+                if ((index + 1) < procs->size ())
+                    fprintf (logFile, ", ");
+                else
+                    fprintf (logFile, "]\n");
+            }
+        }
+        else
+            fprintf (logFile, "TextExtract].\n");
+
+        if (SampleAttributes.GetKeyValueBool ("BaseInit"))
+            fprintf (logFile, "  We will initialize the library on the base thread.\n");
+        else
+            fprintf (logFile, "  We will NOT initialize the library on the base thread.\n");
+
+        if (SampleAttributes.GetKeyValueBool ("TempMemFileSys"))
+            fprintf (logFile, "  We will use RamFileSys for temporary files.\n\n");
+        else
+            fprintf (logFile, "  We will NOT use RamFileSys for temporary files.\n\n");
+
+    }
 
     /* If we are using a base thread library, start it now */
     APDFLib *baseInstance = NULL;
@@ -1318,15 +1371,6 @@ int main(int argc, char** argv)
     workerClasses[Rasterizer].Rasterizer = new RasterizerWorker ();
     workerClasses[Rasterizer].Rasterizer->ParseOptions (SampleAttributes.GetKeyValue (workers[Rasterizer].paramName));
 
-
-    /* construct an array of threads to be run */
-    int totalThreads = 100;
-    if (SampleAttributes.IsKeyPresent ("TotalThreads"))
-        totalThreads = SampleAttributes.GetKeyValueInt ("TotalThreads");
-
-    int activeThreads = 5;
-    if (SampleAttributes.IsKeyPresent ("ActiveThreads"))
-        activeThreads = SampleAttributes.GetKeyValueInt ("ActiveThreads");
 
     /* This will be the list of threads to run */
     ThreadInfo *threads = (ThreadInfo *)malloc (sizeof (ThreadInfo) * totalThreads);
@@ -1366,7 +1410,7 @@ int main(int argc, char** argv)
             }
             if (workerList[index].PDFa == NULL)
             {
-                sprintf ("There is no worker type \"%s\".\n", processName);
+                fprintf (logFile, "There is no worker type \"%s\".\n", processName);
                 exit (-1);
             }
         }
@@ -1384,8 +1428,11 @@ int main(int argc, char** argv)
             type = 0;
         memset ((char *)&threads[index], 0, sizeof (ThreadInfo));
         threads[index].threadNumber = index;
+        threads[index].sequence = index / processes;
         threads[index].object = (void *)workerList[type].PDFa;
         threads[index].objectType = workerTypeList[type];
+        threads[index].logFile = logFile;
+        threads[index].logFileSet = logFileSet;
         type++;
     }
 
@@ -1470,7 +1517,7 @@ int main(int argc, char** argv)
 
             /* If we are not silent, then display a status for the thread completing */
             if (!doneThread->silent)
-                printf ("Thread %01d completed in %0.6g seconds wall, %0.10g seconds CPU, with code %01d.\n",
+                fprintf (doneThread->logFile, "Thread %01d completed in %0.6g seconds wall, %0.10g seconds CPU, with code %01d.\n",
                 doneThread->threadNumber+1, doneThread->wallTimeUsed, doneThread->cpuTimeUsed, doneThread->result);
 
             /* end the thread */
@@ -1495,7 +1542,7 @@ int main(int argc, char** argv)
         }
 
         /* We should never get here. Something went wrong in our counts!*/
-        printf ("Something went wrong in our threading counts?\n We say we started %01d of %01d threads,"
+        fprintf (logFile, "Something went wrong in our threading counts?\n We say we started %01d of %01d threads,"
                 " completed %&01d, but have no threads active?\n", startedThreads, totalThreads, completedThreads);
         exit (-2);
     }
@@ -1508,6 +1555,10 @@ int main(int argc, char** argv)
     /* If we are using a base thread library, stop it now */
     if (SampleAttributes.GetKeyValueBool ("BaseInit"))
         delete baseInstance;
+
+    if (logFileSet)
+        fclose (logFile);
+
 
     return errCode;
 };

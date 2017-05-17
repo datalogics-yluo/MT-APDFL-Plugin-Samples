@@ -508,6 +508,7 @@ class workerclass;
 typedef struct
 {
     ASInt32         threadNumber;                       /* Serial number of thread in set of threads */
+    ASUns32         sequence;
     SDKThreadID     threadID;                           /* Platform dependent thread "handle" */
     void           *object;                             /* Worker Thread Object */
     int             objectType;                         /* Enumerator giving thread type */
@@ -519,21 +520,15 @@ typedef struct
     bool            silent;                             /* When true, write nothing to stdout! */
     bool            noAPDFL;                            /* When true, do not init/term the library in this thread! */
     bool            threadCompleted;                    /* Mark the thread complete for unix to locate it */
+    FILE           *logFile;                            /* Write status message to this file */
+    bool            logFileSet;                         /* If log file is set, then default "silent" to "false". */
 } ThreadInfo;
 
 
 /* This is a base class for the worker threads
-**   At this point, it provides for a guarenteed
-** sequence number, for the sequence within this set of
-** workers, and nothing else
 */
 class workerclass
 {
-private:
-    int         sequence;
-
-    CSMutex     mutex;
-
 public:
     /* Every worker thread needs an input and output file 
     ** The ideal worker has a sequence of them, so that we may 
@@ -580,21 +575,25 @@ public:
     */
     bool        noAPDFL;
 
+
+    /* When true, set "ASSetTempFileSys (ASGetRamFileSys ());" at library initialization.
+    ** Default is false
+    */
+    bool            useTempMemFileSys;
+
     /* Dictionary of options for this object */
     attributes *threadAttributes;
 
-    workerclass () { sequence = 0;
-                     InFileCount = 0;
+    workerclass () { InFileCount = 0;
                      InFile2Count = 0;
                      InFile3Count = 0;
                      OutPathCount = 0;
                      silent = true;
                      noAPDFL = false;
-                     InitCS (mutex); 
+                     useTempMemFileSys = false;
                      InFilePath = InFileName = InFileSuffix = OutFilePath = NULL;
     }
-    ~workerclass () { DestroyCS (mutex); 
-                      for (int index = 0; index < InFileCount; index++) 
+    ~workerclass () { for (int index = 0; index < InFileCount; index++) 
                           { free (InFilePath[index]); free (InFileName[index]); free (InFileSuffix[index]); }
                       for (int index = 0; index < InFile2Count; index++)
                           { free (InFile2Path[index]); free (InFile2Name[index]); free (InFile2Suffix[index]); }
@@ -618,15 +617,6 @@ public:
     void WorkerThread (ThreadInfo *)
     {
         return;
-    }
-
-    int getNextSequence ()
-    {
-        int result;
-        EnterCS (mutex);
-        result = sequence++;
-        LeaveCS (mutex);
-        return result;
     }
 
     char *GetInFileName (int threadSequence)
@@ -690,7 +680,11 @@ public:
         if (noAPDFL)
             info->instance = NULL;
         else
+        {
             info->instance = new APDFLib ();
+            if (useTempMemFileSys)
+                ASSetTempFileSys (ASGetRamFileSys ());
+        }
         info->silent = silent;
     }
 
@@ -897,6 +891,10 @@ public:
 
         if (threadAttributes->IsKeyPresent ("NoAPDFL"))
             noAPDFL = threadAttributes->GetKeyValueBool ("NoAPDFL");
+
+        if (threadAttributes->IsKeyPresent ("TempMemFileSys"))
+            useTempMemFileSys = threadAttributes->GetKeyValueBool ("TempMemFileSys");
+
 
         char workpath[2048];
         for (int index = 0; index < InFileCount; index++)
