@@ -419,7 +419,7 @@ public:
 #if !MAC_ENV	
                 ASPathName destFilePath = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullOutputFileName, NULL);
 #else
-                ASPathName destFilePath = GetMacPath (fullOutputFileName);
+                ASPathName destFilePath = APDFLDoc::makePath (fullOutputFileName);
 #endif
 
                 /* Release the output file name */
@@ -561,7 +561,7 @@ public:
 #if !MAC_ENV	
                 ASPathName destFilePath = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullOutputFileName, NULL);
 #else
-                ASPathName destFilePath = GetMacPath (fullOutputFileName);
+                ASPathName destFilePath = APDFLDoc::makePath (fullOutputFileName);
 #endif
 
                 /* Release the output file name */
@@ -598,6 +598,7 @@ private:
     PDFProcessorPDFXConversionOption ConvertOptions[2];
 };
 
+#if !MAC_ENV    //yluo XPS2PDF plugin is not available for Mac platform
 /*
 ** XPS2PDF worker
 ** This thread will convert one document from XPS to PDF.
@@ -706,7 +707,7 @@ public:
 
 
 };
-
+#endif  //!Mac_ENV for XPS2PDF
 #include "PSFCalls.h"
 #include "PERCalls.h"
 #include "PEWCalls.h"
@@ -1196,7 +1197,7 @@ public:
 #if !MAC_ENV	
                 ASPathName destFilePath = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullOutputFileName, NULL);
 #else
-                ASPathName destFilePath = GetMacPath (fullOutputFileName);
+                ASPathName destFilePath = APDFLDoc::makePath (fullOutputFileName);
 #endif
 
                 PDDocSave (outDoc, PDSaveFull | PDSaveCollectGarbage, destFilePath, NULL, NULL, NULL);
@@ -1249,9 +1250,11 @@ void outerWorker (ThreadInfo *info)
     case PDFX:
         ((PDFxWorker *)baseObject)->WorkerThread (info);
         break;
+#if !MAC_ENV
     case XPS2PDF:
         ((XPS2PDFWorker *)baseObject)->WorkerThread (info);
         break;
+#endif
     case TextExtract:
         ((TextextWorker *)baseObject)->WorkerThread (info);
         break;
@@ -1351,10 +1354,10 @@ int main(int argc, char** argv)
 
     workerClasses[PDFX].PDFx = new PDFxWorker ();
     workerClasses[PDFX].PDFx->ParseOptions (SampleAttributes.GetKeyValue (workers[PDFX].paramName));
-
+#if !MAC_ENV    //XPS2PDF does not supported by MAC
     workerClasses[XPS2PDF].XPS2PDF = new XPS2PDFWorker ();
     workerClasses[XPS2PDF].XPS2PDF->ParseOptions (SampleAttributes.GetKeyValue (workers[XPS2PDF].paramName));
-
+#endif
     workerClasses[TextExtract].TextExtract = new TextextWorker ();
     workerClasses[TextExtract].TextExtract->ParseOptions (SampleAttributes.GetKeyValue (workers[TextExtract].paramName));
 

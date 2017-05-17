@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "641432DA260C58059B2A5E75D08EAFD59DEDBB28",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "641432DA260C58059B2A5E75D08EAFD59DEDBB28" : 0,
+    "5F5108B97721714628967949DB3E04301A0683F3" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "93EAAFC4-ACB5-4235-8D02-60FBED285AB3",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "641432DA260C58059B2A5E75D08EAFD59DEDBB28" : "pdfl15_all\/",
+    "5F5108B97721714628967949DB3E04301A0683F3" : ""
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "MultiTHreadingSample",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "test\/Mac\/Debug\/CPlusPlus\/Sample_Source\/Multi-Threading\/MutliThreadingSample\/MultiTHreadingSample.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "octocat.dlogics.com:datalogics\/apdfl-sandbox.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "5F5108B97721714628967949DB3E04301A0683F3"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "octocat.dlogics.com:yluo\/pdfl15_all",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "641432DA260C58059B2A5E75D08EAFD59DEDBB28"
+    }
+  ]
+}
