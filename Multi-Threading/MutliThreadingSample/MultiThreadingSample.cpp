@@ -708,7 +708,7 @@ public:
 
 
 };
-
+#endif
 #include "PSFCalls.h"
 #include "PERCalls.h"
 #include "PEWCalls.h"
@@ -1477,7 +1477,7 @@ int main(int argc, char** argv)
             ASInt32 index = WaitForAnyThreadComplete (activeThreadArray, runningThreads);
 #else
             ASInt32 index = -1;
-            while (0)
+            while (1)
             {
                 for (int x = 0; x < runningThreads; x++)
                 {

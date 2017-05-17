@@ -54,7 +54,7 @@
 #define inputPath "..\\..\\..\\..\\Resources\\Sample_Input"
 #else
 #define PathSep  '/'
-#define inputPath "../_Input"
+#define inputPath "../../../../Resources/Sample_Input"
 #endif
 
 class valuelist
@@ -179,7 +179,12 @@ public:
         **   Then read the file, and pare it into the form of command lines, and parse it into
         ** the attributes dictionary
         */
+#if !MAC_ENV
         if ((argc == 2) && (argv[0] != NULL))
+#else
+        // mac there are two extra dummy args, Argument 4 is the readable file name
+        if ((argc == 4) && (argv[0] != NULL))
+#endif
         {
 
 
@@ -931,7 +936,7 @@ public:
         {
             if (access (OutFilePath[index], 6))
             {
-                mkdir (OutFilePath[index], 666);
+                mkdir (OutFilePath[index], 0777);
                 if (access (OutFilePath[index], 6))
                 {
                     printf ("The output path cannot be found or created!\n    \"%s\"\n", OutFilePath);
