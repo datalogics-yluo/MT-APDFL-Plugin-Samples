@@ -360,7 +360,9 @@ public:
     void AddKeyValue (char *key, valuelist *value)
     {
         std::string newKey(key);
-        keys.insert ({ newKey, value });
+
+        keys.insert(std::pair<std::string, valuelist*>(newKey, value));
+
     }
 
     valuelist *GetKeyValue (char *key)
