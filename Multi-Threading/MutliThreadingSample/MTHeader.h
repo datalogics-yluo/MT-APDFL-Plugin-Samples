@@ -18,6 +18,8 @@
 #include <direct.h>
 #else
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #endif
 
 #include "InitializeLibrary.h"
@@ -929,7 +931,7 @@ public:
         {
             if (access (OutFilePath[index], 6))
             {
-                mkdir (OutFilePath[index]);
+                mkdir (OutFilePath[index], 666);
                 if (access (OutFilePath[index], 6))
                 {
                     printf ("The output path cannot be found or created!\n    \"%s\"\n", OutFilePath);
