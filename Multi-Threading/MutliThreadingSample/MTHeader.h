@@ -936,7 +936,11 @@ public:
         {
             if (access (OutFilePath[index], 6))
             {
+#ifdef WIN_PLATFORM
+                mkdir (OutFilePath[index]);
+#else
                 mkdir (OutFilePath[index], 0777);
+#endif
                 if (access (OutFilePath[index], 6))
                 {
                     printf ("The output path cannot be found or created!\n    \"%s\"\n", OutFilePath);
