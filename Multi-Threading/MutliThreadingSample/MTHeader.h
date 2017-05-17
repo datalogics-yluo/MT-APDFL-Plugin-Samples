@@ -153,7 +153,7 @@ public:
 ** However, we are using the same construct to parse substrings
 ** (classIdOptions) as well.
 **
-/* Finally, if the arg count is 2, argument 1 is not null, and 
+** Finally, if the arg count is 2, argument 1 is not null, and 
 ** argument 2 is the name of a file that can be opened for read access,
 ** we will presume argument 2 desribes a file containing arguments in the 
 ** same form as the command line, and us it in place of the command line.
@@ -480,7 +480,7 @@ typedef pthread_t SDKThreadID;
 typedef void * ThreadFuncReturnType;
 typedef void * ThreadFuncArgType;
 typedef ThreadFuncReturnType ThreadFuncType (ThreadFuncArgType);
-#define createThread( func, tinfo ) (pthread_create( &tinfo.threadID, NULL, (ThreadFuncType *)func, tinfo.threadArgs ) == 0)
+#define createThread( func, tinfo ) (pthread_create( &tinfo.threadID, NULL, (ThreadFuncType *)func, &tinfo) == 0)
 #define destroyThread( tinfo ) pthread_detach( tinfo->threadID )
 
 
@@ -700,7 +700,7 @@ public:
 #ifndef WIN_PLATFORM
         info->endTime= time (&info->endTime);
         info->endCPU = clock ();
-        info->wallTimeUsed = ((info->endtime - info->startTime) * 1.0) / CLOCKS_PER_SEC;
+        info->wallTimeUsed = ((info->endTime - info->startTime) * 1.0) / CLOCKS_PER_SEC;
         info->cpuTimeUsed = ((info->endCPU - info->startCPU) * 1.0) / CLOCKS_PER_SEC;
 #endif
 
