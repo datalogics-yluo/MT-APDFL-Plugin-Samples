@@ -40,6 +40,9 @@
 **  "Processes=" is a command seperator list, enclosed in brackets, naming each process to run, in the order they 
 **    are to be run. There may be only one, or there may be many. A given process name can be included in the list 
 ** .  more than once. Threads will be started in the order given here, repeating as the list is exhausted.
+**  "PauseEvery=" will cause the process to allow the active threads to fall to zero every N threads, This simulates
+**    a random start/stop environment, in which we will sometimes have no active threads. A value of zero is default, 
+**    and will cause the thread pump to never stop.
 **
 **  Each type of process may have a set of options specified for it. These may be common, or unique to the process. 
 **    These are specified as a common seperated series of keyword/value pairs, inside a set of brackets. The names should
@@ -709,6 +712,7 @@ public:
 
 };
 #endif
+
 #include "PSFCalls.h"
 #include "PERCalls.h"
 #include "PEWCalls.h"
@@ -1226,20 +1230,15 @@ private:
     ASInt8      colorComponents;
 };
 
-
-/* This procedure is the one called by all threads!
-**  it uses the workerclass object to create the library, and 
-** collect startup information, then call the WorkerThread of the 
-** approrpriate worker object to handle the bulk of the processing. 
-** finally, it uses the workerclass to close the library, and collect 
-** timing information.
+/* This procedure calls a worker thread of a specific type, 
+** based on the info->objectType field. 
+**
+** This must be updated for every new worker type!
 */
-void outerWorker (ThreadInfo *info)
+void callWorker (ThreadInfo *info)
 {
     workerclass *baseObject = (workerclass *)(info->object);
-   
 
-    baseObject->startThreadWorker (info);
     switch (info->objectType)
     {
     case NONAPDFL:
@@ -1263,11 +1262,47 @@ void outerWorker (ThreadInfo *info)
         ((RasterizerWorker *)baseObject)->WorkerThread (info);
         break;
     default:
-         baseObject->WorkerThread (info);
+        baseObject->WorkerThread (info);
         break;
     }
 
+    return;
+}
+
+/* This procedure is the one called by all threads!
+**  it uses the workerclass object to create the library, and 
+** collect startup information, then call the WorkerThread of the 
+** approrpriate worker object to handle the bulk of the processing. 
+** finally, it uses the workerclass to close the library, and collect 
+** timing information.
+*/
+int outerWorker (ThreadInfo *info)
+{
+    workerclass *baseObject = (workerclass *)(info->object);
+   
+
+    baseObject->startThreadWorker (info);
+
+    /* If anyone raises, for any reason,inside of a thread, and itisnot caught in the thread,
+    ** Catch it here. Do nothing about it, just make sure we execute the thread termination.
+    */
+    try         
+    {
+        if (info->noAPDFL)
+            callWorker (info);
+        else
+        {
+            DURING
+                callWorker (info);
+            HANDLER
+            END_HANDLER
+        }
+    }
+    catch (...) { };
+
     baseObject->endThreadWorker (info);
+
+    return (info->result);
 }
 
 
@@ -1314,36 +1349,47 @@ int main(int argc, char** argv)
         activeThreads = SampleAttributes.GetKeyValueInt ("ActiveThreads");
 
 
-    /* If there is a log file established, write some information about this run into it! */
-    if (logFileSet)
+    /* Write some information about this run the log! */
+    fprintf (logFile, "Running %01d threads, %01d at a time. Processes: [", totalThreads, activeThreads);
+    valuelist *procs = SampleAttributes.GetKeyValue ("Processes");
+    if (procs != NULL)
     {
-        fprintf (logFile, "Running %01d threads, %01d at a time. Processes: [", totalThreads, activeThreads);
-        valuelist *procs = SampleAttributes.GetKeyValue ("Processes");
-        if (procs != NULL)
+        for (int index = 0; index < procs->size (); index++)
         {
-            for (int index = 0; index < procs->size (); index++)
-            {
-                fprintf (logFile, "%s", procs->value (index));
-                if ((index + 1) < procs->size ())
-                    fprintf (logFile, ", ");
-                else
-                    fprintf (logFile, "]\n");
-            }
+            fprintf (logFile, "%s", procs->value (index));
+            if ((index + 1) < procs->size ())
+                fprintf (logFile, ", ");
+            else
+                fprintf (logFile, "]\n");
         }
-        else
-            fprintf (logFile, "TextExtract].\n");
-
-        if (SampleAttributes.GetKeyValueBool ("BaseInit"))
-            fprintf (logFile, "  We will initialize the library on the base thread.\n");
-        else
-            fprintf (logFile, "  We will NOT initialize the library on the base thread.\n");
-
-        if (SampleAttributes.GetKeyValueBool ("TempMemFileSys"))
-            fprintf (logFile, "  We will use RamFileSys for temporary files.\n\n");
-        else
-            fprintf (logFile, "  We will NOT use RamFileSys for temporary files.\n\n");
-
     }
+    else
+        fprintf (logFile, "TextExtract].\n");
+
+    int pauseEveryCount = 0;
+    int *pauseEveryList = NULL;
+
+    if (SampleAttributes.IsKeyPresent ("PauseEvery"))
+    {
+        valuelist *list = SampleAttributes.GetKeyValue ("PauseEvery");
+        pauseEveryCount = list->size ();
+        pauseEveryList = (int *)malloc (sizeof (int) * pauseEveryCount);
+        for (int index = 0; index < pauseEveryCount; index++)
+            pauseEveryList[index] = list->GetValueInt (index);
+    }
+
+
+
+    if (SampleAttributes.GetKeyValueBool ("BaseInit"))
+        fprintf (logFile, "  We will initialize the library on the base thread.\n");
+    else
+        fprintf (logFile, "  We will NOT initialize the library on the base thread.\n");
+
+    if (SampleAttributes.GetKeyValueBool ("TempMemFileSys"))
+        fprintf (logFile, "  We will use RamFileSys for temporary files.\n\n");
+    else
+        fprintf (logFile, "  We will NOT use RamFileSys for temporary files.\n\n");
+
 
     /* If we are using a base thread library, start it now */
     APDFLib *baseInstance = NULL;
@@ -1451,18 +1497,59 @@ int main(int argc, char** argv)
     */
     ThreadInfo **activeThreadInfo = (ThreadInfo **)malloc (sizeof (ThreadInfo *) * activeThreads);
 
+    /* Accumulate percentage used */
+    double percentageUsed = 0;
+
+    /* This mechanism will allow the queue of active threads to fall to zero
+    ** from time to time. If there is a single "pauseEvery" value, it will pause
+    ** every N threads. If the pause entry is a list of values, it will pause after the 
+    ** first number of threads, then againafter the next number, and so on
+    */
+    int pauseEveryIndex = 0;
+    int pauseEvery = 0;
+    if (pauseEveryList)
+        pauseEvery = pauseEveryList[pauseEveryIndex];
+
+    /* When this variable is true, we will drain the active queue before proceeding
+    */
+    bool pausing = false;
+
+    /* This loop is the thread pump */
     while (completedThreads < totalThreads)
     {
+
+        /* If we are paused, and there are no longer any running threads
+        ** turn pause off, and reset PauseEvery from the input values.
+        */
+        if ((pausing) && (runningThreads == 0))
+        {
+            pausing = false;
+            pauseEveryIndex = (pauseEveryIndex + 1) % pauseEveryCount;
+            pauseEvery = pauseEveryList[pauseEveryIndex];
+        }
+
         /* If we have less threads running than we want active, and we have not 
         ** already started all threads, start a thread!
         */
-        if ((startedThreads < totalThreads) && (runningThreads < activeThreads))
+        if ((startedThreads < totalThreads) && (runningThreads < activeThreads) && (!pausing))
         {
             createThread (outerWorker, threads[startedThreads]);
             activeThreadArray[runningThreads] = threads[startedThreads].threadID;
             activeThreadInfo[runningThreads] = &threads[startedThreads];
             startedThreads++;
             runningThreads++;
+
+            /* If pause every is zero, we will not pause.
+            ** It will default to zero, or may be set there in an entry
+            ** in the PauseEvery command. In the later case, it will stop
+            ** pausing when this entry is seen.
+            */
+            if (pauseEvery)
+                if (pauseEvery == 1)
+                    pausing = true;
+                else
+                    pauseEvery--;
+
             continue;
         }
 
@@ -1500,6 +1587,10 @@ int main(int argc, char** argv)
             ** do it. activeThreadInfo[index] is a pointer to the threads ThreadInfo block
             */
             ThreadInfo *doneThread = activeThreadInfo[index];
+
+            if (doneThread->result > errCode)
+                errCode = doneThread->result;
+
 #ifdef WIN_PLATFORM
             /* For windows, it is easier to collect thread info after the thread completes 
             ** The values are in FILETIME, which is nano seconds since 1/1/1601 (For some ofd reason), 
@@ -1513,12 +1604,15 @@ int main(int argc, char** argv)
             cpu64[0] += kernel64[0];
             doneThread->wallTimeUsed = ((((end64[0] * 1.0) / 1000) /* nano to micro */ / 1000) /* Micro to milli */ / 1000 /* Milli to seconds*/);
             doneThread->cpuTimeUsed = ((((cpu64[0] * 1.0) / 1000) /* nano to micro */ / 1000) /* Micro to milli */ / 1000 /* Milli to seconds*/);
+            doneThread->percentUtilized = (doneThread->cpuTimeUsed / doneThread->wallTimeUsed) * 100;
 #endif
+
+            percentageUsed += doneThread->percentUtilized;
 
             /* If we are not silent, then display a status for the thread completing */
             if (!doneThread->silent)
-                fprintf (doneThread->logFile, "Thread %01d completed in %0.6g seconds wall, %0.10g seconds CPU, with code %01d.\n",
-                doneThread->threadNumber+1, doneThread->wallTimeUsed, doneThread->cpuTimeUsed, doneThread->result);
+                fprintf (doneThread->logFile, "Thread %01d completed in %0.6g seconds wall, %0.10g seconds CPU, with code %01d. -- %0.03g%% Utilized.\n",
+                doneThread->threadNumber+1, doneThread->wallTimeUsed, doneThread->cpuTimeUsed, doneThread->result, doneThread->percentUtilized);
 
             /* end the thread */
             destroyThread (doneThread);
@@ -1547,6 +1641,8 @@ int main(int argc, char** argv)
         exit (-2);
     }
 
+    percentageUsed /= totalThreads;
+    fprintf (logFile, "\n\n%0.5g%% of time used.\n", percentageUsed);
 
     /* Shut down the working thread objects */
     for (int index = 0; index < NumberOfWorkers; index++)
@@ -1556,9 +1652,16 @@ int main(int argc, char** argv)
     if (SampleAttributes.GetKeyValueBool ("BaseInit"))
         delete baseInstance;
 
+    /* If we built a pause Every List, free it */
+    if (pauseEveryList)
+        free (pauseEveryList);
+
+    /* write error result to log file
+    */
+    fprintf (logFile, "The highest error code returned was %01d.\n", errCode);
+
+    /* Close the logfile (If it was not stdout) */
     if (logFileSet)
         fclose (logFile);
-
-
     return errCode;
 };

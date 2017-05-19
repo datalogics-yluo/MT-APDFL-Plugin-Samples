@@ -522,6 +522,7 @@ typedef struct
     time_t          startTime, endTime;                 /* Used in Unix only, wall time started/stopped */
     clock_t         startCPU, endCPU;                   /* Used in Unix only to track CPU time used. */
     double          wallTimeUsed, cpuTimeUsed;          /* Walltime start to finish, and CPU time (user and kernal) consumed */
+    double          percentUtilized;                    /* Percentage of CPU time in wall time */
     bool            silent;                             /* When true, write nothing to stdout! */
     bool            noAPDFL;                            /* When true, do not init/term the library in this thread! */
     bool            threadCompleted;                    /* Mark the thread complete for unix to locate it */
@@ -703,6 +704,7 @@ public:
         info->endCPU = clock ();
         info->wallTimeUsed = ((info->endTime - info->startTime) * 1.0) / CLOCKS_PER_SEC;
         info->cpuTimeUsed = ((info->endCPU - info->startCPU) * 1.0) / CLOCKS_PER_SEC;
+        doneThread->percentUtilized = (doneThread->cpuTimeUsed / dontThread->wallTimeUsed) * 100;
 #endif
 
         info->threadCompleted = true;
