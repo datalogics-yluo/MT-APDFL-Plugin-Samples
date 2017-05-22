@@ -311,6 +311,27 @@ private:
 **                   RemoveAllAnnotations=[false]                        SettingforPDF/a conversion option "removeAllAnnotations" (100 values max!)
 */
 #include "PDFProcessorCalls.h"
+ASBool PDFProcessorProgressMonitorCB(ASInt32 pageNum, ASInt32 totalPages, float current, void *clientData)
+{
+    if (clientData)
+    {
+        ASBool * IsMonitorCalled = (ASBool*)clientData;
+        if (*IsMonitorCalled == false)
+        {
+            printf("PDFProcessor Progress Monitor CallBack\n");
+            //Set to true to Display this Message Only Once
+            *IsMonitorCalled = true;
+        }
+    }
+
+    printf("PDFProcessor Page %d of %d. Overall Progress = %f %%. \n",
+        pageNum + 1, /* Adding 1, since Page numbers are 0-indexed*/
+        totalPages,
+        current /* Current Overall Progress */);
+
+    //Return 1 to Cancel conversion
+    return 0;
+}
 class PDFaWorker : public workerclass
 {
 #define NumberOfPDFAConvertOptions 4
@@ -357,9 +378,9 @@ public:
             removeAllAnnotations[0] = false;
         }
 
-        if (threadAttributes->IsKeyPresent ("ConvertorOption"))
+        if (threadAttributes->IsKeyPresent ("ConvertOption"))
         {
-            valuelist *values = threadAttributes->GetKeyValue ("ConvertorOption");
+            valuelist *values = threadAttributes->GetKeyValue ("ConvertOption");
             convertorOptionsCount = values->size ();
             for (int index = 0; index < convertorOptionsCount; index++)
             {
@@ -411,12 +432,10 @@ public:
 
                 memset ((char *)&userParams, 0, sizeof (PDFProcessorPDFAConvertParamsRec));
                 userParams.size = sizeof (PDFProcessorPDFAConvertParamsRec);
-                userParams.abortIfXFAPresent = false;
+                userParams.progMon = PDFProcessorProgressMonitorCB;
                 userParams.colorCompression = kPDFProcessorColorJpegCompression;
-                userParams.grayCompression = kPDFProcessorGrayZipCompression;
-                userParams.monoCompression = kPDFProcessorMonoCCITTGroup4Compression;
-                userParams.noRasterizationOnFontErrors = rasterizeFontErrors[sequence % rasterizeFontErrorsCount]; 
-                userParams.removeAllAnnotations = removeAllAnnotations[sequence % removeAllAnnotationsCount];
+                userParams.noRasterizationOnFontErrors = false; 
+                userParams.removeAllAnnotations = false;
 
 
                 /* Create the ouput file ASPath name */
@@ -431,7 +450,7 @@ public:
                 
                 /* Perform the conversions */
                 PDFProcessorConvertAndSaveToPDFA (inDoc.getPDDoc (), destFilePath, ASGetDefaultFileSys (), 
-                                                  ConvertOptions[convertorOptions[sequence % convertorOptionsCount]], &userParams);
+                                ConvertOptions[convertorOptions[sequence % convertorOptionsCount]+1], &userParams);
 
                 /* Release the output path name */
                 ASFileSysReleasePath (NULL, destFilePath);

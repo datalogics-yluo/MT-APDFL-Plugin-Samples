@@ -15,9 +15,9 @@ NonAPDFLOptions=[
 PDFaOptions=[
        silent=true, 
        noapdfl=false, 
-       InFileName=%AddRedaction.pdf,
+       InFileName=%trans_1page.pdf,
        OutFilePath=Output,
-       ConvertOption=1,
+       ConvertOption=3,
        RasterizeFontErrors=true,
        RemoveAllAnnotations=false
                      ]
