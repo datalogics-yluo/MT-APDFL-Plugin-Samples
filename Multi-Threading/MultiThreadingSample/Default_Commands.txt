@@ -1,0 +1,55 @@
+TotalThreads=100
+activeThreads=5 
+BaseInit=true 
+processes=[NonAPDFL, PDFa, PDFx, XPS2PDF, TextExtract, Rasterizer]
+LogFile=MTRun.log
+TempMemFileSys=false
+NonAPDFLOptions=[
+       silent=true, 
+       noapdfl=true, 
+       InFileName=%AddRedaction.pdf,
+       OutFilePath=Output,
+       Repetitions=5,
+       Primes=1000
+                ]
+PDFaOptions=[
+       silent=true, 
+       noapdfl=false, 
+       InFileName=%trans_1page.pdf,
+       OutFilePath=Output,
+       ConvertOption=3,
+       RasterizeFontErrors=true,
+       RemoveAllAnnotations=false
+                     ]
+PDFxOptions=[
+       silent=true, 
+       noapdfl=false, 
+       InFileName=%AddRedaction.pdf,
+       OutFilePath=Output,
+       ConvertOption=1,
+       RemoveAllAnnotations=false
+                   ]
+XPS2PDFOptions=[
+       silent=true, 
+       noapdfl=false, 
+       InFileName=%XPStoPDF.xps,
+       OutFilePath=Output
+                      ]
+TextExtractOptions=[
+       silent=true, 
+       noapdfl=false, 
+       InFileName=%constitution.pdf,
+       OutFilePath=Output,
+       NumberOfPages=1
+       ]
+RasterizerOptions=[
+       silent=true, 
+       noapdfl=false, 
+       InFileName=%constitution.pdf,
+       OutFilePath=Output,
+       NumberOfPages=1,
+       repetitions=1,
+       SaveImages=false,
+       Resolution=300,
+       ColorModel=DeviceRGB
+                    ]
