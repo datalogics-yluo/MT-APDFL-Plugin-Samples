@@ -1,7 +1,7 @@
 TotalThreads=100
 activeThreads=5 
 BaseInit=true 
-processes=[NonAPDFL, PDFa, PDFx, XPS2PDF, TextExtract, Rasterizer]
+processes=[NonAPDFL, PDFa, PDFx, XPS2PDF, TextExtract, Rasterizer, Flattener]
 LogFile=MTRun.log
 TempMemFileSys=false
 NonAPDFLOptions=[
@@ -52,4 +52,11 @@ RasterizerOptions=[
        SaveImages=false,
        Resolution=300,
        ColorModel=DeviceRGB
+                    ]
+FlattenOptions=[
+       silent=true, 
+       noapdfl=false, 
+       InFileName=%trans_multipage.pdf,
+       OutFilePath=Output,
+       NumberOfPages=1
                     ]
