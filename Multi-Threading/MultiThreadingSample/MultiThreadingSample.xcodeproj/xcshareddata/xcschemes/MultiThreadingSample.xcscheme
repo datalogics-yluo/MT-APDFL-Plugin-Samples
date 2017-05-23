@@ -17,7 +17,7 @@
                BlueprintIdentifier = "8D0C4E890486CD37000505A6"
                BuildableName = "MultiThreadingSample-Debug.app"
                BlueprintName = "MultiThreadingSample"
-               ReferencedContainer = "container:MultiTHreadingSample.xcodeproj">
+               ReferencedContainer = "container:MultiThreadingSample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -35,7 +35,7 @@
             BlueprintIdentifier = "8D0C4E890486CD37000505A6"
             BuildableName = "MultiThreadingSample-Debug.app"
             BlueprintName = "MultiThreadingSample"
-            ReferencedContainer = "container:MultiTHreadingSample.xcodeproj">
+            ReferencedContainer = "container:MultiThreadingSample.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -58,9 +58,15 @@
             BlueprintIdentifier = "8D0C4E890486CD37000505A6"
             BuildableName = "MultiThreadingSample-Debug.app"
             BlueprintName = "MultiThreadingSample"
-            ReferencedContainer = "container:MultiTHreadingSample.xcodeproj">
+            ReferencedContainer = "container:MultiThreadingSample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "Default_Commands.txt"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -77,7 +83,7 @@
             BlueprintIdentifier = "8D0C4E890486CD37000505A6"
             BuildableName = "MultiThreadingSample-Debug.app"
             BlueprintName = "MultiThreadingSample"
-            ReferencedContainer = "container:MultiTHreadingSample.xcodeproj">
+            ReferencedContainer = "container:MultiThreadingSample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

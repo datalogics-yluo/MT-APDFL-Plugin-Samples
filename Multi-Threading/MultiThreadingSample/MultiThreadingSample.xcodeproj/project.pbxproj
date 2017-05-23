@@ -13,6 +13,8 @@
 		2E21C06F1C8DD3FD00018A6D /* APDFLDoc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2E21C06B1C8DD3FD00018A6D /* APDFLDoc.h */; };
 		2E21C0701C8DD3FD00018A6D /* InitializeLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2E21C06C1C8DD3FD00018A6D /* InitializeLibrary.cpp */; };
 		2E21C0711C8DD3FD00018A6D /* InitializeLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = 2E21C06D1C8DD3FD00018A6D /* InitializeLibrary.h */; };
+		2E97D9991ED4997C00407FD7 /* DL150PDFPort.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E97D9981ED4997C00407FD7 /* DL150PDFPort.framework */; };
+		2E97D99A1ED4998600407FD7 /* DL150PDFPort.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2E97D9981ED4997C00407FD7 /* DL150PDFPort.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		335725340C9B40490095FC3D /* DL150ACE.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3357252A0C9B40480095FC3D /* DL150ACE.framework */; };
 		335725350C9B40490095FC3D /* DL150AGM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3357252B0C9B40480095FC3D /* DL150AGM.framework */; };
 		335725360C9B40490095FC3D /* DL150ARE.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3357252C0C9B40480095FC3D /* DL150ARE.framework */; };
@@ -167,6 +169,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				2E97D99A1ED4998600407FD7 /* DL150PDFPort.framework in CopyFiles */,
 				335725480C9B40500095FC3D /* DL150ACE.framework in CopyFiles */,
 				335725490C9B40500095FC3D /* DL150AGM.framework in CopyFiles */,
 				3357254A0C9B40500095FC3D /* DL150ARE.framework in CopyFiles */,
@@ -197,6 +200,7 @@
 		2E21C06B1C8DD3FD00018A6D /* APDFLDoc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APDFLDoc.h; path = ../../_Common/APDFLDoc.h; sourceTree = "<group>"; };
 		2E21C06C1C8DD3FD00018A6D /* InitializeLibrary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = InitializeLibrary.cpp; path = ../../_Common/InitializeLibrary.cpp; sourceTree = "<group>"; };
 		2E21C06D1C8DD3FD00018A6D /* InitializeLibrary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InitializeLibrary.h; path = ../../_Common/InitializeLibrary.h; sourceTree = "<group>"; };
+		2E97D9981ED4997C00407FD7 /* DL150PDFPort.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150PDFPort.framework; path = ../../../../../../../build/mac/Debug/DL150PDFPort.framework; sourceTree = "<group>"; };
 		3357252A0C9B40480095FC3D /* DL150ACE.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150ACE.framework; path = ../../../Binaries/DL150ACE.framework; sourceTree = SOURCE_ROOT; };
 		3357252B0C9B40480095FC3D /* DL150AGM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150AGM.framework; path = ../../../Binaries/DL150AGM.framework; sourceTree = SOURCE_ROOT; };
 		3357252C0C9B40480095FC3D /* DL150ARE.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DL150ARE.framework; path = ../../../Binaries/DL150ARE.framework; sourceTree = SOURCE_ROOT; };
@@ -337,6 +341,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2E97D9991ED4997C00407FD7 /* DL150PDFPort.framework in Frameworks */,
 				8D0C4E920486CD37000505A6 /* Foundation.framework in Frameworks */,
 				BA2E45960888421A0081FD28 /* ApplicationServices.framework in Frameworks */,
 				BA568C160A47467400825A50 /* CoreServices.framework in Frameworks */,
@@ -369,6 +374,7 @@
 		20286C29FDCF999611CA2CEA /* HelowrldX */ = {
 			isa = PBXGroup;
 			children = (
+				2E97D9981ED4997C00407FD7 /* DL150PDFPort.framework */,
 				BA8E7EB50AD7027C00AD5ADC /* Precompiled Headers */,
 				BA3D8BB90B652F530079A6FB /* Headers */,
 				BA8BFB7D0AC2F69500AF4E32 /* Configurations */,
@@ -725,7 +731,7 @@
 			attributes = {
 				LastUpgradeCheck = 0710;
 			};
-			buildConfigurationList = BACCD188089AA4370006D315 /* Build configuration list for PBXProject "MultiTHreadingSample" */;
+			buildConfigurationList = BACCD188089AA4370006D315 /* Build configuration list for PBXProject "MultiThreadingSample" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -829,7 +835,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		BACCD188089AA4370006D315 /* Build configuration list for PBXProject "MultiTHreadingSample" */ = {
+		BACCD188089AA4370006D315 /* Build configuration list for PBXProject "MultiThreadingSample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BACCD18B089AA4370006D315 /* Debug */,

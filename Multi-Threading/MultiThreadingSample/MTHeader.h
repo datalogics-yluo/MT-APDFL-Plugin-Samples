@@ -707,7 +707,8 @@ public:
         info->endCPU = clock ();
         info->wallTimeUsed = ((info->endTime - info->startTime) * 1.0) / CLOCKS_PER_SEC;
         info->cpuTimeUsed = ((info->endCPU - info->startCPU) * 1.0) / CLOCKS_PER_SEC;
-        doneThread->percentUtilized = (doneThread->cpuTimeUsed / dontThread->wallTimeUsed) * 100;
+        // yluo doneThread is undefined here
+        // doneThread->percentUtilized = (doneThread->cpuTimeUsed / dontThread->wallTimeUsed) * 100;
 #endif
 
         info->threadCompleted = true;
