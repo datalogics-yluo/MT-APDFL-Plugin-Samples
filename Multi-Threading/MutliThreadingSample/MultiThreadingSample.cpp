@@ -22,11 +22,17 @@
 
 
 
-#include "InitializeLibrary.h"
+#include "Utilities.h"
 #include "MTHeader.h"
-#include "APDFLDoc.h"
 
+#include "PDCalls.h"
+#include "PSFCalls.h"
+#include "PERCalls.h"
+#include "PEWCalls.h"
+#include "PagePDECntCalls.h"
+#include "PDPageDrawM.h"
 #include "DLExtrasCalls.h"
+
 
 /* There will be an expandable collection of thread worker method classes that may be run. 
 ** Each class will have an initialization method, that will set it's unique variables, from a command line array.
@@ -52,6 +58,7 @@
 **                       if the path to the directory does not exist, it willnot be created, and the run will fail!
 **       "Silent="  may be true of false. If true, the process will write no messages to the display. Default is true.
 **       "TempMemFileSys=" may be true or false. If true, set default temp file sys to ASMemFileSys at startup.
+**       "LoadPlugins=" may be true of false. Default is per worker class (Workers[]).
 */
 
 /* This is the current set of known workers 
@@ -98,18 +105,18 @@ typedef struct worktypes
     char                *name;
     char                *paramName;
     int                  sequence;
-
+    bool                 LoadPlugins;
 } WorkerType;
 
 
 WorkerType workers[] = {
-/*      Name             Options             Id    */
-    {"NonAPDFL",    "NonAPDFLOptions",       NONAPDFL },
-    {"PDFa",        "PDFaOptions",           PDFA },
-    {"PDFx",        "PDFxOptions",           PDFX },
-    {"XPS2PDF",     "XPS2PDFOptions",        XPS2PDF },
-    {"TextExtract", "TextExtractOptions",    TextExtract },
-    { "Rasterizer", "RasterizerOptions",     Rasterizer }
+/*      Name             Options             Id         Load Plugins*/
+    {"NonAPDFL",    "NonAPDFLOptions",       NONAPDFL,      false},
+    {"PDFa",        "PDFaOptions",           PDFA,          true},
+    {"PDFx",        "PDFxOptions",           PDFX,          true},
+    {"XPS2PDF",     "XPS2PDFOptions",        XPS2PDF,       true},
+    {"TextExtract", "TextExtractOptions",    TextExtract,   false},
+    {"Rasterizer",  "RasterizerOptions",     Rasterizer,    false}
 };
 #define NumberOfWorkers (sizeof (workers)/sizeof (WorkerType))
 
@@ -152,6 +159,9 @@ public:
     void ParseOptions (valuelist *values)
     {
         workerclass::ParseOptions (values, "%AddRedaction.pdf", "Output");
+
+        if (threadAttributes->IsKeyPresent ("LoadPlugins"))
+            workers[NONAPDFL].LoadPlugins = threadAttributes->GetKeyValueBool ("LoadPlugins");
 
         if (threadAttributes->IsKeyPresent ("Repetitions"))
         {
@@ -331,6 +341,9 @@ public:
     {
         workerclass::ParseOptions (values, "%AddRedaction.pdf", "Output");
 
+        if (threadAttributes->IsKeyPresent ("LoadPlugins"))
+            workers[PDFA].LoadPlugins = threadAttributes->GetKeyValueBool ("LoadPlugins");
+
         if (threadAttributes->IsKeyPresent ("RasterizeFontErrors"))
         {
             valuelist *values = threadAttributes->GetKeyValue ("RasterizeFontErrors");
@@ -487,6 +500,9 @@ public:
     {
         workerclass::ParseOptions (values, "%AddRedaction.pdf", "Output");
 
+        if (threadAttributes->IsKeyPresent ("LoadPlugins"))
+            workers[PDFX].LoadPlugins = threadAttributes->GetKeyValueBool ("LoadPlugins");
+
         if (threadAttributes->IsKeyPresent ("RemoveAllAnnotations"))
         {
             valuelist *values = threadAttributes->GetKeyValue ("RemoveAllAnnotations");
@@ -626,6 +642,9 @@ public:
     void ParseOptions (valuelist *values)
     {
         workerclass::ParseOptions(values, "%XPStoPDF.xps", "Output");
+
+        if (threadAttributes->IsKeyPresent ("LoadPlugins"))
+            workers[XPS2PDF].LoadPlugins = threadAttributes->GetKeyValueBool ("LoadPlugins");
     };
 
 
@@ -651,7 +670,7 @@ public:
 
                 //The .joboptions file specifies a great number of settings which determine exactly how the PDF document
                 //is created by the converter.
-                ASText jobNameText = ASTextFromUnicode ((ASUTF16Val*)"../../../../Resources/joboptions/Standard.joboptions", kUTF8);
+                ASText jobNameText = ASTextFromUnicode ((ASUTF16Val*)"../Resources/joboptions/Standard.joboptions", kUTF8);
                 ASCabPutText (settings, "PDFSettings", jobNameText);
 
                 //Specify which description in the .joboptions file we will use.
@@ -713,9 +732,7 @@ public:
 };
 #endif
 
-#include "PSFCalls.h"
-#include "PERCalls.h"
-#include "PEWCalls.h"
+
 /*
 ** TextExtract  worker
 ** This thread extract the content of N pages (Specified in page count, below)
@@ -739,6 +756,9 @@ public:
     void ParseOptions (valuelist *values)
     {
         workerclass::ParseOptions (values, "%constitution.pdf", "Output");
+
+        if (threadAttributes->IsKeyPresent ("LoadPlugins"))
+            workers[TextExtract].LoadPlugins = threadAttributes->GetKeyValueBool ("LoadPlugins");
 
         if (threadAttributes->IsKeyPresent ("NumberOfPages"))
         {
@@ -876,9 +896,7 @@ public:
 **                   Resolution=300                                     Resolution to render image too.
 **                   ColorModel={RGB,CMYK,GRAY,DeviceN]                 Which color model to use. RGB is the default.
 */
-#include "PagePDECntCalls.h"
-#include "PDPageDrawM.h"
-#include "DLExtrasCalls.h"
+
 class RasterizerWorker : public workerclass
 {
     /* This thread will copy a specified file N times, into new specified files.
@@ -892,6 +910,9 @@ public:
     void ParseOptions (valuelist *values)
     {
         workerclass::ParseOptions (values, "%AddRedaction.pdf", "Output");
+
+        if (threadAttributes->IsKeyPresent ("LoadPlugins"))
+            workers[Rasterizer].LoadPlugins = threadAttributes->GetKeyValueBool ("LoadPlugins");
 
         if (threadAttributes->IsKeyPresent ("Repetitions"))
         {
@@ -1283,7 +1304,7 @@ int outerWorker (ThreadInfo *info)
 
     baseObject->startThreadWorker (info);
 
-    /* If anyone raises, for any reason,inside of a thread, and itisnot caught in the thread,
+    /* If anyone raises, for any reason,inside of a thread, and it is not caught in the thread,
     ** Catch it here. Do nothing about it, just make sure we execute the thread termination.
     */
     try         
