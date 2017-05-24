@@ -1325,7 +1325,7 @@ public:
         workerclass::ParseOptions(values, "%AddRedaction.pdf", "Output");
 
         if (threadAttributes->IsKeyPresent ("LoadPlugins"))
-            workers[Flatttener].LoadPlugins = threadAttributes->GetKeyValueBool ("LoadPlugins");
+            workers[Flattener].LoadPlugins = threadAttributes->GetKeyValueBool ("LoadPlugins");
     };
 
     /* One thread worker procedure */

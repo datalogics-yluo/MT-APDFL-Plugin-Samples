@@ -20,6 +20,7 @@ PDFaOptions=[
        InFileName=%trans_1page.pdf,
        OutFilePath=Output,
        ConvertOption=3,
+       LoadPlugins=true,
        RasterizeFontErrors=true,
        RemoveAllAnnotations=false
                      ]
@@ -62,7 +63,7 @@ RasterizerOptions=[
 FlattenOptions=[
        silent=true, 
        noapdfl=false, 
-       LoadPlugins=false,
+       LoadPlugins=true,
        InFileName=%trans_multipage.pdf,
        OutFilePath=Output,
        NumberOfPages=1
