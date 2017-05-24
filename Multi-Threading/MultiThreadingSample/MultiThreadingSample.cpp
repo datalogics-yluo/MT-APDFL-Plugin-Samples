@@ -1697,6 +1697,7 @@ int main(int argc, char** argv)
         threads[index].objectType = workerTypeList[type];
         threads[index].logFile = logFile;
         threads[index].logFileSet = logFileSet;
+        threads[index].LoadPlugins = workers[workerTypeList[type]].LoadPlugins;
         type++;
     }
 
