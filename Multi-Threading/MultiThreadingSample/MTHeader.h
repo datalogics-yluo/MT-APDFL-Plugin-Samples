@@ -528,6 +528,7 @@ typedef struct
     FILE           *logFile;                            /* Write status message to this file */
     bool            logFileSet;                         /* If log file is set, then default "silent" to "false". */
     bool            LoadPlugins;                        /* If true, we must load plugins for this type of worker. */
+    bool            UseTempMemFileSys;                  /* If true, use the Ram File Sys for temp files. */
 } ThreadInfo;
 
 
@@ -581,12 +582,6 @@ public:
     */
     bool        noAPDFL;
 
-
-    /* When true, set "ASSetTempFileSys (ASGetRamFileSys ());" at library initialization.
-    ** Default is false
-    */
-    bool            useTempMemFileSys;
-
     /* Dictionary of options for this object */
     attributes *threadAttributes;
 
@@ -596,7 +591,6 @@ public:
                      OutPathCount = 0;
                      silent = true;
                      noAPDFL = false;
-                     useTempMemFileSys = false;
                      InFilePath = InFileName = InFileSuffix = OutFilePath = NULL;
     }
     ~workerclass () { for (int index = 0; index < InFileCount; index++) 
@@ -605,18 +599,18 @@ public:
                           { free (InFile2Path[index]); free (InFile2Name[index]); free (InFile2Suffix[index]); }
                       for (int index = 0; index < InFile3Count; index++)
                           {free (InFile3Path[index]); free (InFile3Name[index]); free (InFile3Suffix[index]); }
-                      if (InFilePath) free (InFilePath); 
-                      if (InFileName) free (InFileName); 
-                      if (InFileSuffix) free (InFileSuffix); 
-                      if (InFile2Path) free (InFile2Path);
-                      if (InFile2Name) free (InFile2Name);
-                      if (InFile2Suffix) free (InFile2Suffix);
-                      if (InFile3Path) free (InFile3Path);
-                      if (InFile3Name) free (InFile3Name);
-                      if (InFile3Suffix) free (InFile3Suffix);
+                      if (InFileCount) free (InFilePath); 
+                      if (InFileCount) free (InFileName); 
+                      if (InFileCount) free (InFileSuffix); 
+                      if (InFile2Count) free (InFile2Path);
+                      if (InFile2Count) free (InFile2Name);
+                      if (InFile2Count) free (InFile2Suffix);
+                      if (InFile3Count) free (InFile3Path);
+                      if (InFile3Count) free (InFile3Name);
+                      if (InFile3Count) free (InFile3Suffix);
                       for (int index = 0; index < OutPathCount; index++)
                           { free (OutFilePath[index]);}
-                      if (OutFilePath) free (OutFilePath);
+                      if (OutPathCount) free (OutFilePath);
                       delete threadAttributes;
     }
 
@@ -694,7 +688,7 @@ public:
             if (!info->LoadPlugins)
                 flags |= kDontLoadPlugIns;
             info->instance = new APDFLib (flags);
-            if (useTempMemFileSys)
+            if (info->UseTempMemFileSys)
                 ASSetTempFileSys (ASGetRamFileSys ());
         }
         info->silent = silent;
@@ -905,9 +899,6 @@ public:
 
         if (threadAttributes->IsKeyPresent ("NoAPDFL"))
             noAPDFL = threadAttributes->GetKeyValueBool ("NoAPDFL");
-
-        if (threadAttributes->IsKeyPresent ("TempMemFileSys"))
-            useTempMemFileSys = threadAttributes->GetKeyValueBool ("TempMemFileSys");
 
         char workpath[2048];
         for (int index = 0; index < InFileCount; index++)

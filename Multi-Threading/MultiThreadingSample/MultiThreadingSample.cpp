@@ -4,20 +4,10 @@
 //
 //=====================================================================
 // Sample: MultiSampleThreading - Demonstrates the use of the APDFL 
-//                                library in amulti-threaded environment
+//                                library in a multi-threaded environment
 //
-// Note:
-// This sample will extract text from two seperate PDF documents. It
-// will save output in the working directory as a .pdf and .txt file. 
-// This program demonstrates the APDFL's ability to handle ASCII and
-// unicode text extraction.
-//
-//Steps:
-// 1) Initialize the PDWordFinder class and the information we 
-//    need to draw the text to the output.
-// 2) Iterate through each word of the input document and draw
-//    each new line of text to the output document.
-// 3) Extract Unicode from a second PDF document.
+//   This sample presents a framework, partially populated, to allow for
+//   investigating Mult-Threading interactions in the APDFL library.
 //=====================================================================
 
 
@@ -38,27 +28,89 @@
 ** Each class will have an initialization method, that will set it's unique variables, from a command line array.
 ** Each class will have a "worker" method that will be executed for it's process.
 **
-** The command line controls processing
-**  "LogFile=" Given tha name of a file to hold a progress log. If this is given, the default for "silent" will change to "false".
-**  "TotalThreads=" gives the total number of threads to run. Default is 100 threads.
-**  "ActiveThreads=" gives the number of threads to be run at a given time. Default is 5.
-**  "BaseInit=" may be true or false. If true, the library isinitialized inthe base threads. Default is true;
-**  "Processes=" is a command seperator list, enclosed in brackets, naming each process to run, in the order they 
-**    are to be run. There may be only one, or there may be many. A given process name can be included in the list 
-** .  more than once. Threads will be started in the order given here, repeating as the list is exhausted.
-**  "PauseEvery=" will cause the process to allow the active threads to fall to zero every N threads, This simulates
-**    a random start/stop environment, in which we will sometimes have no active threads. A value of zero is default, 
-**    and will cause the thread pump to never stop.
+** The command line controls processing. It may be written on the command line, or stored in a file, and the name 
+**   of the file specified as the only entry on the command line. The file default_Commands.txt lists all possible commands, 
+**   and thier default values. One simple way to make a new test is to copy that file, remove everything not needed for your 
+**   test, and modify the remaining options into what your test requires.
+
+**  These options control the overall processing:
 **
-**  Each type of process may have a set of options specified for it. These may be common, or unique to the process. 
-**    These are specified as a common seperated series of keyword/value pairs, inside a set of brackets. The names should
-**    be in the form "ProcessNameOptions". Currently, the default options are:
-**       "InFileName="  The name of a file used for input in the process. If the file does not exist, the run will fail!
-**       "OutFilePath="  The name of an directory tohold output. If there directory does not exist, it will be created.
-**                       if the path to the directory does not exist, it willnot be created, and the run will fail!
-**       "Silent="  may be true of false. If true, the process will write no messages to the display. Default is true.
-**       "TempMemFileSys=" may be true or false. If true, set default temp file sys to ASMemFileSys at startup.
-**       "LoadPlugins=" may be true of false. Default is per worker class (Workers[]).
+**  "LogFile=" Gives the name of a file to hold a progress log. If this is given, the default for "silent" will change to "false".
+**             if omitted, output will default to stdout.
+**
+**  "TotalThreads=" gives the total number of threads to run. Default is 100 threads.
+**                  While this value, like any other, maybe a list, only the first value will be used.
+**
+**  "ActiveThreads=" gives the number of threads to be run at a given time. Default is 5.
+**              Note that this will interact with the following command (PauseEvery) such that the number of active threads may be less than
+**              this on occassion. The design of the thread pump is such that we will note only one thread terminated, before starting a new
+**              thread, so generally, "ActiveThreads" threads will be running at any given moment. Though some of those threads may have compeleted
+**              working.
+**
+**              The value here may be a list. This allows the test designer to vary the number of working threads over time. The values in the list
+**              will be used one by one, as threads are started, and the list will be cycled through when it's end is reached.
+**
+**  "PauseEvery=" will cause the process to allow the active threads to fall to zero every N threads. The default value is zero,'
+**              This simulates a random start/stop environment, in which we will sometimes have no active threads. Whenthe value is zro,
+**              we will stop pausing.
+**
+**              The value here may be a list, in which case we will pause afte the first number in the list, then resume and pause after the
+**              second, and so on. We will cycle back to the start of the list when values are exhausted. Note that a zero in the list will
+**              cause us to stop pausing.
+**
+**  "BaseInit=" may be true or false. If true, the library is initialized in the base thread. Default is true,
+**              Where ever possible, applications should initialize and terminate the library on the "base" thread. 
+**              This does two things. It puts the bulk of the initialize and terminate time into the base thread, allowing
+**              worker threads to process more quickly, and it prevents the library from completly closing, and requiring a 
+**              complete reopen. The "secondary" open of the library, required on each thread, will them be much faster. We know that
+**              in some environments there is no conceptual "base thread" the hang this init/term on. So we permit applications that
+**              do not have a base initialization. However, these will perform markedly worse than applications which do have a base thread. 
+**              one saving grace here is that if there are simulataneous threads of the library running, only the first to start must do the compelete
+**              open, and only the last to finish must do the compelete close. Only one thread at a time may be opening or closing the library!
+**
+**              This value is singular. If a list is supplied, only the first entry will be used.
+
+**  "Processes=" is a command seperator list, enclosed in brackets, naming each process to run, in the order they
+**              are to be run. There may be only one, or there may be many. A given process name can be included in the list
+**              more than once. Threads will be started in the order given here, repeating as the list is exhausted.
+**
+**  "TempMemFileSys=" may be true or false. If true, set default temp file sys to ASMemFileSys at startup.
+**
+**              You may wish to use this option if a point of contention is access to a disc drive for storing temporary files.
+**
+**  "Silent=" may be true or false. If true, this silences messages written from the framework (Though not, neccessarily from worker threads).
+**          this defaults to true if logfile is not used, and false if logfile is used. Primarily, you may want this set to true to deaden
+**          extranious I/O operations while testing. 
+**
+**
+**  Each type of worker may have a set of options specified for it.
+**    These are specified as a comma seperated series of keyword/value pairs, inside a set of brackets. The names should
+**    be in the form "ProcessNameOptions".
+**
+**  These options are common to all workers. They do not all need to be used for all workers:
+**
+**  "InFileName="  The name of a file used for input in the process. If the file does not exist, the run will fail!
+**
+**          This may be a list of names. The first thread run will use the first name, the second the second name, and so on, 
+**          cycling back to the start of the list. This canbe used to create asyymetric behaviour in threads, so that some do more
+**          work than others. 
+**
+**  "InFile2Name=".. The name of a secondary input file. This may be used in workers that require 2 input files.It behaves as 
+**           InFileName above.
+**
+**  "InFile3Name=".. The name of a tertiary input file. This may be used in workers that require 3 input files.It behaves as
+**           InFileName above.
+**
+**  "OutFilePath="  The name of an directory to hold output. If there directory does not exist, it will be created.
+**                       if the path to the directory does not exist, it will not be created, and the run will fail!
+**
+**          This may be a list of names. They will be used in order, the first output to the first path, the second to the second, and so on.
+
+**  "Silent="  may be true of false. If true, the worker will write no messages to the display. Default is true.
+**
+**  "LoadPlugins=" may be true of false. Default is per worker class (Workers[]).
+**
+**          If your thread does not need to use plugins, setting this option true can save some time and contention in the Init/Term logic. 
 */
 
 /* This is the current set of known workers 
@@ -1601,7 +1653,8 @@ int main(int argc, char** argv)
     else
         fprintf (logFile, "  We will NOT initialize the library on the base thread.\n");
 
-    if (SampleAttributes.GetKeyValueBool ("TempMemFileSys"))
+    bool UseTempMemFileSys = SampleAttributes.GetKeyValueBool ("TempMemFileSys");
+    if (UseTempMemFileSys)
         fprintf (logFile, "  We will use RamFileSys for temporary files.\n\n");
     else
         fprintf (logFile, "  We will NOT use RamFileSys for temporary files.\n\n");
@@ -1698,6 +1751,7 @@ int main(int argc, char** argv)
         threads[index].logFile = logFile;
         threads[index].logFileSet = logFileSet;
         threads[index].LoadPlugins = workers[workerTypeList[type]].LoadPlugins;
+        threads[index].UseTempMemFileSys = UseTempMemFileSys;
         type++;
     }
 
