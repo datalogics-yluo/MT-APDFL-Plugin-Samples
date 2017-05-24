@@ -22,7 +22,6 @@
 #include <sys/stat.h>
 #endif
 
-#include "InitializeLibrary.h"
 
 /* These two classes are used to implement a command line parser, for the syntax:
 **
@@ -51,10 +50,10 @@
 #define PathSep '\\'
 #define access _access
 #define mkdir _mkdir
-#define inputPath "..\\..\\..\\..\\Resources\\Sample_Input"
+#define inputPath "..\\..\\Resources\\Sample_Input"
 #else
 #define PathSep  '/'
-#define inputPath "../../../../Resources/Sample_Input"
+#define inputPath "../../Resources/Sample_Input"
 #endif
 
 class valuelist
@@ -528,6 +527,7 @@ typedef struct
     bool            threadCompleted;                    /* Mark the thread complete for unix to locate it */
     FILE           *logFile;                            /* Write status message to this file */
     bool            logFileSet;                         /* If log file is set, then default "silent" to "false". */
+    bool            LoadPlugins;                        /* If true, we must load plugins for this type of worker. */
 } ThreadInfo;
 
 
@@ -687,7 +687,10 @@ public:
             info->instance = NULL;
         else
         {
-            info->instance = new APDFLib ();
+            ASUns32 flags = 0;
+            if (!info->LoadPlugins)
+                flags |= kDontLoadPlugIns;
+            info->instance = new APDFLib (flags);
             if (useTempMemFileSys)
                 ASSetTempFileSys (ASGetRamFileSys ());
         }
@@ -902,7 +905,6 @@ public:
 
         if (threadAttributes->IsKeyPresent ("TempMemFileSys"))
             useTempMemFileSys = threadAttributes->GetKeyValueBool ("TempMemFileSys");
-
 
         char workpath[2048];
         for (int index = 0; index < InFileCount; index++)
