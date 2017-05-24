@@ -684,7 +684,10 @@ public:
         info->startCPU = clock ();
 #endif
         if (noAPDFL)
+        {
             info->instance = NULL;
+            info->noAPDFL = true;
+        }
         else
         {
             ASUns32 flags = 0;
