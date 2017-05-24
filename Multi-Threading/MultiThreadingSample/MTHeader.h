@@ -53,7 +53,7 @@
 #define inputPath "..\\..\\Resources\\Sample_Input"
 #else
 #define PathSep  '/'
-#define inputPath "../../Resources/Sample_Input"
+#define inputPath "../Resources/Sample_Input"
 #endif
 
 class valuelist
@@ -608,12 +608,12 @@ public:
                       if (InFilePath) free (InFilePath); 
                       if (InFileName) free (InFileName); 
                       if (InFileSuffix) free (InFileSuffix); 
-                      if (InFile2Path) free (InFilePath);
-                      if (InFile2Name) free (InFileName);
-                      if (InFile2Suffix) free (InFileSuffix);
-                      if (InFile3Path) free (InFilePath);
-                      if (InFile3Name) free (InFileName);
-                      if (InFile3Suffix) free (InFileSuffix);
+                      if (InFile2Path) free (InFile2Path);
+                      if (InFile2Name) free (InFile2Name);
+                      if (InFile2Suffix) free (InFile2Suffix);
+                      if (InFile3Path) free (InFile3Path);
+                      if (InFile3Name) free (InFile3Name);
+                      if (InFile3Suffix) free (InFile3Suffix);
                       for (int index = 0; index < OutPathCount; index++)
                           { free (OutFilePath[index]);}
                       if (OutFilePath) free (OutFilePath);

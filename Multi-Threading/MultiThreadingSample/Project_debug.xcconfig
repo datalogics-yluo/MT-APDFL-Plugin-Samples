@@ -1,0 +1,25 @@
+// Copyright (c) 2015-2016, Datalogics, Inc. All rights reserved.
+//
+// http://dev.datalogics.com/adobe-pdf-library/license-for-downloaded-pdf-samples/
+//
+
+#include "Common.xcconfig"
+
+//
+// GNU C/C++ - Language
+//
+
+// Enable Fix & Continue
+GCC_ENABLE_FIX_AND_CONTINUE = YES
+
+//
+// GNU C/C++ - Code Generation
+//
+
+GCC_OPTIMIZATION_LEVEL = 0
+
+//
+// GNU C/C++ - Preprocessing
+//
+
+GCC_PREPROCESSOR_DEFINITIONS = LOAD_PLUGIN=1 AS_DEBUG=1 DEBUG=1 _DEBUG=1 DISABLECPLUSPLUSDURING=0 EXCEPTIONS_ALWAYS_CPLUSPLUS=1
