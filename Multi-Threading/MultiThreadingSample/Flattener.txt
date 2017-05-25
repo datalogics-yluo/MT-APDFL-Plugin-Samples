@@ -1,0 +1,14 @@
+TotalThreads=500
+activeThreads=8
+BaseInit=true 
+processes=Flattener
+PauseEvery=0
+TempMemFileSys=false
+FlattenOptions=[
+       silent=true, 
+       noapdfl=false, 
+       LoadPlugins=true,
+       InFileName=%trans_multipage.pdf,
+       OutFilePath=Output,
+       NumberOfPages=1
+                    ]

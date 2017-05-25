@@ -1,0 +1,10 @@
+TotalThreads=100
+activeThreads=8
+BaseInit=true
+processes=TextExtract
+TextExtractOptions=[
+       silent=false, 
+       noapdfl=false, 
+       InFileName=%pdf_reference_1-7.pdf,
+       NumberOfPages=1
+       ]

@@ -1,0 +1,12 @@
+TotalThreads=10
+activeThreads=5 
+BaseInit=true 
+processes=XPS2PDF
+PauseEvery=0
+TempMemFileSys=false
+XPS2PDFOptions=[
+       silent=false, 
+       noapdfl=false, 
+       InFileName=%XPStoPDF.xps,
+       OutFilePath=Output,
+                     ]

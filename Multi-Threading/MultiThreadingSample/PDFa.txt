@@ -1,0 +1,16 @@
+TotalThreads=10
+activeThreads=5 
+BaseInit=true 
+processes=PDFa
+PauseEvery=0
+TempMemFileSys=false
+PDFaOptions=[
+       silent=false, 
+       noapdfl=false, 
+       InFileName=%trans_1page.pdf,
+       OutFilePath=Output,
+       ConvertOption=RGB1b,
+       LoadPlugins=true,
+       RasterizeFontErrors=true,
+       RemoveAllAnnotations=false
+                     ]
