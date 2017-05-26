@@ -58,7 +58,7 @@
 #define inputPath "..\\..\\Resources\\Sample_Input"
 #else
 #define PathSep  '/'
-#define inputPath "../Resources/Sample_Input"
+#define inputPath "../../Resources/Sample_Input"
 #endif
 
 class valuelist

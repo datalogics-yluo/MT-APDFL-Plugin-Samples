@@ -138,7 +138,7 @@ char * workerclass::GetOutFileName (int threadSequence, int inner)
 void workerclass::startThreadWorker (ThreadInfo *info)
 {
 #ifndef WIN_PLATFORM
-    info->startTime = time (&info->startTime);
+    time (&info->startTime);
     info->startCPU = clock ();
 #endif
     if (noAPDFL)
@@ -169,11 +169,12 @@ void workerclass::endThreadWorker (ThreadInfo *info)
         delete info->instance;
 
 #ifndef WIN_PLATFORM
-    info->endTime = time (&info->endTime);
+    time (&info->endTime);
     info->endCPU = clock ();
     info->wallTimeUsed = ((info->endTime - info->startTime) * 1.0) / CLOCKS_PER_SEC;
     info->cpuTimeUsed = ((info->endCPU - info->startCPU) * 1.0) / CLOCKS_PER_SEC;
-    info->percentUtilized = (info->cpuTimeUsed / dontThread->wallTimeUsed) * 100;
+    if(info->wallTimeUsed > 0)
+        info->percentUtilized = (info->cpuTimeUsed / info->wallTimeUsed) * 100;
 #endif
     /* This is used by non windows thread pump to detect that a thread is complete */
     info->threadCompleted = true;

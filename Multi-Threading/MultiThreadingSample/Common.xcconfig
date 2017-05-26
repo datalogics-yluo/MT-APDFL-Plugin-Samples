@@ -11,7 +11,7 @@ ARCHS = $(ARCHS_STANDARD_32_64_BIT)
 MACOSX_DEPLOYMENT_TARGET = 10.7;
 
 // Library search paths for all targets
-FRAMEWORK_SEARCH_PATHS = ../CPlusPlus/Binaries
+FRAMEWORK_SEARCH_PATHS = ../Binaries
 
 // Add an rpath setting to allow us to use @rpath in the APDFL Frameworks
 LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks"
@@ -20,7 +20,7 @@ LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks"
 DL_PDFL_FRAMEWORKS = -framework DL150ACE -framework DL150AGM -framework DL150ARE -framework DL150AXE8SharedExpat -framework DL150BIB -framework DL150BIBUtils -framework DL150CoolType -framework DL150JP2KLib -framework DL150AdobeXMP -framework DL150PDFL
 
 // Common Header search paths for all targets
-HEADER_SEARCH_PATHS = $(HEADER_SEARCH_PATHS) ../CPlusPlus/Include/Headers
+HEADER_SEARCH_PATHS = $(HEADER_SEARCH_PATHS) ../Include/Headers
 
 // Compile everything as objective-c++
 GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp

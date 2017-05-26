@@ -235,7 +235,7 @@ void APDFLib::fillDirectories()
 
 	//Set the font directory list and its length.
 	fontDirList[0] = (ASUTF16Val*)"../../Resources/Font";
-	fontDirList[1] = (ASUTF16Val*)"../Resources/CMap";
+	fontDirList[1] = (ASUTF16Val*)"../../Resources/CMap";
 	pdflData.dirList = (char**)fontDirList;
 	pdflData.listLen = NUM_FONTS;
 
@@ -275,7 +275,7 @@ void APDFLib::fillDirectories()
 		tmpP[i] = (char*)malloc(sizeof(char)*MAX_PATH);
 		strncpy_safe(tmpP[ i ], MAX_PATH, fontPath[ i ], sizeof(fontPath[ i ]));
 	}
-	pluginDirList[0] = (ASUTF16Val*)tmpP;
+	pluginDirList[0] = (ASUTF16Val*)"../Binaries";
 	pdflData.pluginDirList = (char**)pluginDirList;
 	pdflData.pluginDirListLen = NUM_PLUGIN_DIRS;
 #endif

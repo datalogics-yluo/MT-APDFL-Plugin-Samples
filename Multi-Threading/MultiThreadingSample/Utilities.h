@@ -17,8 +17,11 @@
 #define NUM_FONTS 2          //The number of font directories we'll include during initialization.    
 #define NUM_COLOR_PROFS 1    //The number of color profile directories we'll include during initialization.
 #define NUM_PLUGIN_DIRS 1    //The number of plugin directories we'll include during initialization.
-
+#if WIN_PLATFORM
 #include <io.h>
+#else
+#include <sys/uio.h>
+#endif
 #include <iostream>
 #include <cstring>
 #include <vector>
