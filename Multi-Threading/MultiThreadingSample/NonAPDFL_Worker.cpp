@@ -21,7 +21,7 @@
     ** The intent is to provide a mixture of I/O bound and CPU Bound actvities
     */
 
-#include "NonApdfl_Worker.h"
+#include "NonAPDFL_Worker.h"
 
     /* Parse the non-APDFL conversion thread options into attributes */
 void NonAPDFLWorker::ParseOptions (attributes *frameAttributes, WorkerType *worker)

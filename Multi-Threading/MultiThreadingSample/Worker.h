@@ -5,8 +5,8 @@
 #ifndef WORKER_H
 #define WORKER_H
 
-#include "MtHeader.h"
-#include "ASExpt.h"
+#include "MTHeader.h"
+#include "ASExpT.h"
 #include <time.h>
 
 /* This enumeration is used to identify worker by class within the set of all classes
