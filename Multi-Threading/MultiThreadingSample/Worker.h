@@ -57,7 +57,7 @@ typedef struct worktypes
 {
     char                *name;
     char                *paramName;
-    int                  sequence;
+    EnumOfWorkers        type;
     bool                 LoadPlugins;
 } WorkerType;
 

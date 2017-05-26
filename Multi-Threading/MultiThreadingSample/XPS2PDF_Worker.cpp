@@ -26,8 +26,9 @@ void XPS2PDFWorker::ParseOptions (attributes *FrameAttributes, WorkerType *worke
 {    /* Fill in the worker interface table for this worker type */
     WorkerIDEntry = worker;
     worker->name = "XPS2PDf";
-    worker->LoadPlugins = false;
+    worker->LoadPlugins = true;
     worker->paramName = "XPS2PDFOptions";
+    worker->type = workerType;
 
     /* Parse the common attributes for this worker type,
     ** Provide defaults for InFileName and OutFilePath

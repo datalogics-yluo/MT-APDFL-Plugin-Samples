@@ -10,6 +10,7 @@
 **                   OutFilePath=[Output]                               Directory where output is written
 **                   noAPDFL=false                                      When true, we will NOT init/term the library for each thread
 **                   NumberOfPages=[1]                                  Number of pages of content to extract in this thread (100 values max!)
+**                   SaveWordList=false                                 If true, the words will be written to a file.If false, not. 
 */
 #include "MTHeader.h"
 #include "Worker.h"
@@ -33,5 +34,6 @@ public:
 private:
     ASUns32 pages[100];
     ASUns32 pagesCount;
+    bool    saveWordList;
 
 };

@@ -25,6 +25,7 @@ void TextextWorker::ParseOptions (attributes *FrameAttributes, WorkerType *worke
     worker->name = "TextExtract";
     worker->LoadPlugins = false;
     worker->paramName = "TextExtractOptions";
+    worker->type = workerType;
 
     /* Parse the common attributes for this worker type,
     ** Provide defaults for InFileName and OutFilePath
@@ -44,6 +45,9 @@ void TextextWorker::ParseOptions (attributes *FrameAttributes, WorkerType *worke
         pages[0] = 1;
     }
 
+    saveWordList = false;
+    if (threadAttributes->IsKeyPresent ("SaveWordList"))
+        saveWordList = threadAttributes->GetKeyValueBool ("SaveWordList");
 };
 
 
@@ -101,13 +105,16 @@ void TextextWorker::WorkerThread (ThreadInfo *info)
         strcat (fullOutputFileName, "txt");
 
         /* Create a file to hold the words */
-        FILE *wordFile = fopen (fullOutputFileName, "w");
+        FILE *wordFile = NULL;
+        if (saveWordList)
+            wordFile = fopen (fullOutputFileName, "w");
 
         /* Release the file name */
         free (fullOutputFileName);
 
         /* Write document and page name to result file */
-        fprintf (wordFile, "%s Page: %01d", fullFileName, pageToDo);
+        if (saveWordList)
+            fprintf (wordFile, "%s Page: %01d", fullFileName, pageToDo);
 
 
         for (int i = 0; i < numWordsFound; ++i)
@@ -117,11 +124,13 @@ void TextextWorker::WorkerThread (ThreadInfo *info)
 
             char workWord[1024];
             PDWordGetString (nextWord, workWord, 1024);
-            fprintf (wordFile, "(%3d)  %s\n", i, workWord);
+            if (saveWordList)
+                fprintf (wordFile, "(%3d)  %s\n", i, workWord);
         }
 
         /* Close the word file */
-        fclose (wordFile);
+        if (saveWordList)
+            fclose (wordFile);
 
         /* Release the word finder results */
         PDWordFinderReleaseWordList (wordFinder, 0);

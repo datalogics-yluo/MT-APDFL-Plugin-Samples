@@ -31,8 +31,9 @@ void FlattenWorker::ParseOptions (attributes *FrameAttributes, WorkerType *worke
 {
     WorkerIDEntry = worker;
     worker->name = "Flattener";
-    worker->LoadPlugins = false;
+    worker->LoadPlugins = true;
     worker->paramName = "FlattenerOptions";
+    worker->type = workerType;
 
     /* Parse the common attributes for this worker type,
     ** Provide defaults for InFileName and OutFilePath
@@ -136,14 +137,17 @@ void FlattenWorker::WorkerThread (ThreadInfo *info)
             &flattenParams);             //Flattener options.
         if (flattenResult)
         {
-            std::cout << "Flattened " << numFlattened << " pages." << std::endl;
+            if (!silent)
+                fprintf (info->logFile, " flattened %01d pages.\n", numFlattened);
         }
-        else
+        else 
         {
-            std::cout << "Flattening failed." << std::endl;
+            if (!silent)
+                fprintf (info->logFile, "Flattening failed.\n");
             ASRaise (GenError (genErrGeneral));
         }
-        printf ("outputfile name: %s\n", fullOutputFileName);
+        if (!silent)
+            printf ("outputfile name: %s\n", fullOutputFileName);
         /* Save the output PDF Document */
         inDoc.saveDoc (fullOutputFileName); //fullOutputFileName
         /* Release the output file name */
@@ -168,8 +172,9 @@ ASBool flattenerProgMon (ASInt32 pageNum, ASInt32 totalPages, float current, ASI
     //If we've begun a new page, or if we've finished.
     if (pageNum != (data->prevPage) || current == 100.0f)
     {
-        //Print the completion percentage.
-        fprintf (data->logFile, "[%0.06g%%] Flattening page %01d of %01d.\n", current, pageNum + 1, totalPages);
+        if (!data->silent)
+            //Print the completion percentage.
+            fprintf (data->logFile, "[%0.06g%%] Flattening page %01d of %01d.\n", current, pageNum + 1, totalPages);
 
         //Update previous page.
         data->prevPage = pageNum;

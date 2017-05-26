@@ -52,7 +52,8 @@ TextExtractOptions=[
        silent=true, 
        LoadPlugins=false,
       noapdfl=false, 
-       NumberOfPages=1
+       NumberOfPages=1,
+       SaveWordList=false
        ]
 RasterizerOptions=[
        InFileName=%constitution.pdf,

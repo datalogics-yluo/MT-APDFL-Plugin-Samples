@@ -1,5 +1,5 @@
-TotalThreads=10
-activeThreads=5 
+TotalThreads=100
+activeThreads=8
 BaseInit=true 
 processes=PDFa
 PauseEvery=0
@@ -7,7 +7,7 @@ TempMemFileSys=false
 PDFaOptions=[
        silent=false, 
        noapdfl=false, 
-       InFileName=%trans_1page.pdf,
+       InFileName=%trans_multipage.pdf,
        OutFilePath=Output,
        ConvertOption=RGB1b,
        LoadPlugins=true,
