@@ -31,6 +31,7 @@ void NonAPDFLWorker::ParseOptions (attributes *frameAttributes, WorkerType *work
     worker->name = "NonAPDFL";
     worker->LoadPlugins = false;
     worker->paramName = "NonAPDFLOptions"; 
+    worker->type = workerType;
 
     /* Parse the common attributes for this worker type,
     ** Provide defaults for InFileName and OutFilePath

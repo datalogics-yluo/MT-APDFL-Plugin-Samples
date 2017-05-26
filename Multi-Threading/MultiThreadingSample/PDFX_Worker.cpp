@@ -23,8 +23,9 @@ void PDFxWorker::ParseOptions (attributes *FrameAttributes, WorkerType *worker)
     /* Fill in the worker interface table for this worker type */
     WorkerIDEntry = worker;
     worker->name = "PDFx";
-    worker->LoadPlugins = false;
+    worker->LoadPlugins = true;
     worker->paramName = "PDFxOptions";
+    worker->type = workerType;
 
     /* Parse the common attributes for this worker type,
     ** Provide defaults for InFileName and OutFilePath

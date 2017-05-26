@@ -371,8 +371,8 @@ int main(int argc, char** argv)
 
                 if (!strcmp (workerName, processName))
                 {
-                    workerList[index].PDFa = workerClasses[workers[x].sequence].PDFa;
-                    workerTypeList[index] = workers[x].sequence;
+                    workerList[index].PDFa = workerClasses[workers[x].type].PDFa;
+                    workerTypeList[index] = workers[x].type;
                     break;
                 }
             }

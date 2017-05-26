@@ -1,10 +1,10 @@
-TotalThreads=500
+TotalThreads=100
 activeThreads=8
 BaseInit=true 
 processes=Flattener
 PauseEvery=0
 TempMemFileSys=false
-FlattenOptions=[
+FlattenerOptions=[
        silent=true, 
        noapdfl=false, 
        LoadPlugins=true,

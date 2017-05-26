@@ -1,5 +1,5 @@
 TotalThreads=100
-activeThreads=5 
+activeThreads=8
 BaseInit=true 
 processes=Rasterizer
 RasterizerOptions=[

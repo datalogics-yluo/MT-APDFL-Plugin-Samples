@@ -39,6 +39,7 @@ void RasterizerWorker::ParseOptions (attributes *FrameAttributes, WorkerType *wo
     worker->name = "Rasterizer";
     worker->LoadPlugins = false;
     worker->paramName = "RasterizerOptions";
+    worker->type = workerType;
 
     /* Parse the common attributes for this worker type,
     ** Provide defaults for InFileName and OutFilePath

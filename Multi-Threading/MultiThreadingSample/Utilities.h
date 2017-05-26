@@ -18,6 +18,7 @@
 #define NUM_COLOR_PROFS 1    //The number of color profile directories we'll include during initialization.
 #define NUM_PLUGIN_DIRS 1    //The number of plugin directories we'll include during initialization.
 
+#include <io.h>
 #include <iostream>
 #include <cstring>
 #include <vector>
@@ -25,8 +26,6 @@
 #include "PDFLCalls.h"
 #include "ASCalls.h"
 #include "ASExtraCalls.h"
-
-
 
 
 #ifdef AIX_GCC_COMPAT
@@ -81,7 +80,7 @@ class APDFLib
 {
 public:
     //Constructor initializes APDFL and sets the path to DL150PDFL.dll to dl150Dir. If NULL is passed, defaults to ../../../Binaries. dl150Dir should be a relative path.
-    APDFLib(ASUns32 flags = 0, wchar_t* dl150Dir = NULL);
+    APDFLib (ASUns32 flags = 0, char* binariesPath = NULL, char *pluginsPath = NULL, char *resourcesPath = NULL);
     ~APDFLib();                                       //Destructor terminates APDFL.
 
     ASInt32 getInitError();                           //Reports whether an error happened during initialization and returns that error.
@@ -96,7 +95,7 @@ private:
 
     void fillDirectories();                           //Sets directory information for our PDFLDataRec.
 #if WIN_PLATFORM
-    HINSTANCE loadDFL150PDFL(wchar_t* relativeDir);   //Loads the DL150PDFL library dynamically.
+    HINSTANCE loadDL150PDFL(char* relativeDir);   //Loads the DL150PDFL library dynamically.
 #endif
 
     ASUTF16Val* fontDirList[NUM_FONTS];               //List of font directories we'll include during initialization.              //TODO: platform divergences
@@ -106,6 +105,10 @@ private:
     GCCAIXHelper gccHelp;
 #endif
 
+
+    char BinariesPath[2048];
+    char PluginsPath[2048];
+    char ResourcesPath[2048];
 };
 
 class APDFLDoc

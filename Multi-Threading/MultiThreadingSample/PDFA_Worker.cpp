@@ -30,8 +30,9 @@ void PDFaWorker::ParseOptions (attributes *FrameAttributes, WorkerType *worker)
     /* Fill in the worker interface table for this worker type */
     WorkerIDEntry = worker;
     worker->name = "PDFa";
-    worker->LoadPlugins = false;
+    worker->LoadPlugins = true;
     worker->paramName = "PDFaOptions";
+    worker->type = workerType;
 
     /* Parse the common attributes for this worker type,
     ** Provide defaults for InFileName and OutFilePath

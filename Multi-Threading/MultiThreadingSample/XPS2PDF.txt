@@ -1,5 +1,5 @@
-TotalThreads=10
-activeThreads=5 
+TotalThreads=100
+activeThreads=7
 BaseInit=true 
 processes=XPS2PDF
 PauseEvery=0
