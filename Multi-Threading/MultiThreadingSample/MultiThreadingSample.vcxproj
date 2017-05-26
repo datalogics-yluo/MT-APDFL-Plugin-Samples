@@ -159,12 +159,28 @@
   <ItemGroup>
     <ClCompile Include="..\Include\Source\PDFLInitCommon.c" />
     <ClCompile Include="..\Include\Source\PDFLInitHFT.c" />
+    <ClCompile Include="Flattener_Worker.cpp" />
+    <ClCompile Include="NonAPDFL_Worker.cpp" />
+    <ClCompile Include="PDFA_Worker.cpp" />
+    <ClCompile Include="PDFX_Worker.cpp" />
+    <ClCompile Include="Rasterizer_Worker.cpp" />
+    <ClCompile Include="TextExtract_Worker.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="MultiThreadingSample.cpp" />
+    <ClCompile Include="Worker.cpp" />
+    <ClCompile Include="XPS2PDF_Worker.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Flattener_Worker.h" />
+    <ClInclude Include="NonAPDFL_Worker.h" />
+    <ClInclude Include="PDFA_Worker.h" />
+    <ClInclude Include="PDFX_Worker.h" />
+    <ClInclude Include="Rasterizer_Worker.h" />
+    <ClInclude Include="TextExtract_Worker.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="MTHeader.h" />
+    <ClInclude Include="Worker.h" />
+    <ClInclude Include="XPS2PDF_Worker.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

@@ -1,0 +1,10 @@
+TotalThreads=1000 
+activeThreads=8 
+BaseInit=false 
+PauseEvery=[13, 17]
+processes=NonAPDFL
+NonAPDFLOptions=[
+       silent=false, 
+       noapdfl=true, 
+       InFileName=%AddRedaction.pdf
+       ]
