@@ -5,9 +5,14 @@
 #ifndef WORKER_H
 #define WORKER_H
 
-#include "MTHeader.h"
-#include "ASExpT.h"
+#include "MtHeader.h"
+#include "Utilities.h"
+#include "ASExpt.h"
 #include <time.h>
+
+#ifndef WIN_PLATFORM
+#include <sys/utime.h>
+#endif
 
 /* This enumeration is used to identify worker by class within the set of all classes
 ** based on workerclass. As new classes are added, an enumeration for them should be 
@@ -39,8 +44,10 @@ typedef struct
     void           *object;                             /* Worker Thread Object */
     APDFLib        *instance;                           /* APDFL Library instance */
     ASInt32         result;                             /* Numeric result, unique to worker type. But "zero" is always "No Problem" */
-    time_t          startTime, endTime;                 /* Used in Unix only, wall time started/stopped */
+#ifndef WIN_PLATFORM
+    struct timeval  startTime, endTime;                 /* Used in Unix only, wall time started/stopped */
     clock_t         startCPU, endCPU;                   /* Used in Unix only to track CPU time used. */
+#endif
     double          wallTimeUsed, cpuTimeUsed;          /* Walltime start to finish, and CPU time (user and kernal) consumed */
     double          percentUtilized;                    /* Percentage of CPU time in wall time */
     bool            silent;                             /* When true, write nothing to stdout! */
@@ -117,6 +124,9 @@ public:
 
     /* Dictionary of options for this object */
     attributes *threadAttributes;
+
+    /* Dictionary of framework attributes */
+    attributes *frameAttributes;
 
     workerclass ();
     ~workerclass ();

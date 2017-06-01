@@ -17,11 +17,8 @@
 #define NUM_FONTS 2          //The number of font directories we'll include during initialization.    
 #define NUM_COLOR_PROFS 1    //The number of color profile directories we'll include during initialization.
 #define NUM_PLUGIN_DIRS 1    //The number of plugin directories we'll include during initialization.
-#if WIN_PLATFORM
+
 #include <io.h>
-#else
-#include <sys/uio.h>
-#endif
 #include <iostream>
 #include <cstring>
 #include <vector>
@@ -29,6 +26,7 @@
 #include "PDFLCalls.h"
 #include "ASCalls.h"
 #include "ASExtraCalls.h"
+#include "MTHeader.h"
 
 
 #ifdef AIX_GCC_COMPAT
@@ -79,11 +77,12 @@ class GCCAIXHelper
      void *hAXE, *hXMP, *hJP2K, *hBIBUt, *hBIB, *hACE, *hARE, *hAGM, *hCT, *hPDFL;
 };
 #endif // AIX_GCC_COMPAT
+
 class APDFLib
 {
 public:
-    //Constructor initializes APDFL and sets the path to DL150PDFL.dll to dl150Dir. If NULL is passed, defaults to ../../../Binaries. dl150Dir should be a relative path.
-    APDFLib (ASUns32 flags = 0, char* binariesPath = NULL, char *pluginsPath = NULL, char *resourcesPath = NULL);
+    //Constructor initializes APDFL Using choices encoded in the attributes.
+    APDFLib (ASUns32 flags, attributes *FrameAttributes);
     ~APDFLib();                                       //Destructor terminates APDFL.
 
     ASInt32 getInitError();                           //Reports whether an error happened during initialization and returns that error.
@@ -91,70 +90,36 @@ public:
     static void displayError(ASErrorCode);            //Utility method, may be used to print APDFL errors to the terminal.
 
 private:
-    APDFLib(const APDFLib&);                          // not implemented
     PDFLDataRec pdflData;                             //A struct containing information that APDFL initializes with.
     ASInt32 initError;                                //Used to record initialization errors.
     ASBool initValid;                                 //Set to true if the library initializes successfully.
 
-    void fillDirectories();                           //Sets directory information for our PDFLDataRec.
-#if WIN_PLATFORM
+    void fillDirectories(attributes *frameAttributes);                           //Sets directory information for our PDFLDataRec.
+#ifdef WIN_PLATFORM
     HINSTANCE loadDL150PDFL(char* relativeDir);   //Loads the DL150PDFL library dynamically.
 #endif
 
-    ASUTF16Val* fontDirList[NUM_FONTS];               //List of font directories we'll include during initialization.              //TODO: platform divergences
-    ASUTF16Val* colorProfDirList[NUM_COLOR_PROFS];    //List of color profile directories we'll include during initialization.     //TODO: platform divergences
-    ASUTF16Val* pluginDirList[NUM_PLUGIN_DIRS];       //List of plugin directories we'll include during initialization.            //TODO: platform divergences
+    ASUTF16Val* fontDirList[100];               //List of font directories we'll include during initialization.              //TODO: platform divergences
+    ASUTF16Val* colorProfDirList[100];    //List of color profile directories we'll include during initialization.     //TODO: platform divergences
+    ASUTF16Val* pluginDirList[100];       //List of plugin directories we'll include during initialization.            //TODO: platform divergences
 #if AIX_GCC_COMPAT
     GCCAIXHelper gccHelp;
 #endif
 
+#ifdef WIN_PLATFORM
+    char *ToUTF16AndAppendToStringPool (char *string);
+#endif
 
     char BinariesPath[2048];
     char PluginsPath[2048];
     char ResourcesPath[2048];
+    char *stringPool;
+    size_t stringPoolSize;
 };
 
-class APDFLDoc
-{
+PDDoc OpenSampleFile (char *);
+void  SaveDocument (PDDoc doc, char *name, PDSaveFlags saveFlags = (PDSaveFull | PDSaveCollectGarbage));
+ASPathName GetMacPath (char * filename);
 
-private:
-
-    static const unsigned MAX_PATH_LENGTH = 4096;                          //Private data members assosciated with the document.
-    wchar_t nameOfDocument[MAX_PATH_LENGTH];
-
-    volatile ASPathName asPathName;
-    ASErrorCode errorCode;
-
-    void initialize ();                                                     //Called in constructor to initialize some data members.
-    ASErrorCode setASPathName (wchar_t*);                                  //Helper method used to create ASPathName objects for operations.
-    void CommonConstruct (wchar_t*, bool);                                   //Helper to allow char* overload of constructor with minimal code copying
-
-    APDFLDoc (const APDFLDoc&);                                             //Do not allow copy constructor or assignment operator to be used.
-    APDFLDoc& operator=(const APDFLDoc&);                                  //in order to prevent shallow copies of objects.
-
-public:
-
-    volatile PDDoc pdDoc;                                                  //Made public so it can be accessed directly.
-
-    APDFLDoc (wchar_t*, bool doRepairDamagedFile);                          //Constructor used to open a document.
-    APDFLDoc (const char*, bool doRepairDamagedFile);                       //Constructor used to open a document.
-    APDFLDoc ();                                                            //Constructor used to create a document.
-
-    ASSize_t numPages () { return (PDDocGetNumPages (pdDoc)); }
-
-    volatile PDDoc& getPDDoc () { return pdDoc; };                           //Returns a reference to the PDDoc that was created or opened.
-
-    ASErrorCode saveDoc (wchar_t* = NULL, PDSaveFlags = PDSaveFull);        //Used to save the document, may be provided a path and PDSaveFlags.
-    ASErrorCode saveDoc (const char*, PDSaveFlags = PDSaveFull);            //Used to save the document to a specified non-wide string, may be provided PDSaveFlags.
-
-    ~APDFLDoc ();                                                           //Destructor frees up resources.
-
-    static ASPathName makePath (const char* path);                         //Provide functionality for device independent path construction
-    static ASPathName makePath (const wchar_t* path);
-
-    ASErrorCode printErrorHandlerMessage ();
-
-    static ASUnicodeFormat GetHostUnicodeFormat () { return (sizeof (wchar_t) == 2 ? kUTF16HostEndian : kUTF32HostEndian); }
-};
 
 #endif //UTILITIES_H

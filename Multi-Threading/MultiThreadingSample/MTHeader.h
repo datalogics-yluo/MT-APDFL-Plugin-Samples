@@ -25,7 +25,6 @@
 #endif
 
 #include "ASExpT.h"
-#include "Utilities.h"
 
 
 /* These two classes are used to implement a command line parser, for the syntax:
@@ -58,7 +57,7 @@
 #define inputPath "..\\..\\Resources\\Sample_Input"
 #else
 #define PathSep  '/'
-#define inputPath "../../Resources/Sample_Input"
+#define inputPath "../Resources/Sample_Input"
 #endif
 
 class valuelist
@@ -96,7 +95,7 @@ public:
                         end = strstr (start, "]");
                     if (!end)
                         end = start + strlen (start);
-                    int length = end - start;
+                    size_t length = end - start;
                     char *saveValue = (char *)malloc (length + 1);
                     strncpy (saveValue, start, length);
                     saveValue[length] = 0;
@@ -122,7 +121,7 @@ public:
             free (list[count]);
     }
 
-    int size () { return list.size (); }
+    int size () { return (int)list.size (); }
 
     char *value (int index) { return list[index]; }
 
@@ -254,7 +253,7 @@ public:
                 if (equal)
                 {
                     /* Sperate out and store the key */
-                    int keyLen = equal - argv[count];
+                    size_t keyLen = equal - argv[count];
                     key = (char *)malloc (keyLen + 1);
                     strncpy (key, argv[count], keyLen);
                     key[keyLen] = 0;

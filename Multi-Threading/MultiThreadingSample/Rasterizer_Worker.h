@@ -15,7 +15,6 @@
 **                   Resolution=300                                     Resolution to render image too.
 **                   ColorModel={RGB,CMYK,GRAY,DeviceN]                 Which color model to use. RGB is the default.
 */
-#include "MTHeader.h"
 #include "Worker.h"
 
 class RasterizerWorker : public workerclass

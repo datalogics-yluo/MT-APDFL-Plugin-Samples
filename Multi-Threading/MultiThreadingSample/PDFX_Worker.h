@@ -12,7 +12,6 @@
 **                   ConvertOption=[1]                                  Convertor Option selector, 1 to 2. (100 values max!)
 **                   RemoveAllAnnotations=[false]                        SettingforPDF/a conversion option "removeAllAnnotations" (100 values max!)
 */
-#include "MTHeader.h"
 #include "Worker.h"
 #include "PDFProcessorCalls.h"
 #include "CosCalls.h"

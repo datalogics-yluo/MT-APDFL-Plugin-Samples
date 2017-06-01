@@ -10,7 +10,6 @@
 **                   OutFilePath=[Output]                               Directory where output is written
 **                   noAPDFL=false                                      When true, we will NOT init/term the library for each thread
 */
-#include "Utilities.h"
 #include "XPS2PDF_Worker.h"
 #ifndef MAC_ENV
 #include "XPS2PDFCalls.h"
@@ -96,10 +95,11 @@ void XPS2PDFWorker::WorkerThread (ThreadInfo *info)
             else
             {
                 /* Save the output PDF Document */
-                APDFLDoc outAPDoc;
-                outAPDoc.pdDoc = outputDoc;
-                outAPDoc.saveDoc (fullOutputFileName);
+                SaveDocument (outputDoc, fullOutputFileName);
             }
+
+            /* Close the output document */
+            PDDocClose (outputDoc);
 
             /* release the output file name */
             free (fullOutputFileName);

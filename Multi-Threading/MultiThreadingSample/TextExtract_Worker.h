@@ -12,7 +12,6 @@
 **                   NumberOfPages=[1]                                  Number of pages of content to extract in this thread (100 values max!)
 **                   SaveWordList=false                                 If true, the words will be written to a file.If false, not. 
 */
-#include "MTHeader.h"
 #include "Worker.h"
 
 class TextextWorker : public workerclass

@@ -14,7 +14,6 @@
 **                   RemoveAllAnnotations=[false]                       SettingforPDF/a conversion option "removeAllAnnotations" (100 values max!)
 **                   UseProgressMonitor=false                           Uses or does not use the progress monitor. Singular Value! Default is off.
 */
-#include "MTHeader.h"
 #include "Worker.h"
 #include "PDFProcessorExpT.h"
 

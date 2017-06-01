@@ -124,55 +124,57 @@ void PDFaWorker::WorkerThread (ThreadInfo *info)
 
     DURING
         /* Open the input document */
-        APDFLDoc inDoc (fullFileName, true);
+        PDDoc inDoc = OpenSampleFile (fullFileName);
 
-    /* Free the input file names */
-    free (fullFileName);
+        /* Free the input file names */
+        free (fullFileName);
 
-    /* Initialize the HFT for the plugin */
-    gPDFProcessorHFT = InitPDFProcessorHFT;
+        /* Initialize the HFT for the plugin */
+        gPDFProcessorHFT = InitPDFProcessorHFT;
 
-    //initialize PDFProcessor plugin
-    if (!PDFProcessorInitialize ())
-        /* If the plugin cannot be initilized! */
-        info->result = 1;
-    else
-    {
-        /* COnstruct the user params record for the PDF/A conversion */
-        PDFProcessorPDFAConvertParamsRec userParams;
-
-        memset ((char *)&userParams, 0, sizeof (PDFProcessorPDFAConvertParamsRec));
-        userParams.size = sizeof (PDFProcessorPDFAConvertParamsRec);
-        if (useProgressMonitor)
+        //initialize PDFProcessor plugin
+        if (!PDFProcessorInitialize ())
+            /* If the plugin cannot be initilized! */
+            info->result = 1;
+        else
         {
-            userParams.progMon = PDFProcessorProgressMonitorCBPDFa;
-            userParams.progMonData = &silent;
-        }
-        userParams.colorCompression = kPDFProcessorColorJpegCompression;
-        userParams.noRasterizationOnFontErrors = false;
-        userParams.removeAllAnnotations = false;
+            /* COnstruct the user params record for the PDF/A conversion */
+            PDFProcessorPDFAConvertParamsRec userParams;
+
+            memset ((char *)&userParams, 0, sizeof (PDFProcessorPDFAConvertParamsRec));
+            userParams.size = sizeof (PDFProcessorPDFAConvertParamsRec);
+            if (useProgressMonitor)
+            {
+                userParams.progMon = PDFProcessorProgressMonitorCBPDFa;
+                userParams.progMonData = &silent;
+            }
+            userParams.colorCompression = kPDFProcessorColorJpegCompression;
+            userParams.noRasterizationOnFontErrors = false;
+            userParams.removeAllAnnotations = false;
 
 
-        /* Create the ouput file ASPath name */
+            /* Create the ouput file ASPath name */
 #if !MAC_ENV	
-        ASPathName destFilePath = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullOutputFileName, NULL);
+            ASPathName destFilePath = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullOutputFileName, NULL);
 #else
-        ASPathName destFilePath = APDFLDoc::makePath (fullOutputFileName);
+         ASPathName destFilePath =GetMacPath (fullOutputFileName);
 #endif
 
-        /* Release the output file name */
-        free (fullOutputFileName);
+            /* Release the output file name */
+            free (fullOutputFileName);
 
-        /* Perform the conversions */
-        PDFProcessorConvertAndSaveToPDFA (inDoc.getPDDoc (), destFilePath, ASGetDefaultFileSys (),
-            ConvertOptions[convertorOptions[sequence % convertorOptionsCount] + 1], &userParams);
+            /* Perform the conversions */
+            PDFProcessorConvertAndSaveToPDFA (inDoc, destFilePath, ASGetDefaultFileSys (),
+                ConvertOptions[convertorOptions[sequence % convertorOptionsCount] + 1], &userParams);
 
-        /* Release the output path name */
-        ASFileSysReleasePath (NULL, destFilePath);
+            /* Release the output path name */
+            ASFileSysReleasePath (NULL, destFilePath);
 
-        /* terminate the plugin */
-        PDFProcessorTerminate ();
-    }
+            PDDocClose (inDoc);
+
+            /* terminate the plugin */
+            PDFProcessorTerminate ();
+        }
     HANDLER
         info->result = 2;
     END_HANDLER
