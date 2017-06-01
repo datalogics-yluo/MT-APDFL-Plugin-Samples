@@ -200,9 +200,10 @@ char *APDFLib::ToUTF16AndAppendToStringPool (char *string)
     GetFullPathNameA (string, 4096, fullPath, 0);
 
     size_t length = strlen (fullPath);
-    char *ptr = stringPool + stringPoolSize;
+    size_t save = stringPoolSize;
     stringPoolSize += (length * 2) + 2;
     stringPool = (char *)realloc (stringPool, stringPoolSize);
+    char *ptr = stringPool + save;
     mbstowcs ((wchar_t *)ptr, fullPath, (length * 2) + 2);
     return (ptr);
 }
@@ -263,7 +264,7 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
 
     /* Set the CMaps directory */
     if (cmapsSupplied)
-        pdflData.cMapDirectory = (ASUTF16Val*)frameAttributes->GetKeyValue ("CMapsPath")->value (0);
+        pdflData.cMapDirectory = (ASUTF16Val*)ToUTF16AndAppendToStringPool (frameAttributes->GetKeyValue ("CMapsPath")->value (0));
     else
         pdflData.cMapDirectory = (ASUTF16Val *)L"../../Resources/CMap";;
 
@@ -379,8 +380,8 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
     }
     else
     {
-        fontDirList[0] = (ASUTF16Val*)"../../Resources/Font";
-        fontDirList[1] = (ASUTF16Val*)"../../Resources/CMap";
+        fontDirList[0] = "../../Resources/Font";
+        fontDirList[1] = "../../Resources/CMap";
         pdflData.listLen = 2;
     }
     pdflData.dirList = (char**)fontDirList;
@@ -395,7 +396,7 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
     }
     else
     {
-        colorProfDirList[0] = (ASUTF16Val*)"../../Resources/Color/Profiles";
+        colorProfDirList[0] = "../../Resources/Color/Profiles";
 
         pdflData.colorProfileDirListLen = 1;
     }
@@ -420,11 +421,11 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
         valuelist *plugins = frameAttributes->GetKeyValue ("PluginsPath");
         pdflData.pluginDirListLen = plugins->size ();
         for (int index = 0; index < pdflData.pluginDirListLen; index++)
-            pluginDirList[index] = (ASUTF16Val *)ToUTF16AndAppendToStringPool (plugins->value (index));
+            pluginDirList[index] = plugins->value (index);
     }
     else
     {
-        pluginDirList[0] = (ASUTF16Val*)"../Binaries";
+        pluginDirList[0] = "../Binaries";
         pdflData.pluginDirListLen = 1;
     }
     pdflData.pluginDirList = (char**)pluginDirList;

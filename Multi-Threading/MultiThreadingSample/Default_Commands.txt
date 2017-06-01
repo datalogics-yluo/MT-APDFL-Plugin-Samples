@@ -1,8 +1,8 @@
 LogFile=MTRun.log
 LibraryPath=..\CPlusPlus\Binaries
 PluginsPath=..\CPlusPlus\Binaries
-ResourcesPath=..\..\Resources
-ColorsPath=..\..\Resouces\Color
+ResourcesPath=[..\..\Resources\Font, ..\..\Resources\CMaps]
+ColorsPath=..\..\Resources\Color
 UnicodePath=..\..\Resources\Unicode
 CMapsPath=..\..\Resources\CMap
 ResourcePath=c:\Datalogics\APDFL15.0.4\Resources
