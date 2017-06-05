@@ -29,6 +29,7 @@
 //   ColorsPath                     Where to find color profiles, defaults to ..\\..\\Resources\\Color\\Profiles
 //...UnicodePath                    Where to find the Unicode Directory, defaults to ../../Resources/Unicode
 //   CMapsPath                      Where to find the CMaps Directory, defaults to ../../Resources/CMaps
+//   MemoryManger                   Which memory manager should APDFL Use?
 //========================================================================================================
 APDFLib::APDFLib(ASUns32 Flags, attributes *FrameAttributes)
 #if AIX_GCC_COMPAT
@@ -68,6 +69,11 @@ APDFLib::APDFLib(ASUns32 Flags, attributes *FrameAttributes)
     fillDirectories(FrameAttributes);             //Set the directory inclusion data.
 
     pdflData.flags = Flags;                      // Pass on initialization flags. Generally zero.
+
+    if ((FrameAttributes != NULL) && (FrameAttributes->IsKeyPresent ("MemoryManager")))
+        pdflData.allocator = StringToMemManager (FrameAttributes->GetKeyValue ("MemoryManager")->value (0));
+    else
+        pdflData.allocator = NULL;
 
 #ifdef WIN_PLATFORM
     pdflData.inst = dllInst;
@@ -205,7 +211,22 @@ char *APDFLib::ToUTF16AndAppendToStringPool (char *string)
     stringPool = (char *)realloc (stringPool, stringPoolSize);
     char *ptr = stringPool + save;
     mbstowcs ((wchar_t *)ptr, fullPath, (length * 2) + 2);
-    return (ptr);
+    return ((char *)save);
+}
+#else
+char *APDFLib::AppendToStringPool (char *string)
+{
+    char *fullPath;
+    realname (string, fullPath);
+
+    size_t length = strlen (fullPath);
+    size_t save = stringPoolSize;
+    stringPoolSize += (length) + 1;
+    stringPool = (char *)realloc (stringPool, stringPoolSize);
+    char *ptr = stringPool + save;
+    strcpy ((char *)ptr, fullPath);
+    free (fullPath);
+    return ((char *)save);
 }
 #endif
 
@@ -225,65 +246,72 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
 
 #ifdef WIN_PLATFORM
 
+    //Set the font directory list and its length.
     if (resourcesSupplied)
     {
         valuelist *resources = frameAttributes->GetKeyValue ("ResourcesPath");
         pdflData.listLen = resources->size ();
+        fontDirList = (char **)malloc (sizeof (char *) * pdflData.listLen);
         for (int index = 0; index < pdflData.listLen; index++)
-            fontDirList[index] = (ASUTF16Val *)ToUTF16AndAppendToStringPool (resources->value (index));
+            fontDirList[index] = ToUTF16AndAppendToStringPool (resources->value (index));
     }
     else
     {
-        //Set the font directory list and its length.
-        fontDirList[0] = (ASUTF16Val*)L"..\\..\\Resources\\Font";
-        fontDirList[1] = (ASUTF16Val*)L"..\\..\\Resources\\CMap";
+
         pdflData.listLen = 2;
+        fontDirList = (char **)malloc (sizeof (char *) * pdflData.listLen);
+        fontDirList[0] = ToUTF16AndAppendToStringPool ("..\\..\\Resources\\Font");
+        fontDirList[1] = ToUTF16AndAppendToStringPool ("..\\..\\Resources\\CMap");
+
     }
-    pdflData.dirList = fontDirList;
+    pdflData.dirList = (ASUTF16Val **)fontDirList;
 
     //Set the color profile directory list and its length.
     if (colorsSupplied)
     {
         valuelist *colors = frameAttributes->GetKeyValue ("ColorsPath");
         pdflData.colorProfileDirListLen = colors->size ();
+        colorProfDirList = (char **)malloc (sizeof (char *) * pdflData.colorProfileDirListLen);
         for (int index = 0; index < pdflData.colorProfileDirListLen; index++)
-            colorProfDirList[index] = (ASUTF16Val *)ToUTF16AndAppendToStringPool (colors->value (index));
+            colorProfDirList[index] = ToUTF16AndAppendToStringPool (colors->value (index));
     }
     else
     {
-        colorProfDirList[0] = (ASUTF16Val*)L"..\\..\\Resources\\Color\\Profiles";
         pdflData.colorProfileDirListLen = 1;
+        colorProfDirList = (char **)malloc (sizeof (char *) * pdflData.colorProfileDirListLen);
+        colorProfDirList[0] = ToUTF16AndAppendToStringPool ("..\\..\\Resources\\Color\\Profiles");
     }
-    pdflData.colorProfileDirList = colorProfDirList;
+    pdflData.colorProfileDirList = (ASUTF16Val **)colorProfDirList;
 
     //Set the Unicode directory.
     if (unicodeSupplied)
         pdflData.unicodeDirectory = (ASUTF16Val *)ToUTF16AndAppendToStringPool (frameAttributes->GetKeyValue ("UnicodePath")->value (0));
     else
-        pdflData.unicodeDirectory = (ASUTF16Val*)L"..\\..\\Resources\\Unicode";
+        pdflData.unicodeDirectory = (ASUTF16Val *)ToUTF16AndAppendToStringPool ("..\\..\\Resources\\Unicode");
 
     /* Set the CMaps directory */
     if (cmapsSupplied)
-        pdflData.cMapDirectory = (ASUTF16Val*)ToUTF16AndAppendToStringPool (frameAttributes->GetKeyValue ("CMapsPath")->value (0));
+        pdflData.cMapDirectory = (ASUTF16Val *)ToUTF16AndAppendToStringPool (frameAttributes->GetKeyValue ("CMapsPath")->value (0));
     else
-        pdflData.cMapDirectory = (ASUTF16Val *)L"../../Resources/CMap";;
+        pdflData.cMapDirectory = (ASUTF16Val *)ToUTF16AndAppendToStringPool ("../../Resources/CMap");
 
     //Set the plugin directory and its length.
     if (pluginsSupplied)
     {
         valuelist *plugins = frameAttributes->GetKeyValue ("PluginsPath");
         pdflData.pluginDirListLen = plugins->size ();
+        pluginDirList = (char **)malloc (sizeof (char *) * pdflData.pluginDirListLen);
         for (int index = 0; index < pdflData.pluginDirListLen; index++)
-            pluginDirList[index] = (ASUTF16Val *)ToUTF16AndAppendToStringPool (plugins->value (index));
+            pluginDirList[index] = ToUTF16AndAppendToStringPool (plugins->value (index));
     }
     else
     {
-        char pluginPathBuffer[4096];
-        GetFullPathNameA ("..\\Binaries", 4096, pluginPathBuffer, 0);
-        pluginDirList[0] = (ASUTF16Val*)pluginPathBuffer;
         pdflData.pluginDirListLen = 1;
+        pluginDirList = (char **)malloc (sizeof (char *) * pdflData.pluginDirListLen);
+        pluginDirList[0] = ToUTF16AndAppendToStringPool ("..\\Binaries");
     }
-    pdflData.pluginDirList = pluginDirList;
+    pdflData.pluginDirList = (ASUTF16Val **)pluginDirList;
+
 #endif
 
 #ifdef MAC_PLATFORM
@@ -296,14 +324,17 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
     {
         valuelist *resources = frameAttributes->GetKeyValue ("ResourcesPath");
         pdflData.listLen = resources->size ();
+        fontDirList = (char **)malloc (sizeof (char *) * pdflData.listLen);
         for (int index = 0; index < pdflData.listLen; index++)
-            fontDirList[index] = resources->value (index);
+            fontDirList[index] = AppendToStringPool (resources->value (index));
     }
     else
     {
-        fontDirList[0] = "../../Resources/Font";
-        fontDirList[1] = "../Resources/CMap";
         pdflData.listLen = 2;
+        fontDirList = (char **)malloc (sizeof (char *) * pdflData.listLen);
+        fontDirList[0] = AppendToStringPool("../../Resources/Font");
+        fontDirList[1] = AppendToStringPool("../Resources/CMap");
+
     }
     pdflData.dirList = (char**)fontDirList;
 
@@ -312,29 +343,40 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
     {
         valuelist *colors = frameAttributes->GetKeyValue ("ColorsPath");
         pdflData.colorProfileDirListLen = colors->size ();
+        colorProfDirList = (char **)malloc (sizeof (char *) * pdflData.colorProfileDirListLen);
         for (int index = 0; index < pdflData.colorProfileDirListLen; index++)
-            colorProfDirList[index] = colors->value (index);
+            colorProfDirList[index] = AppendToStringPool(colors->value (index));
     }
     else
     {
-        colorProfDirList[0] ="../../Resources/Color/Profiles";
         pdflData.colorProfileDirListLen = 1;
+        colorProfDirList = (char **)malloc (sizeof (char *) * pdflData.colorProfileDirListLen);
+        colorProfDirList[0] = AppendToStringPool("../../Resources/Color/Profiles")
     }
-    pdflData.colorProfileDirList = (char**)colorProfDirList;
+    pdflData.colorProfileDirList = colorProfDirList;
 
     //Set the Unicode directory.
     if (unicodeSupplied)
-        pdflData.unicodeDirectory = (ASUTF16Val *)ToUTF16AndAppendToStringPool (frameAttributes->GetKeyValue ("UnicodePath")->value (0));
+        pdflData.unicodeDirectory = AppendToStringPool(frameAttributes->GetKeyValue ("UnicodePath")->value (0));
     else
-        pdflData.unicodeDirectory = (char*)"../../Resources/Unicode";
+        pdflData.unicodeDirectory = AppendToStringPool("../../Resources/Unicode");
 
     /* Set the CMaps directory */
     if (cmapsSupplied)
-        pdflData.cMapDirectory = frameAttributes->GetKeyValue ("CMapsPath")->value (0);
+        pdflData.cMapDirectory = AppendToStringPool(frameAttributes->GetKeyValue ("CMapsPath")->value (0));
     else
-        pdflData.cMapDirectory = "../../Resources/CMap";
+        pdflData.cMapDirectory = AppendToStringPool("../../Resources/CMap");
 
+
+    /* I do notknow what this piece of code is SUPPOSED todo. 
+    ** It looks like it is setting the plugin path, butit looks like it sets it "interestingly
+    **
+    ** For now, I am going to turn it off
+    */
+#if 0
     char resourceDirectory[MAX_PATH];
+
+    char resource
 
     CFBundleRef bundleRef = CFBundleGetMainBundle();
     CFURLRef baseURL = CFBundleCopyBundleURL(bundleRef);
@@ -362,9 +404,13 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
         tmpP[i] = (char*)malloc(sizeof(char)*MAX_PATH);
         strncpy_safe(tmpP[ i ], MAX_PATH, fontPath[ i ], sizeof(fontPath[ i ]));
     }
+
+
     pluginDirList[0] = (ASUTF16Val*)tmpP;
     pdflData.pluginDirList = (char**)pluginDirList;
     pdflData.pluginDirListLen = NUM_PLUGIN_DIRS;
+#endif
+
 #endif
 
 #ifdef UNIX_PLATFORM
@@ -375,14 +421,17 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
     {
         valuelist *resources = frameAttributes->GetKeyValue ("ResourcesPath");
         pdflData.listLen = resources->size ();
+        fontDirList = (char **)malloc (sizeof (char *) * pdflData.listLen);
         for (int index = 0; index < pdflData.listLen; index++)
-            fontDirList[index] = resources->value (index);
+            fontDirList[index] = AppendToStringPool(resources->value (index));
     }
     else
     {
-        fontDirList[0] = "../../Resources/Font";
-        fontDirList[1] = "../../Resources/CMap";
         pdflData.listLen = 2;
+        fontDirList = (char **)malloc (sizeof (char *) * pdflData.listLen);
+        fontDirList[0] = AppendToStringPool("../../Resources/Font");
+        fontDirList[1] = AppendToStringPool("../../Resources/CMap");
+
     }
     pdflData.dirList = (char**)fontDirList;
 
@@ -391,46 +440,63 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
     {
         valuelist *colors = frameAttributes->GetKeyValue ("ColorsPath");
         pdflData.colorProfileDirListLen = colors->size ();
+        colorProfDirList = (char **)malloc (sizeof (char *) * pdflData.colorProfileDirListLen);
         for (int index = 0; index < pdflData.colorProfileDirListLen; index++)
-            colorProfDirList[index] = colors->value (index);
+            colorProfDirList[index] = AppendToStringPool(colors->value (index));
     }
     else
     {
-        colorProfDirList[0] = "../../Resources/Color/Profiles";
-
         pdflData.colorProfileDirListLen = 1;
+        colorProfDirList = (char **)malloc (sizeof (char *) * pdflData.colorProfileDirListLen);
+        colorProfDirList[0] = AppendToStringPool("../../Resources/Color/Profiles");
     }
     pdflData.colorProfileDirList = (char**)colorProfDirList;
 
     //Set the Unicode directory.
-    pdflData.cMapDirectory = (char*)fontDirList[1];
     if (unicodeSupplied)
-        pdflData.unicodeDirectory = frameAttributes->GetKeyValue ("UnicodePath")->value (0);
+        pdflData.unicodeDirectory = AppendToStringPool(frameAttributes->GetKeyValue ("UnicodePath")->value (0));
     else
-        pdflData.unicodeDirectory = (char*)"../../Resources/Unicode";
+        pdflData.unicodeDirectory = AppendToStringPool("../../Resources/Unicode");
 
     /* Set the CMaps directory */
     if (cmapsSupplied)
-        pdflData.cMapDirectory = frameAttributes->GetKeyValue ("CMapsPath")->value (0);
+        pdflData.cMapDirectory = AppendToStringPool((frameAttributes->GetKeyValue ("CMapsPath")->value (0));
     else
-        pdflData.cMapDirectory = "../../Resources/CMap";
+        pdflData.cMapDirectory = AppendToStringPool("../../Resources/CMap");
 
     //Set the plugin
     if (pluginsSupplied)
     {
         valuelist *plugins = frameAttributes->GetKeyValue ("PluginsPath");
         pdflData.pluginDirListLen = plugins->size ();
+        pluginDirList = (char **)malloc (sizeof (char *) * pdflData.pluginDirListLen);
         for (int index = 0; index < pdflData.pluginDirListLen; index++)
-            pluginDirList[index] = plugins->value (index);
+            pluginDirList[index] = AppendToStringPool (plugins->value (index));
     }
     else
     {
-        pluginDirList[0] = "../Binaries";
         pdflData.pluginDirListLen = 1;
+        pluginDirList = (char **)malloc (sizeof (char *) * pdflData.pluginDirListLen);
+        pluginDirList[0] = AppendToStringPool ("../Binaries");
     }
     pdflData.pluginDirList = (char**)pluginDirList;
 
 #endif
+
+
+
+    /* All of the "addressses" above are actually displacements into the stringPool
+    **
+    ** Once the string pool is complete, we need to resolve them into addresses
+    */
+    for (int index = 0; index < pdflData.listLen; index++)
+        fontDirList[index] = stringPool + (size_t)fontDirList[index];
+    for (int index = 0; index < pdflData.colorProfileDirListLen; index++)
+        colorProfDirList[index] = stringPool + (size_t)colorProfDirList[index];
+    for (int index = 0; index < pdflData.pluginDirListLen; index++)
+        pluginDirList[index] = stringPool + (size_t)pluginDirList[index];
+    pdflData.cMapDirectory = (ASUTF16Val *)(stringPool + (size_t)pdflData.cMapDirectory);
+    pdflData.unicodeDirectory = (ASUTF16Val *)(stringPool + (size_t)pdflData.unicodeDirectory);
 }
 
 //========================================================================================================
@@ -455,6 +521,9 @@ APDFLib::~APDFLib()
         PDFLTermHFT();
     if (stringPool != NULL)
         free (stringPool);
+    free (fontDirList);
+    free (colorProfDirList);
+    free (pluginDirList);
 }
 
 
@@ -553,4 +622,66 @@ ASPathName GetMacPath (char * filename)
 
     return newPathName;
 }
+
+
 #endif
+
+
+/* This is the controller for selecting a memory manager
+** 
+** To add a new memory manager, add it's ID to the MemoryManagers enum,
+** and it's include file to the list of memory manager includes, in utilities.h, 
+** Add it's external name to memManagerNames, and it's access
+** routine to the switch in StringToMemManager, below.
+**
+** Add a new pair of files. The .h file needs to define it's access routine only. 
+** the .cpp file sould include defintions for allocation, reallocation, deallocation,
+** an remaining size.
+*/
+
+char *memManagerNames[NumberOfMemManager] =
+{ "NONE", "MALLOC", "TCMALLOC", "RPMALLOC" };
+
+TKAllocatorProcs *StringToMemManager (char *name)
+{
+    char localName[20];
+    strcpy (localName, name);
+    for (int index = 0; localName[index] != 0; index++)
+        localName[index] = toupper (localName[index]);
+
+    MemoryManagers id = NumberOfMemManager;
+    for (int index = 0; index < NumberOfMemManager; index++)
+    {
+        if (!strcmp (localName, memManagerNames[index]))
+        {
+            id = (MemoryManagers)index;
+            break;
+        }
+
+        switch (id)
+        {
+        case no_memoryManager:
+            return (nomemory_access ());
+            break;
+
+        case malloc_memoryManager:
+            return (malloc_access ());
+            break;
+
+        case tcmalloc_memory_Manager:
+            return (tcmalloc_access ());
+            break;
+
+        case rpmalloc_memory_manager:
+            return (rpmalloc_access ());
+            break;
+
+        case NumberOfMemManager:
+        default:
+            return (NULL);
+            break;
+        }
+    }
+
+    return (NULL);
+}

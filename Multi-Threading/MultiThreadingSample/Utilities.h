@@ -78,6 +78,25 @@ class GCCAIXHelper
 };
 #endif // AIX_GCC_COMPAT
 
+/* We may specify in the commands which memory manager to use. this section defines the legal managers
+*/
+typedef enum memoryMangers
+{
+    no_memoryManager,
+    malloc_memoryManager,
+    tcmalloc_memory_Manager,
+    rpmalloc_memory_manager,
+    NumberOfMemManager
+} MemoryManagers;
+
+#include "no_memory.h"
+#include "malloc_memory.h"
+#include "tcmalloc_memory.h"
+#include "rpmalloc_memory.h"
+
+
+TKAllocatorProcs *StringToMemManager (char *name);
+
 class APDFLib
 {
 public:
@@ -93,15 +112,17 @@ private:
     PDFLDataRec pdflData;                             //A struct containing information that APDFL initializes with.
     ASInt32 initError;                                //Used to record initialization errors.
     ASBool initValid;                                 //Set to true if the library initializes successfully.
+    TKAllocatorProcsP memoryAllocator;                //Set to te memory allocator to use
+
 
     void fillDirectories(attributes *frameAttributes);                           //Sets directory information for our PDFLDataRec.
 #ifdef WIN_PLATFORM
     HINSTANCE loadDL150PDFL(char* relativeDir);   //Loads the DL150PDFL library dynamically.
 #endif
 
-    ASUTF16Val* fontDirList[100];               //List of font directories we'll include during initialization.              //TODO: platform divergences
-    ASUTF16Val* colorProfDirList[100];    //List of color profile directories we'll include during initialization.     //TODO: platform divergences
-    ASUTF16Val* pluginDirList[100];       //List of plugin directories we'll include during initialization.            //TODO: platform divergences
+    char** fontDirList;
+    char** colorProfDirList;
+    char** pluginDirList;
 #if AIX_GCC_COMPAT
     GCCAIXHelper gccHelp;
 #endif

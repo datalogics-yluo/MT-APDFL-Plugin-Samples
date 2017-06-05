@@ -3,7 +3,7 @@
 ** worker thread types.
 */
 
-#include "Worker.h"
+#include "worker.h"
 
 /* Initialiaze the object with static values.*/
 workerclass::workerclass ()
@@ -138,7 +138,9 @@ char * workerclass::GetOutFileName (int threadSequence, int inner)
 void workerclass::startThreadWorker (ThreadInfo *info)
 {
 #ifndef WIN_PLATFORM
-    time (&info->startTime);
+    struct timezone zone;
+    memset ((char *)&zone, 0, sizeof (struct timezone));
+    gettimeofday (&info->startTime, &zone);
     info->startCPU = clock ();
 #endif
     if (noAPDFL)
@@ -151,7 +153,7 @@ void workerclass::startThreadWorker (ThreadInfo *info)
         ASUns32 flags = 0;
         if (!info->LoadPlugins)
             flags |= kDontLoadPlugIns;
-        info->instance = new APDFLib (flags);
+        info->instance = new APDFLib (flags, frameAttributes);
         if (info->UseTempMemFileSys)
             ASSetTempFileSys (ASGetRamFileSys ());
     }
@@ -169,12 +171,14 @@ void workerclass::endThreadWorker (ThreadInfo *info)
         delete info->instance;
 
 #ifndef WIN_PLATFORM
-    time (&info->endTime);
+    struct timezone zone;
+    memset ((char *)&zone, 0, sizeof (struct timezone));
+    gettimeofday (&info->startTime, &zone);
     info->endCPU = clock ();
-    info->wallTimeUsed = ((info->endTime - info->startTime) * 1.0) / CLOCKS_PER_SEC;
+    info->wallTimeUsed = ((info->endTime.tv_sec - info->startTime.tv_sec) * 1.0) +
+                         ((info->endTime.tv_usec - info->startTime - tv_usec / 1000000);
     info->cpuTimeUsed = ((info->endCPU - info->startCPU) * 1.0) / CLOCKS_PER_SEC;
-    if(info->wallTimeUsed > 0)
-        info->percentUtilized = (info->cpuTimeUsed / info->wallTimeUsed) * 100;
+    info->percentUtilized = (info->cpuTimeUsed / dontThread->wallTimeUsed) * 100;
 #endif
     /* This is used by non windows thread pump to detect that a thread is complete */
     info->threadCompleted = true;
@@ -293,6 +297,9 @@ void workerclass::parseThreeFileName (int index, char *inname)
 */
 void    workerclass::ParseOptions (attributes *FrameAttributes, char *defaultInFileName, char *defaultOutFilePath)
 {
+    /* Save the frame attribute dictionary to pass into PDFLInit */
+    frameAttributes = FrameAttributes;
+
     /* Get the worker options, if there are any */
     valuelist *values = FrameAttributes->GetKeyValue (WorkerIDEntry->paramName);
 

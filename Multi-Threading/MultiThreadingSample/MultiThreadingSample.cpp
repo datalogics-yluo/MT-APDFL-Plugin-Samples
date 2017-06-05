@@ -82,6 +82,19 @@
 **          this defaults to true if logfile is not used, and false if logfile is used. Primarily, you may want this set to true to deaden
 **          extranious I/O operations while testing. 
 **
+**   The following paths may be set, to allow the test bed to use libraries or resources which are not positioned as expected 
+**    (It is expected to be a memnber of the distribution library CPlusPlus directory).
+**   APDFLPath                      Where to find the libraries, default is ../Binaries
+**   ResourcesPath                  Where to find resources, default is ../../Resources
+**...PluginPath                     Where to find plugins, default is APDFLPath.
+**   ColorsPath                     Where to find color profiles, defaults to ..\\..\\Resources\\Color\\Profiles
+**...UnicodePath                    Where to find the Unicode Directory, defaults to ../../Resources/Unicode
+**   CMapsPath                      Where to find the CMaps Directory, defaults to ../../Resources/CMaps
+**
+** In studying mutli-threading behaviour, it is useful to lok at changes in behaviour as different memory allocators are used.
+** For this reason, we can change the memory allocator used by setting a command line value for MemoryManger. The list of 
+** valid memory managers is maintained in Utilities.h, with the code to effect the change in utilities.cpp.
+**   MemoryManger                   Which memory manager should APDFL Use? (Currently "None" (default), "malloc", "tcmalloc" (unimplemented), and "rpmalloc")
 **
 **  Each type of worker may have a set of options specified for it.
 **    These are specified as a comma seperated series of keyword/value pairs, inside a set of brackets. The names should
@@ -310,12 +323,12 @@ int main(int argc, char** argv)
         fprintf (logFile, "  We will use RamFileSys for temporary files.\n\n");
     else
         fprintf (logFile, "  We will NOT use RamFileSys for temporary files.\n\n");
-
+    fflush (logFile);
 
     /* If we are using a base thread library, start it now */
     APDFLib *baseInstance = NULL;
     if (SampleAttributes.GetKeyValueBool ("BaseInit"))
-        baseInstance = new APDFLib ();
+        baseInstance = new APDFLib (0, &SampleAttributes);
 
     /* Construct the array of worker types 
     ** Set establish the options for each type*/
@@ -534,8 +547,11 @@ int main(int argc, char** argv)
 
             /* If we are not silent, then display a status for the thread completing */
             if (!doneThread->silent)
+            {
                 fprintf (doneThread->logFile, "Thread %01d completed in %0.6g seconds wall, %0.10g seconds CPU, with code %01d. -- %0.03g%% Utilized.\n",
-                doneThread->threadNumber+1, doneThread->wallTimeUsed, doneThread->cpuTimeUsed, doneThread->result, doneThread->percentUtilized);
+                    doneThread->threadNumber + 1, doneThread->wallTimeUsed, doneThread->cpuTimeUsed, doneThread->result, doneThread->percentUtilized);
+                fflush (doneThread->logFile);
+            }
 
             /* end the thread */
             destroyThread (doneThread);
