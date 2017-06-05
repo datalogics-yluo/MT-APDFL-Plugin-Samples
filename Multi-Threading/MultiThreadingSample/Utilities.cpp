@@ -409,6 +409,23 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
     pluginDirList[0] = (ASUTF16Val*)tmpP;
     pdflData.pluginDirList = (char**)pluginDirList;
     pdflData.pluginDirListLen = NUM_PLUGIN_DIRS;
+#else
+    //Set the plugin
+    if (pluginsSupplied)
+    {
+        valuelist *plugins = frameAttributes->GetKeyValue ("PluginsPath");
+        pdflData.pluginDirListLen = plugins->size ();
+        pluginDirList = (char **)malloc (sizeof (char *) * pdflData.pluginDirListLen);
+        for (int index = 0; index < pdflData.pluginDirListLen; index++)
+            pluginDirList[index] = AppendToStringPool (plugins->value (index));
+    }
+    else
+    {
+        pdflData.pluginDirListLen = 1;
+        pluginDirList = (char **)malloc (sizeof (char *) * pdflData.pluginDirListLen);
+        pluginDirList[0] = AppendToStringPool ("../Binaries");
+    }
+    pdflData.pluginDirList = (char**)pluginDirList;
 #endif
 
 #endif
