@@ -238,8 +238,8 @@ void RasterizerWorker::AddImageToDoc (PDDoc doc, size_t mapSize, char *map, size
     PDEImageAttrs attrs;
     memset ((char *)&attrs, 0, sizeof (PDEImageAttrs));
     attrs.flags = kPDEImageExternal;
-    attrs.width = width;
-    attrs.height = depth;
+    attrs.width = (ASUns16)width;
+    attrs.height = (ASUns16)depth;
     attrs.bitsPerComponent = 8;
 
     /* Always compress image flate */
@@ -251,8 +251,8 @@ void RasterizerWorker::AddImageToDoc (PDDoc doc, size_t mapSize, char *map, size
     /* Image is created passed to a 32 bit boundary per row.
     ** For image usage, it must be padded to 8 bits per row
     */
-    ASUns32 rowWidthPacked = width * colorComponents;
-    ASUns32 rowWidthPadded = (((width * colorComponents * 8) + 31) / 32) * 4;
+    size_t rowWidthPacked = width * colorComponents;
+    size_t rowWidthPadded = (((width * colorComponents * 8) + 31) / 32) * 4;
 
     /* Repack rows, as needed */
     if (rowWidthPacked != rowWidthPadded)
@@ -266,7 +266,7 @@ void RasterizerWorker::AddImageToDoc (PDDoc doc, size_t mapSize, char *map, size
     size_t length = width * colorComponents * depth;
 
     /* Image is erect, and sized 1 point per pixel */
-    ASFixedMatrix matrix = { width * fixedOne, 0, 0, depth * fixedOne, 0, 0 };
+    ASFixedMatrix matrix = { (ASUns16)width * fixedOne, 0, 0, (ASUns16)depth * fixedOne, 0, 0 };
 
     /* Color space as per creation
     ** (NOTE: This will not work for deviceN color spaces, will have to
@@ -276,12 +276,12 @@ void RasterizerWorker::AddImageToDoc (PDDoc doc, size_t mapSize, char *map, size
     PDEColorSpace cs = PDEColorSpaceCreateFromName (ASAtomFromString (colorModel));
 
     /* Create a PDE Image (One that can be added to a PDF page */
-    PDEImage image = PDEImageCreate (&attrs, sizeof (attrs), &matrix, 0, cs, NULL, &filterArray, NULL, (ASUns8*)map, length);
+    PDEImage image = PDEImageCreate (&attrs, (ASUns16)sizeof (attrs), &matrix, (ASUns32)0, cs, NULL, &filterArray, NULL, (ASUns8*)map, (ASUns32)length);
 
     /* Create a page to hold the image
     ** Just the size of the image.
     */
-    ASFixedRect pageSize = { 0, depth * fixedOne, width * fixedOne, 0 };
+    ASFixedRect pageSize = { 0, (ASUns16)depth * fixedOne, (ASUns16)width * fixedOne, 0 };
     PDPage page = PDDocCreatePage (doc, PDDocGetNumPages (doc) - 1, pageSize);
 
     /* Get the PDE Content */
@@ -312,81 +312,80 @@ void RasterizerWorker::WorkerThread (ThreadInfo *info)
 
     DURING
         /* Open the input document */
-        APDFLDoc inDoc (fullFileName, true);
-    PDDoc pdDoc = inDoc.getPDDoc ();
+        PDDoc inDoc = OpenSampleFile (fullFileName);
 
 
-    /* Get the number of pages */
-    size_t pagesInDocument = PDDocGetNumPages (pdDoc);
+        /* Get the number of pages */
+        size_t pagesInDocument = PDDocGetNumPages (inDoc);
 
-    /* How many pages have we already done*/
-    ASUns64 numberOfPagesDone = 0;
-    for (int index = 0; index < sequence; index++)
-        numberOfPagesDone += pages[index % pagesCount];
+        /* How many pages have we already done*/
+        ASUns64 numberOfPagesDone = 0;
+        for (int index = 0; index < sequence; index++)
+            numberOfPagesDone += pages[index % pagesCount];
 
-    /* reduce modulos the number of pages in the document */
-    ASUns32 firstPageToDo = numberOfPagesDone % pagesInDocument;
+        /* reduce modulos the number of pages in the document */
+        size_t firstPageToDo = numberOfPagesDone % pagesInDocument;
 
-    ASUns32 numberOfPagesToDo = pages[sequence % pagesCount];
+        size_t numberOfPagesToDo = pages[sequence % pagesCount];
 
-    PDDoc outDoc;
-    if (saveImages)
-        outDoc = PDDocCreate ();
-    else
-        outDoc = NULL;
+        PDDoc outDoc;
+        if (saveImages)
+            outDoc = PDDocCreate ();
+        else
+            outDoc = NULL;
 
-    /* Do the pages fromfirst to last, N times */
-    for (ASInt32 loop = 0; loop < Repetitions[sequence % RepetitionsCount]; loop++)
-    {
-        /* Do the requires set of pages */
-        for (ASInt32 indexPage = 0; indexPage < pages[sequence % pagesCount]; indexPage++)
+        /* Do the pages fromfirst to last, N times */
+        for (ASInt32 loop = 0; loop < Repetitions[sequence % RepetitionsCount]; loop++)
         {
-            /* Obtain the current page */
-            ASUns32 pageToDo = (firstPageToDo + indexPage) % pagesInDocument;
-            PDPage page = PDDocAcquirePage (inDoc.getPDDoc (), pageToDo);
-
-            /* Render the current page */
-            ASSize_t mapsize, width, depth;
-            char *mapBuffer = RenderPageToBitmap (page, &mapsize, &width, &depth);
-
-            /* Release the current page */
-            PDPageRelease (page);
-
-            /* If we are saving the images, make the map and image, and
-            ** add it to the images document
-            */
-            if (saveImages)
+            /* Do the requires set of pages */
+            for (ASInt32 indexPage = 0; indexPage < pages[sequence % pagesCount]; indexPage++)
             {
-                AddImageToDoc (outDoc, mapsize, mapBuffer, width, depth, info);
+                /* Obtain the current page */
+                size_t pageToDo = (firstPageToDo + indexPage) % pagesInDocument;
+                PDPage page = PDDocAcquirePage (inDoc, (ASUns32)pageToDo);
+
+                /* Render the current page */
+                ASSize_t mapsize, width, depth;
+                char *mapBuffer = RenderPageToBitmap (page, &mapsize, &width, &depth);
+
+                /* Release the current page */
+                PDPageRelease (page);
+
+                /* If we are saving the images, make the map and image, and
+                ** add it to the images document
+                */
+                if (saveImages)
+                {
+                    AddImageToDoc (outDoc, mapsize, mapBuffer, width, depth, info);
+                }
+
+                /* Free the bitmap */
+                free (mapBuffer);
+
             }
-
-            /* Free the bitmap */
-            free (mapBuffer);
-
         }
-    }
 
-    if (saveImages)
-    {
-        /* The automatic logic will use he same suffix for the output as the input, so change the suffix here */
-        char *fullOutputFileName = GetOutFileName (sequence, -1);
+        if (saveImages)
+        {
+            /* The automatic logic will use he same suffix for the output as the input, so change the suffix here */
+            char *fullOutputFileName = GetOutFileName (sequence, -1);
 #if !MAC_ENV	
-        ASPathName destFilePath = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullOutputFileName, NULL);
+            ASPathName destFilePath = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullOutputFileName, NULL);
 #else
-        ASPathName destFilePath = APDFLDoc::makePath (fullOutputFileName);
+            ASPathName destFilePath =GetMacPath (fullOutputFileName);
 #endif
 
-        PDDocSave (outDoc, PDSaveFull | PDSaveCollectGarbage, destFilePath, NULL, NULL, NULL);
-        ASFileSysReleasePath (NULL, destFilePath);
-        free (fullOutputFileName);
-        PDDocClose (outDoc);
-    }
+            PDDocSave (outDoc, PDSaveFull | PDSaveCollectGarbage, destFilePath, NULL, NULL, NULL);
+            ASFileSysReleasePath (NULL, destFilePath);
+            free (fullOutputFileName);
+            PDDocClose (outDoc);
+        }
 
     HANDLER
         info->result = 1;
     END_HANDLER
 
-        if (!silent)
-            fprintf (info->logFile, "Rasterizer Worker Thread completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+    if (!silent)
+        fprintf (info->logFile, "Rasterizer Worker Thread completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 }
 

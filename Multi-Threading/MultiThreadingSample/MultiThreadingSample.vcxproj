@@ -160,10 +160,16 @@
     <ClCompile Include="..\Include\Source\PDFLInitCommon.c" />
     <ClCompile Include="..\Include\Source\PDFLInitHFT.c" />
     <ClCompile Include="Flattener_Worker.cpp" />
+    <ClCompile Include="malloc_memory.cpp" />
     <ClCompile Include="NonAPDFL_Worker.cpp" />
+    <ClCompile Include="no_memory.cpp" />
     <ClCompile Include="PDFA_Worker.cpp" />
     <ClCompile Include="PDFX_Worker.cpp" />
     <ClCompile Include="Rasterizer_Worker.cpp" />
+    <ClCompile Include="rpmalloc.c" />
+    <ClCompile Include="rpmalloc_memory.cpp" />
+    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="tcmalloc_memory.cpp" />
     <ClCompile Include="TextExtract_Worker.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="MultiThreadingSample.cpp" />
@@ -172,10 +178,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Flattener_Worker.h" />
+    <ClInclude Include="Header.h" />
+    <ClInclude Include="malloc_memory.h" />
     <ClInclude Include="NonAPDFL_Worker.h" />
+    <ClInclude Include="no_memory.h" />
     <ClInclude Include="PDFA_Worker.h" />
     <ClInclude Include="PDFX_Worker.h" />
     <ClInclude Include="Rasterizer_Worker.h" />
+    <ClInclude Include="rpmalloc.h" />
+    <ClInclude Include="rpmalloc_memory.h" />
+    <ClInclude Include="tcmalloc_memory.h" />
     <ClInclude Include="TextExtract_Worker.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="MTHeader.h" />

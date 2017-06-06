@@ -1,8 +1,11 @@
 LogFile=MTRun.log
-LibraryPath=c:\Datalogics\APDFL15.0.4\CPlusPlus\Binaries
-PluginsPath=c:\Datalogics\APDFL15.0.4\CPlusPlus\Binaries
+LibraryPath=..\CPlusPlus\Binaries
+PluginsPath=..\CPlusPlus\Binaries
+ResourcesPath=[..\..\Resources\Font, ..\..\Resources\CMaps]
+ColorsPath=..\..\Resources\Color
+UnicodePath=..\..\Resources\Unicode
+CMapsPath=..\..\Resources\CMap
 ResourcePath=c:\Datalogics\APDFL15.0.4\Resources
-DataPath=LibraryPath=c:\Datalogics\APDFL15.0.4\Resources\Sample_input
 TotalThreads=100
 ActiveThreads=5
 PauseEvery=0

@@ -11,7 +11,7 @@
 **                   noAPDFL=false                                      When true, we will NOT init/term the library for each thread
 */
 #include "Flattener_Worker.h"
-#include "Utilities.h"
+
 #include "PDFlattenerCalls.h"
 #include "ASExtraCalls.h"
 
@@ -42,13 +42,16 @@ void FlattenWorker::ParseOptions (attributes *FrameAttributes, WorkerType *worke
 
     if (threadAttributes->IsKeyPresent ("UseProgressMonitor"))
         useProgressMonitor = threadAttributes->GetKeyValueBool ("UseProgressMonitor");
+
+    if (threadAttributes->IsKeyPresent ("SaveOutput"))
+        saveOutput = threadAttributes->GetKeyValueBool ("SaveOutput");
 };
 
 void FlattenWorker::WorkerThread (ThreadInfo *info)
 {
     int sequence = info->sequence;
     if (!silent)
-        fprintf (info->logFile, "PDF/a Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+        fprintf (info->logFile, "Flattener Worker Thread Started! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 
     /* Generate input and output file names */
     char *fullFileName = GetInFileName (sequence);
@@ -56,112 +59,119 @@ void FlattenWorker::WorkerThread (ThreadInfo *info)
 
     DURING
         /* Open the input document */
-        APDFLDoc inDoc (fullFileName, true);
+        PDDoc inDoc = OpenSampleFile (fullFileName);
 
-    /* Free the input file names */
-    free (fullFileName);
+        /* Free the input file names */
+        free (fullFileName);
 
-    /* Initialize the HFT for the plugin */
-    gPDFlattenerHFT = InitPDFlattenerHFT;;
+        /* Initialize the HFT for the plugin */
+        gPDFlattenerHFT = InitPDFlattenerHFT;;
 
-    //initialize PDFProcessor plugin
-    if (!PDFlattenerInitialize ())
-        /* If the plugin cannot be initilized! */
-        info->result = 1;
-    else
-    {
-        /* COnstruct the user params recor for the flattening */
-        PDFlattenerUserParamsRec flattenParams;
+        //initialize PDFProcessor plugin
+        if (!PDFlattenerInitialize ())
+            /* If the plugin cannot be initilized! */
+            info->result = 1;
+        else
+        {
+            /* COnstruct the user params recor for the flattening */
+            PDFlattenerUserParamsRec flattenParams;
 
-        memset (&flattenParams, 0, sizeof (PDFlattenerUserParamsRec));
-        flattenParams.size = sizeof (PDFlattenerUserParamsRec);
-        //A profiled color space to use for transparent objects. For CMYK, use "U.S. Web Coated (SWOP)v2".
-        flattenParams.profileDesc = ASTextFromUnicode ((ASUTF16Val*)"sRGB IEC61966-2.1", kUTF8);
-        //The ZIP compression scheme (Flate encoding) for images.
-        flattenParams.colorCompression = kPDFlattenerZipCompression;
-        //Raster/Vector balance. Use 0.00f for no vectors.
-        flattenParams.transQuality = 100.0f;
-        // Callback options.
+            memset (&flattenParams, 0, sizeof (PDFlattenerUserParamsRec));
+            flattenParams.size = sizeof (PDFlattenerUserParamsRec);
+            //A profiled color space to use for transparent objects. For CMYK, use "U.S. Web Coated (SWOP)v2".
+            flattenParams.profileDesc = ASTextFromUnicode ((ASUTF16Val*)"sRGB IEC61966-2.1", kUTF8);
+            //The ZIP compression scheme (Flate encoding) for images.
+            flattenParams.colorCompression = kPDFlattenerZipCompression;
+            //Raster/Vector balance. Use 0.00f for no vectors.
+            flattenParams.transQuality = 100.0f;
+            // Callback options.
 
-        FlattenerData flattenerInterfaceData;
-        flattenerInterfaceData.silent = silent;
-        flattenerInterfaceData.logFile = info->logFile;
-        flattenerInterfaceData.prevPage = -1;
+            FlattenerData flattenerInterfaceData;
+            flattenerInterfaceData.silent = silent;
+            flattenerInterfaceData.logFile = info->logFile;
+            flattenerInterfaceData.prevPage = -1;
         
-        //Progress monitor callback data. I'm using this data to store the previous page 
-        //   the Flattener was working on, using -1 as "hasn't begun yet".
-        flattenParams.progressClientData = (void*)&flattenerInterfaceData;
+            //Progress monitor callback data. I'm using this data to store the previous page 
+            //   the Flattener was working on, using -1 as "hasn't begun yet".
+            flattenParams.progressClientData = (void*)&flattenerInterfaceData;
 
-        //The progress monitor callback function.
-        if (useProgressMonitor)
-            flattenParams.flattenProgress = flattenerProgMon;
-        // Tile flattening options
+            //The progress monitor callback function.
+            if (useProgressMonitor)
+                flattenParams.flattenProgress = flattenerProgMon;
+            // Tile flattening options
 
-        PDFlattenRec flattener;
-        memset (&flattener, 0, sizeof (PDFlattenRec));
-        flattener.size = sizeof (PDFlattenRec);
+            PDFlattenRec flattener;
+            memset (&flattener, 0, sizeof (PDFlattenRec));
+            flattener.size = sizeof (PDFlattenRec);
 
-        flattener.tilingMode = kPDNoTiling;
-        flattener.tileSizePts = 0;
+            flattener.tilingMode = kPDNoTiling;
+            flattener.tileSizePts = 0;
 
-        //Resolution for flattening the interior of an atomic region.
-        flattener.internalDPI = 800.0f;
-        //Resolution for flattening edges of atomic regions.
-        flattener.externalDPI = 200.0f;
+            //Resolution for flattening the interior of an atomic region.
+            flattener.internalDPI = 800.0f;
+            //Resolution for flattening edges of atomic regions.
+            flattener.externalDPI = 200.0f;
 
-        flattener.clipComplexRegions = false;
-        //If we convert stroked elements to filled elements.
-        flattener.strokeToFill = true;
-        //If we use rastered text instead of native text.
-        flattener.useTextOutlines = false;
-        //If we attempt to preserve overprint
-        flattener.preserveOverprint = true;
+            flattener.clipComplexRegions = false;
+            //If we convert stroked elements to filled elements.
+            flattener.strokeToFill = true;
+            //If we use rastered text instead of native text.
+            flattener.useTextOutlines = false;
+            //If we attempt to preserve overprint
+            flattener.preserveOverprint = true;
 
-        flattener.allowShadingOutput = true;
-        flattener.allowLevel3ShadingOutput = true;
+            flattener.allowShadingOutput = true;
+            flattener.allowLevel3ShadingOutput = true;
 
-        //Maximum image size while flattening. 0 is default.
-        flattener.maxFltnrImageSize = 0;
-        //Adaptive flattening threshold. Doesn't matter, since we're not doing adaptive tiling. See tilingMode.
-        flattener.adaptiveThreshold = 0;
+            //Maximum image size while flattening. 0 is default.
+            flattener.maxFltnrImageSize = 0;
+            //Adaptive flattening threshold. Doesn't matter, since we're not doing adaptive tiling. See tilingMode.
+            flattener.adaptiveThreshold = 0;
 
-        flattenParams.flattenParams = &flattener;
+            flattenParams.flattenParams = &flattener;
 
-        /* Perform the flatten document */
-        ASUns32 numFlattened = 0;
-        ASInt32 flattenResult = PDFlattenerConvertEx2 (inDoc.getPDDoc (),      //The document whose pages we wish to flatten.
-            0,                     //The first page to flatten.
-            PDDocGetNumPages (inDoc.getPDDoc ()) - 1,   //The last page to flatten.
-            &numFlattened,         //PDFlattener sets this to the number of pages
-            // it flattened. It will not flatten pages that do not contain transparent elements.
-            &flattenParams);             //Flattener options.
-        if (flattenResult)
-        {
+            /* Perform the flatten document */
+            ASUns32 numFlattened = 0;
+            ASInt32 flattenResult = PDFlattenerConvertEx2 (inDoc,      //The document whose pages we wish to flatten.
+                0,                     //The first page to flatten.
+                PDDocGetNumPages (inDoc) - 1,   //The last page to flatten.
+                &numFlattened,         //PDFlattener sets this to the number of pages
+                // it flattened. It will not flatten pages that do not contain transparent elements.
+                &flattenParams);             //Flattener options.
+            if (flattenResult)
+            {
+                if (!silent)
+                    fprintf (info->logFile, " flattened %01d pages.\n", numFlattened);
+            }
+            else 
+            {
+                if (!silent)
+                    fprintf (info->logFile, "Flattening failed.\n");
+                ASRaise (GenError (genErrGeneral));
+            }
             if (!silent)
-                fprintf (info->logFile, " flattened %01d pages.\n", numFlattened);
+                printf ("outputfile name: %s\n", fullOutputFileName);
+
+            /* Save the output PDF Document */
+            if (saveOutput)
+                SaveDocument (inDoc, fullOutputFileName); //fullOutputFileName
+
+            /* Release the output file name */
+            free (fullOutputFileName);
+            ASTextDestroy (flattenParams.profileDesc);
+
+            /* Close the input document */
+            PDDocClose (inDoc);
+
+            /* terminate the plugin */
+            PDFlattenerTerminate ();
         }
-        else 
-        {
-            if (!silent)
-                fprintf (info->logFile, "Flattening failed.\n");
-            ASRaise (GenError (genErrGeneral));
-        }
-        if (!silent)
-            printf ("outputfile name: %s\n", fullOutputFileName);
-        /* Save the output PDF Document */
-        inDoc.saveDoc (fullOutputFileName); //fullOutputFileName
-        /* Release the output file name */
-        free (fullOutputFileName);
-        ASTextDestroy (flattenParams.profileDesc);
-        /* terminate the plugin */
-        PDFlattenerTerminate ();
-    }
     HANDLER
         info->result = 2;
     END_HANDLER
 
         if (!silent)
-            fprintf (info->logFile, "PDF/a Worker Thread Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
+            fprintf (info->logFile, "Flattener Worker Thread Completed! (Sequence: %01d, Thread: %01d\n", sequence + 1, info->threadNumber + 1);
 }
 
 ASBool flattenerProgMon (ASInt32 pageNum, ASInt32 totalPages, float current, ASInt32 reserved, void *clientData)

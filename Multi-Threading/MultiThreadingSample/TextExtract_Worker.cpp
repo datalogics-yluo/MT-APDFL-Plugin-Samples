@@ -63,84 +63,85 @@ void TextextWorker::WorkerThread (ThreadInfo *info)
 
     DURING
         /* Open the input document */
-        APDFLDoc inDoc (fullFileName, true);
-    PDDoc pdDoc = inDoc.getPDDoc ();
+        PDDoc inDoc = OpenSampleFile (fullFileName);
 
+        /* Get the number of pages */
+        size_t pagesInDocument = PDDocGetNumPages (inDoc);
 
-    /* Get the number of pages */
-    size_t pagesInDocument = PDDocGetNumPages (pdDoc);
+        /* */
+        PDWordFinderConfigRec wfConfig;
+        memset (&wfConfig, 0, sizeof (PDWordFinderConfigRec));
+        wfConfig.recSize = sizeof (PDWordFinderConfigRec);
 
-    /* */
-    PDWordFinderConfigRec wfConfig;
-    memset (&wfConfig, 0, sizeof (PDWordFinderConfigRec));
-    wfConfig.recSize = sizeof (PDWordFinderConfigRec);
+        /* Create a word finder */
+        PDWordFinder wordFinder = PDDocCreateWordFinderEx (inDoc, WF_LATEST_VERSION, false, &wfConfig);
 
-    /* Create a word finder */
-    PDWordFinder wordFinder = PDDocCreateWordFinderEx (pdDoc, WF_LATEST_VERSION, false, &wfConfig);
+        /* How many pages have we already done*/
+        size_t numberOfPagesDone = 0;
+        for (int index = 0; index < sequence; index++)
+            numberOfPagesDone += pages[index % pagesCount];
 
-    /* How many pages have we already done*/
-    ASUns64 numberOfPagesDone = 0;
-    for (int index = 0; index < sequence; index++)
-        numberOfPagesDone += pages[index % pagesCount];
+        /* reduce modulos the number of pages in the document */
+        size_t firstPageToDo = numberOfPagesDone % pagesInDocument;
 
-    /* reduce modulos the number of pages in the document */
-    ASUns32 firstPageToDo = numberOfPagesDone % pagesInDocument;
+        size_t numberOfPagesToDo = pages[sequence % pagesCount];
 
-    ASUns32 numberOfPagesToDo = pages[sequence % pagesCount];
-
-    for (ASUns32 indexPage = 0; indexPage < pages[sequence % pagesCount]; indexPage++)
-    {
-
-        /* Acquire the words for the Nth page */
-        PDWord wordList;
-        ASInt32 numWordsFound;
-        ASUns32 pageToDo = (firstPageToDo + indexPage) % pagesInDocument;
-
-        PDWordFinderAcquireWordList (wordFinder, pageToDo, &wordList, NULL, NULL, &numWordsFound);
-
-        /* The automatic logic will use he same suffix for the output as the input, so change the suffix here */
-        char *fullOutputFileName = GetOutFileName (sequence, pageToDo + 1);
-        char *suffix = &fullOutputFileName[strlen (fullOutputFileName) - 3];
-        suffix[0] = 0;
-        strcat (fullOutputFileName, "txt");
-
-        /* Create a file to hold the words */
-        FILE *wordFile = NULL;
-        if (saveWordList)
-            wordFile = fopen (fullOutputFileName, "w");
-
-        /* Release the file name */
-        free (fullOutputFileName);
-
-        /* Write document and page name to result file */
-        if (saveWordList)
-            fprintf (wordFile, "%s Page: %01d", fullFileName, pageToDo);
-
-
-        for (int i = 0; i < numWordsFound; ++i)
+        for (size_t indexPage = 0; indexPage < pages[sequence % pagesCount]; indexPage++)
         {
-            /* Get the next word */
-            PDWord nextWord = PDWordFinderGetNthWord (wordFinder, i);
 
-            char workWord[1024];
-            PDWordGetString (nextWord, workWord, 1024);
+            /* Acquire the words for the Nth page */
+            PDWord wordList;
+            ASInt32 numWordsFound;
+            size_t pageToDo = (firstPageToDo + indexPage) % pagesInDocument;
+
+            PDWordFinderAcquireWordList (wordFinder, (ASInt32)pageToDo, &wordList, NULL, NULL, &numWordsFound);
+
+            /* The automatic logic will use he same suffix for the output as the input, so change the suffix here */
+            char *fullOutputFileName = GetOutFileName (sequence, (ASUns32)(pageToDo + 1));
+            char *suffix = &fullOutputFileName[strlen (fullOutputFileName) - 3];
+            suffix[0] = 0;
+            strcat (fullOutputFileName, "txt");
+
+            /* Create a file to hold the words */
+            FILE *wordFile = NULL;
             if (saveWordList)
-                fprintf (wordFile, "(%3d)  %s\n", i, workWord);
+                wordFile = fopen (fullOutputFileName, "w");
+
+            /* Release the file name */
+            free (fullOutputFileName);
+
+            /* Write document and page name to result file */
+            if (saveWordList)
+                fprintf (wordFile, "%s Page: %01d", fullFileName, pageToDo);
+
+
+            for (int i = 0; i < numWordsFound; ++i)
+            {
+                /* Get the next word */
+                PDWord nextWord = PDWordFinderGetNthWord (wordFinder, i);
+
+                char workWord[1024];
+                PDWordGetString (nextWord, workWord, 1024);
+                if (saveWordList)
+                    fprintf (wordFile, "(%3d)  %s\n", i, workWord);
+            }
+
+            /* Close the word file */
+            if (saveWordList)
+                fclose (wordFile);
+
+            /* Release the word finder results */
+            PDWordFinderReleaseWordList (wordFinder, 0);
         }
 
-        /* Close the word file */
-        if (saveWordList)
-            fclose (wordFile);
+        /* Release the word finder itself*/
+        PDWordFinderDestroy (wordFinder);
 
-        /* Release the word finder results */
-        PDWordFinderReleaseWordList (wordFinder, 0);
-    }
+        /* Close the input document */
+        PDDocClose (inDoc);
 
-    /* Release the word finder itself*/
-    PDWordFinderDestroy (wordFinder);
-
-    /* free input file name  */
-    free (fullFileName);
+        /* free input file name  */
+        free (fullFileName);
 
     HANDLER
         info->result = 1;

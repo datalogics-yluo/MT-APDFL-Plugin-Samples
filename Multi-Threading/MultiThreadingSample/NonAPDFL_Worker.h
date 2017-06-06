@@ -15,7 +15,6 @@
 **                   Primes=[1000]                                      How many prime numbers shall we find in CPU loading (100 values max!)
 */
 
-#include "MTHeader.h"
 #include "Worker.h"
 #include "ASExpT.h"
 class NonAPDFLWorker : public workerclass

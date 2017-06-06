@@ -10,7 +10,6 @@
 **                   OutFilePath=[Output]                               Directory where output is written
 **                   noAPDFL=false                                      When true, we will NOT init/term the library for each thread
 */
-#include "MTHeader.h"
 #include "Worker.h"
 
 class XPS2PDFWorker : public workerclass

@@ -97,56 +97,59 @@ void PDFxWorker::WorkerThread (ThreadInfo *info)
 
     DURING
         /* Open the input document */
-        APDFLDoc inDoc (fullFileName, true);
+        PDDoc inDoc = OpenSampleFile (fullFileName);
 
-    /* Free the input file names */
-    free (fullFileName);
+        /* Free the input file names */
+        free (fullFileName);
 
-    /* Initialize the HFT for the plugin */
-    gPDFProcessorHFT = InitPDFProcessorHFT;
+        /* Initialize the HFT for the plugin */
+        gPDFProcessorHFT = InitPDFProcessorHFT;
 
-    //initialize PDFProcessor plugin
-    if (!PDFProcessorInitialize ())
-        /* If the plugin cannot be initilized! */
-        info->result = 1;
-    else
-    {
-        /* COnstruct the user params recor for the PDF/x conversion */
-        PDFProcessorPDFXConvertParamsRec userParams;
-
-        memset ((char *)&userParams, 0, sizeof (PDFProcessorPDFXConvertParamsRec));
-        userParams.size = sizeof (PDFProcessorPDFXConvertParamsRec);
-        userParams.abortIfXFAPresent = false;
-        userParams.colorCompression = kPDFProcessorColorJpegCompression;
-        userParams.grayCompression = kPDFProcessorGrayZipCompression;
-        userParams.monoCompression = kPDFProcessorMonoCCITTGroup4Compression;
-        removeAllAnnotations[sequence % removeAllAnnotationsCount];
-        if (useProgressMonitor)
+        //initialize PDFProcessor plugin
+        if (!PDFProcessorInitialize ())
+            /* If the plugin cannot be initilized! */
+            info->result = 1;
+        else
         {
-            userParams.progMon = PDFProcessorProgressMonitorCBPDFx;
-            userParams.progMonData = &silent;
-        }
+            /* COnstruct the user params recor for the PDF/x conversion */
+            PDFProcessorPDFXConvertParamsRec userParams;
 
-        /* Create the ouput file ASPath name */
+            memset ((char *)&userParams, 0, sizeof (PDFProcessorPDFXConvertParamsRec));
+            userParams.size = sizeof (PDFProcessorPDFXConvertParamsRec);
+            userParams.abortIfXFAPresent = false;
+            userParams.colorCompression = kPDFProcessorColorJpegCompression;
+            userParams.grayCompression = kPDFProcessorGrayZipCompression;
+            userParams.monoCompression = kPDFProcessorMonoCCITTGroup4Compression;
+            removeAllAnnotations[sequence % removeAllAnnotationsCount];
+            if (useProgressMonitor)
+            {
+                userParams.progMon = PDFProcessorProgressMonitorCBPDFx;
+                userParams.progMonData = &silent;
+            }
+
+            /* Create the ouput file ASPath name */
 #if !MAC_ENV	
-        ASPathName destFilePath = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullOutputFileName, NULL);
+            ASPathName destFilePath = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), fullOutputFileName, NULL);
 #else
-        ASPathName destFilePath = APDFLDoc::makePath (fullOutputFileName);
+            ASPathName destFilePath = GetMacPath (fullOutputFileName);
 #endif
 
-        /* Release the output file name */
-        free (fullOutputFileName);
+            /* Release the output file name */
+            free (fullOutputFileName);
 
-        /* Perform the conversions */
-        PDFProcessorConvertAndSaveToPDFX (inDoc.getPDDoc (), destFilePath, ASGetDefaultFileSys (),
-            ConvertOptions[convertorOptions[sequence % convertorOptionsCount]], &userParams);
+            /* Perform the conversions */
+            PDFProcessorConvertAndSaveToPDFX (inDoc, destFilePath, ASGetDefaultFileSys (),
+                ConvertOptions[convertorOptions[sequence % convertorOptionsCount]], &userParams);
 
-        /* Release the output path name */
-        ASFileSysReleasePath (NULL, destFilePath);
+            /* Release the output path name */
+            ASFileSysReleasePath (NULL, destFilePath);
 
-        /* terminate the plugin */
-        PDFProcessorTerminate ();
-    }
+            /* Close the input file */
+            PDDocClose (inDoc);
+
+            /* terminate the plugin */
+            PDFProcessorTerminate ();
+        }
     HANDLER
         info->result = 2;
     END_HANDLER
