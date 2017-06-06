@@ -1,15 +1,22 @@
 TotalThreads=100
-activeThreads=8
+activeThreads=6
 BaseInit=true 
 processes=Rasterizer
+LibraryPath=..\CPlusPlus\Binaries
+PluginsPath=..\CPlusPlus\Binaries
+ResourcesPath=[..\..\Resources\Font, ..\..\Resources\CMaps]
+ColorsPath=..\..\Resources\Color
+UnicodePath=..\..\Resources\Unicode
+CMapsPath=..\..\Resources\CMap
+MemoryManager=rpmalloc
 RasterizerOptions=[
        silent=false, 
        noapdfl=false, 
-       InFileName=%constitution.pdf,
+       InFileName=.\pdf_reference_1-7.pdf,
        OutFilePath=Output,
-       NumberOfPages=2,
-       repetitions=5,
-       SaveImages=true,
+       NumberOfPages=1,
+       repetitions=1,
+       SaveImages=false,
        Resolution=300,
        ColorModel=DeviceRGB
                     ]

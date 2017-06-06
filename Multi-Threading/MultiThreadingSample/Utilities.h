@@ -95,7 +95,9 @@ typedef enum memoryMangers
 #include "rpmalloc_memory.h"
 
 
-TKAllocatorProcs *StringToMemManager (char *name);
+TKAllocatorProcs *StringToMemManager (char *name, MemoryManagers *id);
+
+
 
 class APDFLib
 {
@@ -108,12 +110,15 @@ public:
     ASBool isValid() { return initValid; };           //Returns true if the library initialized successfully.
     static void displayError(ASErrorCode);            //Utility method, may be used to print APDFL errors to the terminal.
 
+void InitializeMemoryManager ();
+void FinalizeMemoryManager ();
+
 private:
     PDFLDataRec pdflData;                             //A struct containing information that APDFL initializes with.
     ASInt32 initError;                                //Used to record initialization errors.
     ASBool initValid;                                 //Set to true if the library initializes successfully.
     TKAllocatorProcsP memoryAllocator;                //Set to te memory allocator to use
-
+    MemoryManagers managerID;
 
     void fillDirectories(attributes *frameAttributes);                           //Sets directory information for our PDFLDataRec.
 #ifdef WIN_PLATFORM

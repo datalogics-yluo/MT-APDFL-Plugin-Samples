@@ -71,9 +71,11 @@ APDFLib::APDFLib(ASUns32 Flags, attributes *FrameAttributes)
     pdflData.flags = Flags;                      // Pass on initialization flags. Generally zero.
 
     if ((FrameAttributes != NULL) && (FrameAttributes->IsKeyPresent ("MemoryManager")))
-        pdflData.allocator = StringToMemManager (FrameAttributes->GetKeyValue ("MemoryManager")->value (0));
+        pdflData.allocator = StringToMemManager (FrameAttributes->GetKeyValue ("MemoryManager")->value (0), &managerID);
     else
         pdflData.allocator = NULL;
+
+    InitializeMemoryManager ();
 
 #ifdef WIN_PLATFORM
     pdflData.inst = dllInst;
@@ -541,6 +543,7 @@ APDFLib::~APDFLib()
     free (fontDirList);
     free (colorProfDirList);
     free (pluginDirList);
+    FinalizeMemoryManager ();
 }
 
 
@@ -659,7 +662,8 @@ ASPathName GetMacPath (char * filename)
 char *memManagerNames[NumberOfMemManager] =
 { "NONE", "MALLOC", "TCMALLOC", "RPMALLOC" };
 
-TKAllocatorProcs *StringToMemManager (char *name)
+
+TKAllocatorProcs *StringToMemManager (char *name, MemoryManagers *saveId)
 {
     char localName[20];
     strcpy (localName, name);
@@ -674,31 +678,60 @@ TKAllocatorProcs *StringToMemManager (char *name)
             id = (MemoryManagers)index;
             break;
         }
+    }
 
-        switch (id)
-        {
-        case no_memoryManager:
-            return (nomemory_access ());
-            break;
+    *saveId = id;
 
-        case malloc_memoryManager:
-            return (malloc_access ());
-            break;
+    switch (id)
+    {
+    case no_memoryManager:
+        return (nomemory_access ());
+        break;
 
-        case tcmalloc_memory_Manager:
-            return (tcmalloc_access ());
-            break;
+    case malloc_memoryManager:
+        return (malloc_access ());
+        break;
 
-        case rpmalloc_memory_manager:
-            return (rpmalloc_access ());
-            break;
+    case tcmalloc_memory_Manager:
+        return (tcmalloc_access ());
+        break;
 
-        case NumberOfMemManager:
-        default:
-            return (NULL);
-            break;
-        }
+    case rpmalloc_memory_manager:
+        return (rpmalloc_access ());
+        break;
+
+    case NumberOfMemManager:
+    default:
+        return (NULL);
+        break;
+
     }
 
     return (NULL);
+}
+
+void APDFLib::InitializeMemoryManager ()
+{
+    switch (managerID)
+    {
+        case rpmalloc_memory_manager:
+            rpmalloc_thread_initialize ();
+            break;
+
+        default:
+            break;
+    }
+}
+
+void APDFLib::FinalizeMemoryManager ()
+{
+    switch (managerID)
+    {
+    case rpmalloc_memory_manager:
+        rpmalloc_thread_finalize ();
+        break;
+
+    default:
+        break;
+    }
 }

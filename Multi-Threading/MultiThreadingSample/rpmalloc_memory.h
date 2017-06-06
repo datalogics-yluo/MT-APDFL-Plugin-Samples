@@ -16,9 +16,17 @@
 */
 #ifndef RPMALLOC_MEMORY_h
 #define RPMALLOC_MEMORY_h
+
+#ifndef MAC_ENV
+
 #include "PDFInit.h"
 #include "rpmalloc.h"
 
 TKAllocatorProcs *rpmalloc_access ();
+extern int rpmalloc_init_count;
 
+void rpmalloc_init ();
+void rpmalloc_finalize ();
+
+#endif
 #endif
