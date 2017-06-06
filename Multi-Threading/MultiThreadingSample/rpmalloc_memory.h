@@ -22,11 +22,25 @@
 #include "PDFInit.h"
 #include "rpmalloc.h"
 
-TKAllocatorProcs *rpmalloc_access ();
-extern int rpmalloc_init_count;
+TKAllocatorProcs *rpmalloc_access ();       /* Call this method to acquire an APDFL memory Manager Interface */
 
+/* Call this interface once, from the main line, before any apdfl libraries are 
+** started.this call establishes the overall functionality of the memory manager
+*/
+void rpmalloc_master_initialize ();
+
+/* Call this interface once, from the mainline, after all APDFL libraries are 
+** terminated. This call shuts down the memory manager completly.
+*/
+void rpmalloc_master_finalize ();
+
+/* Call this interface before APDFL initialization for each library initialized. */
 void rpmalloc_init ();
+
+/* Call this interface after APDFL termination, for each library terminated. */
 void rpmalloc_finalize ();
+
+
 
 #endif
 #endif
