@@ -18,11 +18,12 @@
 #include <stdlib.h>
 #include "rpmalloc_memory.h"
 #include "PDFInit.h"
+#include "MTHeader.h"
 
 #ifndef MAC_ENV
 
 static TKAllocatorProcs    rpmalloc_access_block;
-static int rpmalloc_init_count = 0;
+
 
 void *rpmalloc_allocate (void * cleintData, size_t size)
 {
@@ -54,20 +55,32 @@ TKAllocatorProcs *rpmalloc_access ()
     return &rpmalloc_access_block;
 }
 
-void rpmalloc_init ()
+/* Call this interface once, from the main line, before any apdfl libraries are
+** started.this call establishes the overall functionality of the memory manager
+*/
+void rpmalloc_master_initialize ()
 {
-    if (rpmalloc_init_count == 0)
-        rpmalloc_initialize();
-    rpmalloc_init_count++;
-    if (!rpmalloc_is_thread_initialized)
-        rpmalloc_thread_initialize ();
+    rpmalloc_initialize ();
 }
 
+/* Call this interface once, from the mainline, after all APDFL libraries are
+** terminated. This call shuts down the memory manager completly.
+*/
+void rpmalloc_master_finalize ()
+{
+    rpmalloc_finalize ();
+}
+
+/* Call this interface before APDFL initialization for each library initialized. */
+void rpmalloc_init ()
+{
+    rpmalloc_thread_initialize ();
+}
+
+/* Call this interface after APDFL termination, for each library terminated. */
 void rpmalloc_term ()
 {
     rpmalloc_thread_finalize ();
-    rpmalloc_init_count--;
-    if (rpmalloc_init_count <= 0)
-        rpmalloc_finalize ();
 }
+
 #endif

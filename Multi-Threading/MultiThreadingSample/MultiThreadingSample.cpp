@@ -238,6 +238,19 @@ int outerWorker (ThreadInfo *info)
     return (info->result);
 }
 
+/* Some of the memory managers require initialization and termination.
+**
+** If the newly added manager does, add it to these routines
+*/
+void InitializeAllMemoryManagers ()
+{ 
+    rpmalloc_master_initialize ();
+}
+
+void FinalizeAllMemoryManagers ()
+{ 
+    rpmalloc_master_finalize ();
+}
 
 /* program takes the following command line attributes:
 **      TotalThreads (Default to 100)       How many threads total whall we run
@@ -324,6 +337,10 @@ int main(int argc, char** argv)
     else
         fprintf (logFile, "  We will NOT use RamFileSys for temporary files.\n\n");
     fflush (logFile);
+
+    /* Before the first library is started, we must initialize any mameory managers we may wish to use
+    */
+    InitializeAllMemoryManagers ();
 
     /* If we are using a base thread library, start it now */
     APDFLib *baseInstance = NULL;
@@ -590,6 +607,12 @@ int main(int argc, char** argv)
     /* If we are using a base thread library, stop it now */
     if (SampleAttributes.GetKeyValueBool ("BaseInit"))
         delete baseInstance;
+
+    /* After all APDFL Libraries are closed, 
+    ** Finalize all memory managers
+    */
+    FinalizeAllMemoryManagers ();
+
 
     /* If we built a pause Every List, free it */
     if (pauseEveryList)
