@@ -512,8 +512,14 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
         colorProfDirList[index] = stringPool + (size_t)colorProfDirList[index];
     for (int index = 0; index < pdflData.pluginDirListLen; index++)
         pluginDirList[index] = stringPool + (size_t)pluginDirList[index];
+#ifdef WIN_PLATFORM
+    pdflData.cMapDirectory = (ASUTF16Val*)(stringPool + (size_t)pdflData.cMapDirectory);
+    pdflData.unicodeDirectory = (ASUTF16Val*)(stringPool + (size_t)pdflData.unicodeDirectory);
+#else
     pdflData.cMapDirectory = (stringPool + (size_t)pdflData.cMapDirectory);
     pdflData.unicodeDirectory = (stringPool + (size_t)pdflData.unicodeDirectory);
+
+#endif
 }
 
 //========================================================================================================

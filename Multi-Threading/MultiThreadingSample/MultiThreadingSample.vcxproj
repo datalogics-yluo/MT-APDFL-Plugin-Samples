@@ -168,7 +168,6 @@
     <ClCompile Include="Rasterizer_Worker.cpp" />
     <ClCompile Include="rpmalloc.c" />
     <ClCompile Include="rpmalloc_memory.cpp" />
-    <ClCompile Include="Source.cpp" />
     <ClCompile Include="tcmalloc_memory.cpp" />
     <ClCompile Include="TextExtract_Worker.cpp" />
     <ClCompile Include="Utilities.cpp" />
