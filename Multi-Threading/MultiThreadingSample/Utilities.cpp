@@ -218,9 +218,33 @@ char *APDFLib::ToUTF16AndAppendToStringPool (char *string)
 #else
 char *APDFLib::AppendToStringPool (char *string)
 {
-    char *fullPath;
-    fullpath = realpath (string, NULL);
-
+    char *fullPath = new char[2048];
+    char input[2048], plus[2048];
+    char cwd[2048];
+    strcpy(input, string);
+    getcwd(cwd, sizeof(cwd));
+    int start = 0;
+    int level = 0;
+    while (input[start] == '.' && input[start+1] == '.' && input[start+2] == '/') {
+        level++;
+        start +=3;
+    }
+    for (int s=0; s<strlen(input)+1; s++) {
+        if (s >= start) {
+            plus[s-start] = input[s];
+        }
+    }
+    char * extra;
+    while (level>0) {
+        extra = strrchr(cwd, '/');
+        cwd[strlen(cwd) - strlen(extra)] = '\0';
+        level--;
+        start -=3;
+    }
+    strcat(cwd, "/");
+    strcat(cwd, plus);
+    
+    strcpy(fullPath, cwd);
     size_t length = strlen (fullPath);
     size_t save = stringPoolSize;
     stringPoolSize += (length) + 1;
@@ -335,7 +359,7 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
         pdflData.listLen = 2;
         fontDirList = (char **)malloc (sizeof (char *) * pdflData.listLen);
         fontDirList[0] = AppendToStringPool("../../Resources/Font");
-        fontDirList[1] = AppendToStringPool("../Resources/CMap");
+        fontDirList[1] = AppendToStringPool("../../Resources/CMap");
 
     }
     pdflData.dirList = (char**)fontDirList;
