@@ -217,7 +217,7 @@ char *APDFLib::ToUTF16AndAppendToStringPool (char *string)
 char *APDFLib::AppendToStringPool (char *string)
 {
     char *fullPath;
-    realname (string, fullPath);
+    rename (string, fullPath);
 
     size_t length = strlen (fullPath);
     size_t save = stringPoolSize;
@@ -351,7 +351,7 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
     {
         pdflData.colorProfileDirListLen = 1;
         colorProfDirList = (char **)malloc (sizeof (char *) * pdflData.colorProfileDirListLen);
-        colorProfDirList[0] = AppendToStringPool("../../Resources/Color/Profiles")
+        colorProfDirList[0] = AppendToStringPool("../../Resources/Color/Profiles");
     }
     pdflData.colorProfileDirList = colorProfDirList;
 
@@ -512,8 +512,8 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
         colorProfDirList[index] = stringPool + (size_t)colorProfDirList[index];
     for (int index = 0; index < pdflData.pluginDirListLen; index++)
         pluginDirList[index] = stringPool + (size_t)pluginDirList[index];
-    pdflData.cMapDirectory = (ASUTF16Val *)(stringPool + (size_t)pdflData.cMapDirectory);
-    pdflData.unicodeDirectory = (ASUTF16Val *)(stringPool + (size_t)pdflData.unicodeDirectory);
+    pdflData.cMapDirectory = (stringPool + (size_t)pdflData.cMapDirectory);
+    pdflData.unicodeDirectory = (stringPool + (size_t)pdflData.unicodeDirectory);
 }
 
 //========================================================================================================
@@ -548,7 +548,7 @@ PDDoc OpenSampleFile (char *name)
 {
         ASPathName pathName;
 #if MAC_PLATFORM
-        pathName = GetMacPath (fileName);
+        pathName = GetMacPath (name);
 #else
         pathName = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), name, 0);
 #endif

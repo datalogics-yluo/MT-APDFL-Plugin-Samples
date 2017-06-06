@@ -176,9 +176,9 @@ void workerclass::endThreadWorker (ThreadInfo *info)
     gettimeofday (&info->startTime, &zone);
     info->endCPU = clock ();
     info->wallTimeUsed = ((info->endTime.tv_sec - info->startTime.tv_sec) * 1.0) +
-                         ((info->endTime.tv_usec - info->startTime - tv_usec / 1000000);
+                         ((info->endTime.tv_usec - info->startTime.tv_usec / 1000000));
     info->cpuTimeUsed = ((info->endCPU - info->startCPU) * 1.0) / CLOCKS_PER_SEC;
-    info->percentUtilized = (info->cpuTimeUsed / dontThread->wallTimeUsed) * 100;
+    info->percentUtilized = (info->cpuTimeUsed / info->wallTimeUsed) * 100;
 #endif
     /* This is used by non windows thread pump to detect that a thread is complete */
     info->threadCompleted = true;
