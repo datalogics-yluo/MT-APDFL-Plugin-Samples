@@ -219,7 +219,7 @@ char *APDFLib::ToUTF16AndAppendToStringPool (char *string)
 char *APDFLib::AppendToStringPool (char *string)
 {
     char *fullPath;
-    rename (string, fullPath);
+    fullpath = realpath (string, NULL);
 
     size_t length = strlen (fullPath);
     size_t save = stringPoolSize;

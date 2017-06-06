@@ -173,10 +173,10 @@ void workerclass::endThreadWorker (ThreadInfo *info)
 #ifndef WIN_PLATFORM
     struct timezone zone;
     memset ((char *)&zone, 0, sizeof (struct timezone));
-    gettimeofday (&info->startTime, &zone);
+    gettimeofday (&info->endTime, &zone);
     info->endCPU = clock ();
     info->wallTimeUsed = ((info->endTime.tv_sec - info->startTime.tv_sec) * 1.0) +
-                         ((info->endTime.tv_usec - info->startTime.tv_usec / 1000000));
+                         ((info->endTime.tv_usec - info->startTime.tv_usec) / 1000000);
     info->cpuTimeUsed = ((info->endCPU - info->startCPU) * 1.0) / CLOCKS_PER_SEC;
     info->percentUtilized = (info->cpuTimeUsed / info->wallTimeUsed) * 100;
 #endif
