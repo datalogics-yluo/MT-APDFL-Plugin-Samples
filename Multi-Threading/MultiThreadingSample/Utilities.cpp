@@ -701,11 +701,11 @@ TKAllocatorProcs *StringToMemManager (char *name, MemoryManagers *saveId)
     case tcmalloc_memory_Manager:
         return (tcmalloc_access ());
         break;
-
+#ifndef __APPLE__
     case rpmalloc_memory_manager:
         return (rpmalloc_access ());
         break;
-
+#endif
     case NumberOfMemManager:
     default:
         return (NULL);
@@ -720,10 +720,11 @@ void APDFLib::InitializeMemoryManager ()
 {
     switch (managerID)
     {
+#ifndef __APPLE__
         case rpmalloc_memory_manager:
             rpmalloc_thread_initialize ();
             break;
-
+#endif
         default:
             break;
     }
@@ -733,10 +734,11 @@ void APDFLib::FinalizeMemoryManager ()
 {
     switch (managerID)
     {
+#ifndef __APPLE__
     case rpmalloc_memory_manager:
         rpmalloc_thread_finalize ();
         break;
-
+#endif
     default:
         break;
     }

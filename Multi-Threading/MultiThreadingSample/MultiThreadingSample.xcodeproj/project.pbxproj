@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2E0752EB1EE7143C00EA3F2F /* malloc_memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2E0752E71EE7143C00EA3F2F /* malloc_memory.cpp */; };
+		2E0752EC1EE7143C00EA3F2F /* no_memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2E0752E81EE7143C00EA3F2F /* no_memory.cpp */; };
+		2E0752ED1EE7143C00EA3F2F /* rpmalloc_memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2E0752E91EE7143C00EA3F2F /* rpmalloc_memory.cpp */; };
+		2E0752EE1EE7143C00EA3F2F /* tcmalloc_memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2E0752EA1EE7143C00EA3F2F /* tcmalloc_memory.cpp */; };
 		2E97D9A51ED5DE5C00407FD7 /* Utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2E97D9A21ED5DE5C00407FD7 /* Utilities.cpp */; };
 		2E97D9AE1ED5DFE700407FD7 /* PDFLPrecompile.pch in Headers */ = {isa = PBXBuildFile; fileRef = 2E97D9AD1ED5DFE700407FD7 /* PDFLPrecompile.pch */; };
 		2E97D9F21ED6034800407FD7 /* MTHeader.h in Headers */ = {isa = PBXBuildFile; fileRef = 2E97D9F11ED6034800407FD7 /* MTHeader.h */; };
@@ -219,6 +223,10 @@
 
 /* Begin PBXFileReference section */
 		20286C33FDCF999611CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		2E0752E71EE7143C00EA3F2F /* malloc_memory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = malloc_memory.cpp; sourceTree = "<group>"; };
+		2E0752E81EE7143C00EA3F2F /* no_memory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = no_memory.cpp; sourceTree = "<group>"; };
+		2E0752E91EE7143C00EA3F2F /* rpmalloc_memory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rpmalloc_memory.cpp; sourceTree = "<group>"; };
+		2E0752EA1EE7143C00EA3F2F /* tcmalloc_memory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcmalloc_memory.cpp; sourceTree = "<group>"; };
 		2E97D99E1ED5DE2C00407FD7 /* Common.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Common.xcconfig; sourceTree = "<group>"; };
 		2E97D99F1ED5DE2C00407FD7 /* Project_debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project_debug.xcconfig; sourceTree = "<group>"; };
 		2E97D9A01ED5DE2C00407FD7 /* Project_release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project_release.xcconfig; sourceTree = "<group>"; };
@@ -447,6 +455,10 @@
 		20286C2AFDCF999611CA2CEA /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				2E0752E71EE7143C00EA3F2F /* malloc_memory.cpp */,
+				2E0752E81EE7143C00EA3F2F /* no_memory.cpp */,
+				2E0752E91EE7143C00EA3F2F /* rpmalloc_memory.cpp */,
+				2E0752EA1EE7143C00EA3F2F /* tcmalloc_memory.cpp */,
 				2E97DCB81ED8A0EE00407FD7 /* PDFLInitCommon.c */,
 				2E97DCB91ED8A0EE00407FD7 /* PDFLInitHFT.c */,
 				2E97DB681ED89DB000407FD7 /* Flattener_Worker.cpp */,
@@ -863,10 +875,14 @@
 				2E97DB731ED89DB000407FD7 /* MultiThreadingSample.cpp in Sources */,
 				2E97DB771ED89DB000407FD7 /* Rasterizer_Worker.cpp in Sources */,
 				2E97DB7B1ED89DB000407FD7 /* XPS2PDF_Worker.cpp in Sources */,
+				2E0752EB1EE7143C00EA3F2F /* malloc_memory.cpp in Sources */,
+				2E0752ED1EE7143C00EA3F2F /* rpmalloc_memory.cpp in Sources */,
 				2E97DB7A1ED89DB000407FD7 /* Worker.cpp in Sources */,
 				2E97DCBA1ED8A0EE00407FD7 /* PDFLInitCommon.c in Sources */,
 				2E97D9A51ED5DE5C00407FD7 /* Utilities.cpp in Sources */,
 				2E97DB751ED89DB000407FD7 /* PDFA_Worker.cpp in Sources */,
+				2E0752EC1EE7143C00EA3F2F /* no_memory.cpp in Sources */,
+				2E0752EE1EE7143C00EA3F2F /* tcmalloc_memory.cpp in Sources */,
 				2E97DB741ED89DB000407FD7 /* NonAPDFL_Worker.cpp in Sources */,
 				2E97DB721ED89DB000407FD7 /* Flattener_Worker.cpp in Sources */,
 				2E97DCBB1ED8A0EE00407FD7 /* PDFLInitHFT.c in Sources */,

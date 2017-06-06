@@ -243,13 +243,17 @@ int outerWorker (ThreadInfo *info)
 ** If the newly added manager does, add it to these routines
 */
 void InitializeAllMemoryManagers ()
-{ 
+{
+#ifndef __APPLE__
     rpmalloc_master_initialize ();
+#endif
 }
 
 void FinalizeAllMemoryManagers ()
-{ 
+{
+#ifndef __APPLE__
     rpmalloc_master_finalize ();
+#endif
 }
 
 /* program takes the following command line attributes:
