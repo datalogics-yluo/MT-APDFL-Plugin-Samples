@@ -19,8 +19,10 @@
 #include "rpmalloc_memory.h"
 #include "PDFInit.h"
 
-static TKAllocatorProcs    rpmalloc_access_block;
+#ifndef MAC_ENV
 
+static TKAllocatorProcs    rpmalloc_access_block;
+static int rpmalloc_init_count = 0;
 
 void *rpmalloc_allocate (void * cleintData, size_t size)
 {
@@ -52,3 +54,20 @@ TKAllocatorProcs *rpmalloc_access ()
     return &rpmalloc_access_block;
 }
 
+void rpmalloc_init ()
+{
+    if (rpmalloc_init_count == 0)
+        rpmalloc_initialize();
+    rpmalloc_init_count++;
+    if (!rpmalloc_is_thread_initialized)
+        rpmalloc_thread_initialize ();
+}
+
+void rpmalloc_term ()
+{
+    rpmalloc_thread_finalize ();
+    rpmalloc_init_count--;
+    if (rpmalloc_init_count <= 0)
+        rpmalloc_finalize ();
+}
+#endif
