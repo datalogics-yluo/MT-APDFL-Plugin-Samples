@@ -353,7 +353,7 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
     {
         pdflData.colorProfileDirListLen = 1;
         colorProfDirList = (char **)malloc (sizeof (char *) * pdflData.colorProfileDirListLen);
-        colorProfDirList[0] = AppendToStringPool("../../Resources/Color/Profiles")
+        colorProfDirList[0] = AppendToStringPool("../../Resources/Color/Profiles");
     }
     pdflData.colorProfileDirList = colorProfDirList;
 
@@ -514,8 +514,14 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
         colorProfDirList[index] = stringPool + (size_t)colorProfDirList[index];
     for (int index = 0; index < pdflData.pluginDirListLen; index++)
         pluginDirList[index] = stringPool + (size_t)pluginDirList[index];
-    pdflData.cMapDirectory = (ASUTF16Val *)(stringPool + (size_t)pdflData.cMapDirectory);
-    pdflData.unicodeDirectory = (ASUTF16Val *)(stringPool + (size_t)pdflData.unicodeDirectory);
+#ifdef WIN_PLATFORM
+    pdflData.cMapDirectory = (ASUTF16Val*)(stringPool + (size_t)pdflData.cMapDirectory);
+    pdflData.unicodeDirectory = (ASUTF16Val*)(stringPool + (size_t)pdflData.unicodeDirectory);
+#else
+    pdflData.cMapDirectory = (stringPool + (size_t)pdflData.cMapDirectory);
+    pdflData.unicodeDirectory = (stringPool + (size_t)pdflData.unicodeDirectory);
+
+#endif
 }
 
 //========================================================================================================
@@ -551,7 +557,7 @@ PDDoc OpenSampleFile (char *name)
 {
         ASPathName pathName;
 #if MAC_PLATFORM
-        pathName = GetMacPath (fileName);
+        pathName = GetMacPath (name);
 #else
         pathName = ASFileSysCreatePathName (NULL, ASAtomFromString ("Cstring"), name, 0);
 #endif
@@ -695,11 +701,11 @@ TKAllocatorProcs *StringToMemManager (char *name, MemoryManagers *saveId)
     case tcmalloc_memory_Manager:
         return (tcmalloc_access ());
         break;
-
+#ifndef __APPLE__
     case rpmalloc_memory_manager:
         return (rpmalloc_access ());
         break;
-
+#endif
     case NumberOfMemManager:
     default:
         return (NULL);
@@ -714,10 +720,11 @@ void APDFLib::InitializeMemoryManager ()
 {
     switch (managerID)
     {
+#ifndef __APPLE__
         case rpmalloc_memory_manager:
             rpmalloc_thread_initialize ();
             break;
-
+#endif
         default:
             break;
     }
@@ -727,10 +734,11 @@ void APDFLib::FinalizeMemoryManager ()
 {
     switch (managerID)
     {
+#ifndef __APPLE__
     case rpmalloc_memory_manager:
         rpmalloc_thread_finalize ();
         break;
-
+#endif
     default:
         break;
     }

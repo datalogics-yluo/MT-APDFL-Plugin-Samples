@@ -17,8 +17,11 @@
 #define NUM_FONTS 2          //The number of font directories we'll include during initialization.    
 #define NUM_COLOR_PROFS 1    //The number of color profile directories we'll include during initialization.
 #define NUM_PLUGIN_DIRS 1    //The number of plugin directories we'll include during initialization.
-
+#ifdef __APPLE__
+#include <sys/uio.h>
+#else
 #include <io.h>
+#endif
 #include <iostream>
 #include <cstring>
 #include <vector>
@@ -134,6 +137,8 @@ private:
 
 #ifdef WIN_PLATFORM
     char *ToUTF16AndAppendToStringPool (char *string);
+#else
+    char *AppendToStringPool (char *string);
 #endif
 
     char BinariesPath[2048];

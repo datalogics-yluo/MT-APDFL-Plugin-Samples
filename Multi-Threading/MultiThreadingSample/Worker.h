@@ -11,7 +11,7 @@
 #include <time.h>
 
 #ifndef WIN_PLATFORM
-#include <sys/utime.h>
+#include <sys/time.h>
 #endif
 
 /* This enumeration is used to identify worker by class within the set of all classes
