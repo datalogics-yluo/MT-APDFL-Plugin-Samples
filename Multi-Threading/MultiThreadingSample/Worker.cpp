@@ -3,7 +3,7 @@
 ** worker thread types.
 */
 
-#include "worker.h"
+#include "Worker.h"
 
 /* Initialiaze the object with static values.*/
 workerclass::workerclass ()

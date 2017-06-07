@@ -9,7 +9,9 @@ endif
 COMMON_OBJS = PDFLInitCommon.o PDFLInitHFT.o Utilities.o \
 			  Flattener_Worker.o NonAPDFL_Worker.o PDFA_Worker.o \
 			  PDFX_Worker.o Rasterizer_Worker.o \
-			  TextExtract_Worker.o Worker.o XPS2PDF_Worker.o
+			  TextExtract_Worker.o Worker.o XPS2PDF_Worker.o \
+			  malloc_memory.o no_memory.o tcmalloc_memory.o
+			
 
 INCLUDE = ../Include/Headers
 SOURCE= ../Include/Source
@@ -21,7 +23,7 @@ include paths.rel
 
 default: $(SAMPNAME)
 
-CPPFLAGS = -I. -I$(INCLUDE) -I$(DLI_INCLUDE) -I$(COMMON)
+CPPFLAGS = -I. -I$(INCLUDE)
 CFLAGS = $(CCFLAGS)
 
 $(SAMPNAME) : $(COMMON_OBJS) $(OTHER_OBJS)
@@ -40,32 +42,10 @@ PDFLInitCommon.o : $(SOURCE)/PDFLInitCommon.c
 PDFLInitHFT.o : $(SOURCE)/PDFLInitHFT.c
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-Utilities.o : Utilities.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+%.cpp : %.o
 
-Flattener_Worker.o : Flattener_Worker.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-
-NonAPDFL_Worker.o : NonAPDFL_Worker.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-
-PDFA_Worker.o : PDFA_Worker.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-
-PDFX_Worker.o : PDFX_Worker.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-
-Rasterizer_Worker.o : Rasterizer_Worker.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-	
-TextExtract_Worker.o : TextExtract_Worker.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-
-XPS2PDF_Worker.o : XPS2PDF_Worker.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-
-Worker.o : Worker.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+rpmalloc.c : rpmalloc.o
+	$(CC) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 clean:
 	$(RM) *.o core out.* $(SAMPNAME) 

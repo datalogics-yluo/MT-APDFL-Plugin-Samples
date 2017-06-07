@@ -503,7 +503,7 @@ void APDFLib::fillDirectories (attributes *frameAttributes)
 
     /* Set the CMaps directory */
     if (cmapsSupplied)
-        pdflData.cMapDirectory = AppendToStringPool((frameAttributes->GetKeyValue ("CMapsPath")->value (0));
+        pdflData.cMapDirectory = AppendToStringPool((frameAttributes->GetKeyValue ("CMapsPath")->value (0)));
     else
         pdflData.cMapDirectory = AppendToStringPool("../../Resources/CMap");
 
@@ -725,7 +725,7 @@ TKAllocatorProcs *StringToMemManager (char *name, MemoryManagers *saveId)
     case tcmalloc_memory_Manager:
         return (tcmalloc_access ());
         break;
-#ifndef __APPLE__
+#ifdef WIN_PLATFORM
     case rpmalloc_memory_manager:
         return (rpmalloc_access ());
         break;
@@ -744,7 +744,7 @@ void APDFLib::InitializeMemoryManager ()
 {
     switch (managerID)
     {
-#ifndef __APPLE__
+#ifdef WIN_PLATFORM
         case rpmalloc_memory_manager:
             rpmalloc_thread_initialize ();
             break;
@@ -758,7 +758,7 @@ void APDFLib::FinalizeMemoryManager ()
 {
     switch (managerID)
     {
-#ifndef __APPLE__
+#ifdef WIN_PLATFORM
     case rpmalloc_memory_manager:
         rpmalloc_thread_finalize ();
         break;
