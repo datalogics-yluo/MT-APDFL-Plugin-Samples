@@ -183,6 +183,8 @@ void FlattenPDFMain(const char * input, char * output, FlattenProgressMonitor, v
     flattenParams.size = sizeof(PDFlattenRec);
     memset(&flattenUserParams, 0, sizeof(PDFlattenerUserParamsRec));
     flattenUserParams.size = sizeof(PDFlattenerUserParamsRec);
+    //A profiled color space to use for transparent objects. For CMYK, use "U.S. Web Coated (SWOP)v2".
+    flattenUserParams.profileDesc = ASTextFromUnicode ((ASUTF16Val*)"sRGB IEC61966-2.1", kUTF8);
     flattenParams.clipComplexRegions = true;
     flattenParams.strokeToFill = true;
     flattenParams.useTextOutlines = false;

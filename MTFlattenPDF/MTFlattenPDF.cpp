@@ -60,8 +60,8 @@ int MainProc(int argc, char *argv[] )
 #else
 	pthread_attr_t *pattr = NULL;
 #endif
-	ASInt32 numFiles = 2;
-	ASInt32 numThreads = 2;
+	ASInt32 numFiles = 4;
+	ASInt32 numThreads = 4;
     folderName = "indir";
     outdir = "outdir";
     
