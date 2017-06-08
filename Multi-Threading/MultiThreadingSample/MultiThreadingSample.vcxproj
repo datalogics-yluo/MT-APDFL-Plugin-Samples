@@ -166,6 +166,7 @@
     <ClCompile Include="no_memory.cpp" />
     <ClCompile Include="PDFA_Worker.cpp" />
     <ClCompile Include="PDFX_Worker.cpp" />
+    <ClCompile Include="RasterizeDoc_Worker.cpp" />
     <ClCompile Include="Rasterizer_Worker.cpp" />
     <ClCompile Include="rpmalloc.c" />
     <ClCompile Include="rpmalloc_memory.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="no_memory.h" />
     <ClInclude Include="PDFA_Worker.h" />
     <ClInclude Include="PDFX_Worker.h" />
+    <ClInclude Include="RasterizeDoc_Worker.h" />
     <ClInclude Include="Rasterizer_Worker.h" />
     <ClInclude Include="rpmalloc.h" />
     <ClInclude Include="rpmalloc_memory.h" />

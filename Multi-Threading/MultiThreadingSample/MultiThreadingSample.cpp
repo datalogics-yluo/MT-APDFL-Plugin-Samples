@@ -144,6 +144,8 @@
 #include "TextExtract_Worker.h"
 #include "Rasterizer_Worker.h"
 #include "Flattener_Worker.h"
+#include "Access_Worker.h"
+#include "RasterizeDoc_Worker.h"
 
 typedef union workerclassptr
 {
@@ -155,6 +157,7 @@ typedef union workerclassptr
     RasterizerWorker    *Rasterizer;
     FlattenWorker       *Flattener;
     AccessWorker        *Access;
+    RasterizeDocWorker  *RasterizeDoc;
 } WorkerClassPtr;
 
 
@@ -197,6 +200,9 @@ void callWorker (ThreadInfo *info)
         break;
     case Access:
         ((AccessWorker *)baseObject)->WorkerThread (info);
+        break;
+    case RasterizeDoc:
+        ((RasterizeDocWorker *)baseObject)->WorkerThread (info);
         break;
     default:
         baseObject->WorkerThread (info);
@@ -254,7 +260,7 @@ void InitializeAllMemoryManagers ()
 }
 
 void FinalizeAllMemoryManagers ()
-{
+{ 
 #ifdef WIN_PLATFORM
     rpmalloc_master_finalize ();
 #endif
@@ -385,6 +391,10 @@ int main(int argc, char** argv)
 
     workerClasses[Access].Access = new AccessWorker ();
     workerClasses[Access].Access->ParseOptions (&SampleAttributes, &workers[Access]);
+
+    workerClasses[RasterizeDoc].RasterizeDoc = new RasterizeDocWorker ();
+    workerClasses[RasterizeDoc].RasterizeDoc->ParseOptions (&SampleAttributes, &workers[RasterizeDoc]);
+
 
     /* This will be the list of threads to run */
     ThreadInfo *threads = (ThreadInfo *)malloc (sizeof (ThreadInfo) * totalThreads);

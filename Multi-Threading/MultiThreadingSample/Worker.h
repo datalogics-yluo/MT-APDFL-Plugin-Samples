@@ -29,6 +29,7 @@ typedef enum
     Rasterizer,
     Flattener,
     Access,
+    RasterizeDoc,
     NumberOfWorkers
 } EnumOfWorkers;
 
