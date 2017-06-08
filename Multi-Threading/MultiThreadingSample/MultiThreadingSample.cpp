@@ -144,7 +144,6 @@
 #include "TextExtract_Worker.h"
 #include "Rasterizer_Worker.h"
 #include "Flattener_Worker.h"
-#include "Access_Worker.h"
 
 typedef union workerclassptr
 {
@@ -249,14 +248,14 @@ int outerWorker (ThreadInfo *info)
 */
 void InitializeAllMemoryManagers ()
 {
-#ifndef __APPLE__
+#ifdef WIN_PLATFORM
     rpmalloc_master_initialize ();
 #endif
 }
 
 void FinalizeAllMemoryManagers ()
 { 
-#ifndef __APPLE__
+#ifdef WIN_PLATFORM
     rpmalloc_master_finalize ();
 #endif
 }
