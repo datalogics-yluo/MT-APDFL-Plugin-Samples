@@ -159,6 +159,7 @@
   <ItemGroup>
     <ClCompile Include="..\Include\Source\PDFLInitCommon.c" />
     <ClCompile Include="..\Include\Source\PDFLInitHFT.c" />
+    <ClCompile Include="Access_Worker.cpp" />
     <ClCompile Include="Flattener_Worker.cpp" />
     <ClCompile Include="malloc_memory.cpp" />
     <ClCompile Include="NonAPDFL_Worker.cpp" />
@@ -176,6 +177,7 @@
     <ClCompile Include="XPS2PDF_Worker.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Access_Worker.h" />
     <ClInclude Include="Flattener_Worker.h" />
     <ClInclude Include="Header.h" />
     <ClInclude Include="malloc_memory.h" />

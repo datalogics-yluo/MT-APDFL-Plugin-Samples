@@ -4,7 +4,7 @@
 ** NoAPDFL MUST be false, or the thread will not function.
 ** InFileName as a list will use the Nth entry of the list, modulus the number of entries in the list, for each worker thread.
 
-**  PDFxOptions=[
+**  TextExtractOptions=[
 **                   silent=true                                        When true, do not display status lines
 **                   InFileName=[test data path\constitution.pdf]      A list of file to copy, One file will be copied by each thread, sequcence % #files.
 **                   OutFilePath=[Output]                               Directory where output is written
