@@ -5,9 +5,9 @@
 #ifndef WORKER_H
 #define WORKER_H
 
-#include "MTHeader.h"
+#include "MtHeader.h"
 #include "Utilities.h"
-#include "ASExpT.h"
+#include "ASExpt.h"
 #include <time.h>
 
 #ifndef WIN_PLATFORM
@@ -29,6 +29,7 @@ typedef enum
     Rasterizer,
     Flattener,
     Access,
+    RasterizeDoc,
     NumberOfWorkers
 } EnumOfWorkers;
 

@@ -1,20 +1,18 @@
-TotalThreads=500
+TotalThreads=50
 activeThreads=7
 BaseInit=true 
-processes=TextExtract
+processes=RasterizeDoc
 LibraryPath=..\CPlusPlus\Binaries
 PluginsPath=..\CPlusPlus\Binaries
 ResourcesPath=[..\..\Resources\Font, ..\..\Resources\CMaps]
 ColorsPath=..\..\Resources\Color
 UnicodePath=..\..\Resources\Unicode
 CMapsPath=..\..\Resources\CMap
-MemoryManager=rpmalloc
-TextExtractOptions=[
+MemoryManager=non
+RasterizeDocOptions=[
        silent=false, 
        noapdfl=false, 
-       InFileName=.\pdf_reference_1-7.pdf,
+       InFileName=.\jmockit.pdf,
        OutFilePath=Output,
-       NumberOfPages=1,
-       repetitions=1,
-       SaveWordList=true
-       ]
+       Resolution=300,
+       ColorModel=DeviceRGB
