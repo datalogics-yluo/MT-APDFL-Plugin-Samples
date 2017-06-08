@@ -254,7 +254,7 @@ void InitializeAllMemoryManagers ()
 }
 
 void FinalizeAllMemoryManagers ()
-{ 
+{
 #ifdef WIN_PLATFORM
     rpmalloc_master_finalize ();
 #endif
