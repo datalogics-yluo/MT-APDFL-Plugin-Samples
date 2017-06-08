@@ -28,6 +28,7 @@ typedef enum
     TextExtract,
     Rasterizer,
     Flattener,
+    Access,
     NumberOfWorkers
 } EnumOfWorkers;
 

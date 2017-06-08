@@ -144,6 +144,7 @@
 #include "TextExtract_Worker.h"
 #include "Rasterizer_Worker.h"
 #include "Flattener_Worker.h"
+#include "Access_Worker.h"
 
 typedef union workerclassptr
 {
@@ -154,6 +155,7 @@ typedef union workerclassptr
     TextextWorker       *TextExtract;
     RasterizerWorker    *Rasterizer;
     FlattenWorker       *Flattener;
+    AccessWorker        *Access;
 } WorkerClassPtr;
 
 
@@ -193,6 +195,9 @@ void callWorker (ThreadInfo *info)
         break;
     case Flattener:
         ((FlattenWorker *)baseObject)->WorkerThread(info);
+        break;
+    case Access:
+        ((AccessWorker *)baseObject)->WorkerThread (info);
         break;
     default:
         baseObject->WorkerThread (info);
@@ -250,7 +255,7 @@ void InitializeAllMemoryManagers ()
 }
 
 void FinalizeAllMemoryManagers ()
-{
+{ 
 #ifndef __APPLE__
     rpmalloc_master_finalize ();
 #endif
@@ -337,9 +342,14 @@ int main(int argc, char** argv)
 
     bool UseTempMemFileSys = SampleAttributes.GetKeyValueBool ("TempMemFileSys");
     if (UseTempMemFileSys)
-        fprintf (logFile, "  We will use RamFileSys for temporary files.\n\n");
+        fprintf (logFile, "  We will use RamFileSys for temporary files.\n");
     else
-        fprintf (logFile, "  We will NOT use RamFileSys for temporary files.\n\n");
+        fprintf (logFile, "  We will NOT use RamFileSys for temporary files.\n");
+
+    if (SampleAttributes.IsKeyPresent ("MemoryManager"))
+        fprintf (logFile, "  We will use the Memory Manager %s.\n\n", SampleAttributes.GetKeyValue("MemoryManager")->value(0));
+    else
+        fprintf (logFile, "  We will use the Memory Manager %s.\n\n", "None");
     fflush (logFile);
 
     /* Before the first library is started, we must initialize any mameory managers we may wish to use
@@ -373,6 +383,9 @@ int main(int argc, char** argv)
 
     workerClasses[Flattener].Flattener = new FlattenWorker();
     workerClasses[Flattener].Flattener->ParseOptions (&SampleAttributes, &workers[Flattener]);
+
+    workerClasses[Access].Access = new AccessWorker ();
+    workerClasses[Access].Access->ParseOptions (&SampleAttributes, &workers[Access]);
 
     /* This will be the list of threads to run */
     ThreadInfo *threads = (ThreadInfo *)malloc (sizeof (ThreadInfo) * totalThreads);
