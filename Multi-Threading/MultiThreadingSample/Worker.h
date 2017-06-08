@@ -5,9 +5,9 @@
 #ifndef WORKER_H
 #define WORKER_H
 
-#include "MtHeader.h"
+#include "MTHeader.h"
 #include "Utilities.h"
-#include "ASExpt.h"
+#include "ASExpT.h"
 #include <time.h>
 
 #ifndef WIN_PLATFORM
