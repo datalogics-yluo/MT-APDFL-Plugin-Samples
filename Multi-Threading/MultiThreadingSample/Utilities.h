@@ -19,8 +19,6 @@
 #define NUM_PLUGIN_DIRS 1    //The number of plugin directories we'll include during initialization.
 #ifdef __APPLE__
 #include <sys/uio.h>
-#else
-#include <sys/uio.h>
 #endif
 #include <iostream>
 #include <cstring>

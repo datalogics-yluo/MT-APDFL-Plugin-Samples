@@ -472,7 +472,7 @@ typedef ThreadFuncReturnType ThreadFuncType (ThreadFuncArgType);
 #define destroyThread( tinfo ) CloseHandle( tinfo->threadID )
 
 #define WaitForAnyThreadComplete(list, size) \
-    WaitForMultipleObjects (size, (HANDLE *)list, false, INFINITE) - WAIT_OBJECT_0;
+    WaitForMultipleObjects (size < MAXIMUM_WAIT_OBJECTS ? size : MAXIMUM_WAIT_OBJECTS, (HANDLE *)list, false, INFINITE) - WAIT_OBJECT_0;
 
         
 
