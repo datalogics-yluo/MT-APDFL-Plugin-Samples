@@ -254,14 +254,14 @@ int outerWorker (ThreadInfo *info)
 */
 void InitializeAllMemoryManagers ()
 {
-#ifdef WIN_PLATFORM
+#ifndef __APPLE__
     rpmalloc_master_initialize ();
 #endif
 }
 
 void FinalizeAllMemoryManagers ()
 { 
-#ifdef WIN_PLATFORM
+#ifndef __APPLE__
     rpmalloc_master_finalize ();
 #endif
 }
@@ -493,6 +493,17 @@ int main(int argc, char** argv)
     */
     bool pausing = false;
 
+	/* Overall tiem for unix platforms */
+#ifndef WIN_PLATFORM
+	struct timeval  startTime, endTime;                 /* Used in Unix only, wall time started/stopped */
+	clock_t         startCPU, endCPU;                   /* Used in Unix only to track CPU time used. */
+
+	struct timezone zone;
+	memset((char *)&zone, 0, sizeof(struct timezone));
+	gettimeofday(startTime, &zone);
+	startCPU = clock();
+#endif
+
     /* This loop is the thread pump */
     while (completedThreads < totalThreads)
     {
@@ -581,8 +592,8 @@ int main(int argc, char** argv)
             GetThreadTimes (doneThread->threadID, &start, &end, &kernel, &cpuTime);
             end64[0] -= start64[0];
             cpu64[0] += kernel64[0];
-            doneThread->wallTimeUsed = ((((end64[0] * 1.0) / 1000) /* nano to micro */ / 1000) /* Micro to milli */ / 1000 /* Milli to seconds*/);
-            doneThread->cpuTimeUsed = ((((cpu64[0] * 1.0) / 1000) /* nano to micro */ / 1000) /* Micro to milli */ / 1000 /* Milli to seconds*/);
+            doneThread->wallTimeUsed = ((end64[0] * 1.0) / 10000000);
+            doneThread->cpuTimeUsed = ((cpu64[0] * 1.0) / 10000000);
             doneThread->percentUtilized = (doneThread->cpuTimeUsed / doneThread->wallTimeUsed) * 100;
 #endif
 
@@ -622,6 +633,34 @@ int main(int argc, char** argv)
                 " completed %&01d, but have no threads active?\n", startedThreads, totalThreads, completedThreads);
         exit (-2);
     }
+
+	double WallTimeUsed, CPUTimeUsed, Concurrency;
+#ifdef WIN_PLATFORM
+	FILETIME start, end, kernel, cpuTime;
+	ASUns64 *start64 = (ASUns64*)&start, *end64 = (ASUns64 *)&end, *kernel64 = (ASUns64 *)&kernel, *cpu64 = (ASUns64 *)&cpuTime;
+
+	HANDLE processHandle = GetCurrentProcess ();
+	GetProcessTimes(processHandle, &start, &end, &kernel, &cpuTime);
+	GetSystemTimeAsFileTime(&end);
+	
+	end64[0] -= start64[0];
+	cpu64[0] += kernel64[0];
+	WallTimeUsed = ((end64[0] * 1.0) / 10000000);
+	CPUTimeUsed = ((cpu64[0] * 1.0) / 10000000);
+#else
+	gettimeofday (&endTime, &zone);
+	endCPU = clock();
+	wallTimeUsed = ((endTime.tv_sec - startTime.tv_sec) * 1.0) +
+		((endTime.tv_usec - startTime.tv_usec) / 1000000);
+	CPUTimeUsed = ((endCPU -startCPU) * 1.0) / CLOCKS_PER_SEC;
+#endif
+
+	Concurrency = (CPUTimeUsed / WallTimeUsed);
+	fprintf(logFile, "\n\nTotal Wall time:%0.5g seconds.\nTotal CPU Time used %0.5g seconds.\nConcurrency %0.5g.\n ",
+		WallTimeUsed, CPUTimeUsed, Concurrency);
+
+	fprintf(logFile, "%01d Threads, %01d at a time. Each thread took %0.5g seconds CPU, and %0.5g seconds wall.\n",
+		completedThreads, activeThreads, CPUTimeUsed / completedThreads, (double)(WallTimeUsed / (completedThreads * 1.0) * activeThreads));
 
     percentageUsed /= totalThreads;
     fprintf (logFile, "\n\n%0.5g%% of time used.\n", percentageUsed);
