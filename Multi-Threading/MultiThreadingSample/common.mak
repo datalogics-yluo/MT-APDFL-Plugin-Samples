@@ -10,6 +10,7 @@ COMMON_OBJS = PDFLInitCommon.o PDFLInitHFT.o Utilities.o \
 			  Flattener_Worker.o NonAPDFL_Worker.o PDFA_Worker.o \
 			  PDFX_Worker.o Rasterizer_Worker.o \
 			  TextExtract_Worker.o Worker.o XPS2PDF_Worker.o \
+			  RasterizeDoc_Worker.o Access_Worker.o \
 			  malloc_memory.o no_memory.o tcmalloc_memory.o
 			
 

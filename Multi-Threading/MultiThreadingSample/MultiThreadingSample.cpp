@@ -23,6 +23,10 @@
 #include "PDPageDrawM.h"
 #include "DLExtrasCalls.h"
 
+#ifndef WIN_ENV
+#include <sys/times.h>
+#endif
+
 
 /* There will be an expandable collection of thread worker method classes that may be run. 
 ** Each class will have an initialization method, that will set it's unique variables, from a command line array.
@@ -254,14 +258,14 @@ int outerWorker (ThreadInfo *info)
 */
 void InitializeAllMemoryManagers ()
 {
-#ifndef __APPLE__
+#ifdef WIN_ENV
     rpmalloc_master_initialize ();
 #endif
 }
 
 void FinalizeAllMemoryManagers ()
 { 
-#ifndef __APPLE__
+#ifdef WIN_ENV
     rpmalloc_master_finalize ();
 #endif
 }
@@ -496,12 +500,13 @@ int main(int argc, char** argv)
 	/* Overall tiem for unix platforms */
 #ifndef WIN_PLATFORM
 	struct timeval  startTime, endTime;                 /* Used in Unix only, wall time started/stopped */
-	clock_t         startCPU, endCPU;                   /* Used in Unix only to track CPU time used. */
 
 	struct timezone zone;
 	memset((char *)&zone, 0, sizeof(struct timezone));
-	gettimeofday(startTime, &zone);
-	startCPU = clock();
+	gettimeofday(&startTime, &zone);
+
+        struct tms cpuTimesStart;
+        times (&cpuTimesStart);
 #endif
 
     /* This loop is the thread pump */
@@ -649,10 +654,13 @@ int main(int argc, char** argv)
 	CPUTimeUsed = ((cpu64[0] * 1.0) / 10000000);
 #else
 	gettimeofday (&endTime, &zone);
-	endCPU = clock();
-	wallTimeUsed = ((endTime.tv_sec - startTime.tv_sec) * 1.0) +
-		((endTime.tv_usec - startTime.tv_usec) / 1000000);
-	CPUTimeUsed = ((endCPU -startCPU) * 1.0) / CLOCKS_PER_SEC;
+
+	struct tms cpuTimes;
+	times (&cpuTimes);
+	WallTimeUsed = ((endTime.tv_sec - startTime.tv_sec) * 1.0) +
+		(((endTime.tv_usec - startTime.tv_usec) * 1.0) / 1000000);
+	CPUTimeUsed = (((cpuTimes.tms_utime + cpuTimes.tms_stime) * 1.0) -
+		       ((cpuTimesStart.tms_utime + cpuTimesStart.tms_stime) * 1.0)) / sysconf(_SC_CLK_TCK);
 #endif
 
 	Concurrency = (CPUTimeUsed / WallTimeUsed);

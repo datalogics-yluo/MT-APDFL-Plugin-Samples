@@ -12,6 +12,7 @@
 
 #ifndef WIN_PLATFORM
 #include <sys/time.h>
+#include <pthread.h>
 #endif
 
 /* This enumeration is used to identify worker by class within the set of all classes
