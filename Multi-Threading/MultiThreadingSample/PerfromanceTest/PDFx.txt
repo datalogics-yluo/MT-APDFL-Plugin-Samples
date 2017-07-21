@@ -1,0 +1,15 @@
+TotalThreads=400
+activeThreads=40
+BaseInit=true 
+processes=PDFx
+LogFile=PDFx.log
+StatFile=Stats.log
+PDFxOptions=[
+       silent=false, 
+       noapdfl=false, 
+       InFileName=%trans_1page.pdf,
+       OutFilePath=Output,
+       ConvertOption=3,
+       LoadPlugins=true,
+       RemoveAllAnnotations=false
+                     ]

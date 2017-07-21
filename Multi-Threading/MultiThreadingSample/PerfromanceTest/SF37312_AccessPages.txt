@@ -1,0 +1,13 @@
+TotalThreads=400
+activeThreads=40
+BaseInit=true 
+processes=Access
+MemoryManager=none
+LogFile=SF37312.log
+StatFile=Stats.log
+AccessOptions=[
+       silent=false, 
+       noapdfl=false, 
+       InFileName=.\pdf_reference_1-7.pdf,
+       OutFilePath=Output
+]
