@@ -23,10 +23,6 @@
 #include "PDPageDrawM.h"
 #include "DLExtrasCalls.h"
 
-#ifndef WIN_ENV
-#include <sys/times.h>
-#endif
-
 
 /* There will be an expandable collection of thread worker method classes that may be run. 
 ** Each class will have an initialization method, that will set it's unique variables, from a command line array.
@@ -41,6 +37,10 @@
 **
 **  "LogFile=" Gives the name of a file to hold a progress log. If this is given, the default for "silent" will change to "false".
 **             if omitted, output will default to stdout.
+**
+**  "StatisticsFile=" Gives the name of a file to hold a line of performance statistics. When present, we will to this line:
+                    Input File Name, ThreadClass, APDFLVersion, 
+                    Total Threads, ActiveThreads, Total Wall Time, Total CPU Time, Concurrency, Per Thread Avg Wall Time, Per Thread Avg CPU Time.
 **
 **  "TotalThreads=" gives the total number of threads to run. Default is 100 threads.
 **                  While this value, like any other, maybe a list, only the first value will be used.
@@ -258,14 +258,14 @@ int outerWorker (ThreadInfo *info)
 */
 void InitializeAllMemoryManagers ()
 {
-#ifdef WIN_ENV
+#ifndef __APPLE__
     rpmalloc_master_initialize ();
 #endif
 }
 
 void FinalizeAllMemoryManagers ()
 { 
-#ifdef WIN_ENV
+#ifndef __APPLE__
     rpmalloc_master_finalize ();
 #endif
 }
@@ -368,7 +368,7 @@ int main(int argc, char** argv)
     /* If we are using a base thread library, start it now */
     APDFLib *baseInstance = NULL;
     if (SampleAttributes.GetKeyValueBool ("BaseInit"))
-        baseInstance = new APDFLib (0, &SampleAttributes);
+        baseInstance = new APDFLib (kPDFLInitPreferLocalFonts, &SampleAttributes);
 
     /* Construct the array of worker types 
     ** Set establish the options for each type*/
@@ -500,13 +500,12 @@ int main(int argc, char** argv)
 	/* Overall tiem for unix platforms */
 #ifndef WIN_PLATFORM
 	struct timeval  startTime, endTime;                 /* Used in Unix only, wall time started/stopped */
+	clock_t         startCPU, endCPU;                   /* Used in Unix only to track CPU time used. */
 
 	struct timezone zone;
 	memset((char *)&zone, 0, sizeof(struct timezone));
-	gettimeofday(&startTime, &zone);
-
-        struct tms cpuTimesStart;
-        times (&cpuTimesStart);
+	gettimeofday(startTime, &zone);
+	startCPU = clock();
 #endif
 
     /* This loop is the thread pump */
@@ -654,13 +653,10 @@ int main(int argc, char** argv)
 	CPUTimeUsed = ((cpu64[0] * 1.0) / 10000000);
 #else
 	gettimeofday (&endTime, &zone);
-
-	struct tms cpuTimes;
-	times (&cpuTimes);
-	WallTimeUsed = ((endTime.tv_sec - startTime.tv_sec) * 1.0) +
-		(((endTime.tv_usec - startTime.tv_usec) * 1.0) / 1000000);
-	CPUTimeUsed = (((cpuTimes.tms_utime + cpuTimes.tms_stime) * 1.0) -
-		       ((cpuTimesStart.tms_utime + cpuTimesStart.tms_stime) * 1.0)) / sysconf(_SC_CLK_TCK);
+	endCPU = clock();
+	wallTimeUsed = ((endTime.tv_sec - startTime.tv_sec) * 1.0) +
+		((endTime.tv_usec - startTime.tv_usec) / 1000000);
+	CPUTimeUsed = ((endCPU -startCPU) * 1.0) / CLOCKS_PER_SEC;
 #endif
 
 	Concurrency = (CPUTimeUsed / WallTimeUsed);
@@ -672,6 +668,30 @@ int main(int argc, char** argv)
 
     percentageUsed /= totalThreads;
     fprintf (logFile, "\n\n%0.5g%% of time used.\n", percentageUsed);
+
+    if (SampleAttributes.IsKeyPresent ("StatisticsFile"))
+    {
+        valuelist  *list = SampleAttributes.GetKeyValue ("StatisticsFile");
+        char *StatFileName = list->value (0);
+        FILE *statFile = fopen (StatFileName, "a");
+
+        char *processName;
+        if (SampleAttributes.IsKeyPresent ("Processes"))
+        {
+            valuelist *list = SampleAttributes.GetKeyValue ("Processes");
+            processName = list->value (0);
+        }
+        else
+            processName = "PDFa";
+
+        ASUns32 pdflVersion = PDFLGetVersion ();
+
+        fprintf (statFile, "%s|%s|%01d.%01d.%01d|%01d|%01d|%0.5g|%0.5g|%0.5g|%0.5g|%0.5g\n",
+                            argv[1], processName, pdflVersion >> 16, (pdflVersion << 16) >> 16, (pdflVersion << 24) >> 24,
+                            completedThreads, activeThreads, WallTimeUsed, CPUTimeUsed, Concurrency,
+                            (double)(WallTimeUsed / (completedThreads * 1.0) * activeThreads), CPUTimeUsed / completedThreads);
+        fclose (statFile);
+    }
 
     /* Shut down the working thread objects */
     for (int index = 0; index < NumberOfWorkers; index++)
