@@ -1,0 +1,16 @@
+TotalThreads=400
+activeThreads=40
+BaseInit=true 
+processes=PDFa
+LogFile=PDFa.log
+StatisticsFile=StatFile.log
+PDFaOptions=[
+       silent=false, 
+       noapdfl=false, 
+       InFileName=%trans_multipage.pdf,
+       OutFilePath=Output,
+       ConvertOption=RGB1b,
+       LoadPlugins=true,
+       RasterizeFontErrors=true,
+       RemoveAllAnnotations=false
+                     ]

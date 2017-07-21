@@ -1,0 +1,17 @@
+TotalThreads=400
+activeThreads=40
+BaseInit=true 
+processes=Rasterizer
+MemoryManager=none
+LogFile=SF38718_Problem.log
+StatisticsFile=StatFile.log
+RasterizerOptions=[
+       silent=false, 
+       noapdfl=false, 
+       InFileName=.\Problem.pdf,
+       OutFilePath=Output,
+       NumberOfPages=1,
+       repetitions=1,
+       SaveImages=false,
+       Resolution=300,
+       ColorModel=DeviceRGB
